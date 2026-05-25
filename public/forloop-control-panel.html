@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ForLoop Control Panel Launcher</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #07111f;
+        --panel: rgba(11, 27, 46, 0.82);
+        --panel-border: rgba(92, 212, 255, 0.24);
+        --text: #eaf7ff;
+        --muted: #9bb6c9;
+        --cyan: #53d6ff;
+        --gold: #ffcb67;
+        --danger: #ff8c8c;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Inter, Arial, sans-serif;
+        background:
+          radial-gradient(circle at top, rgba(83, 214, 255, 0.12), transparent 34%),
+          linear-gradient(180deg, #07111f 0%, #030811 100%);
+        color: var(--text);
+      }
+
+      .shell {
+        width: min(1100px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 32px 0 48px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: 18px;
+        box-shadow: 0 20px 48px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(18px);
+      }
+
+      .hero {
+        padding: 28px;
+        margin-bottom: 20px;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 12px;
+        color: var(--cyan);
+      }
+
+      h1,
+      h2,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        margin-bottom: 12px;
+        font-size: clamp(30px, 5vw, 44px);
+      }
+
+      .subtitle,
+      .note,
+      li {
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 16px;
+        border-radius: 12px;
+        border: 1px solid rgba(83, 214, 255, 0.32);
+        background: rgba(83, 214, 255, 0.14);
+        color: var(--text);
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .button.secondary {
+        background: rgba(255, 203, 103, 0.1);
+        border-color: rgba(255, 203, 103, 0.28);
+      }
+
+      .grid {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .card {
+        padding: 22px;
+      }
+
+      .meta-list,
+      .file-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .meta-list li,
+      .file-list li {
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .meta-list li:last-child,
+      .file-list li:last-child {
+        border-bottom: 0;
+      }
+
+      code {
+        color: var(--gold);
+        font-family: Consolas, monospace;
+      }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 12px;
+        color: var(--muted);
+      }
+
+      .status strong {
+        color: var(--text);
+      }
+
+      .warning {
+        color: var(--danger);
+      }
+
+      @media (max-width: 780px) {
+        .shell {
+          width: min(100vw - 20px, 1100px);
+          padding-top: 20px;
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hero,
+        .card {
+          padding: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero panel">
+        <p class="eyebrow">Developer Entry</p>
+        <h1>ForLoop Control Panel Launcher</h1>
+        <p class="subtitle">
+          This is the browser entry page for the separate ForLoop developer platform. It does not
+          modify or expose the normal SciLoop user frontend.
+        </p>
+        <div class="actions">
+          <a class="button" href="/forloop-control-panel/">Open ForLoop Control Panel</a>
+          <a class="button secondary" href="/">Open SciLoop User Frontend</a>
+          <a class="button secondary" href="http://localhost:3001/forloop-control-panel/">Open From Backend</a>
+        </div>
+        <p class="status">
+          <strong>Main ForLoop route:</strong>
+          <code>/forloop-control-panel/</code>
+        </p>
+      </section>
+
+      <section class="grid">
+        <article class="card panel">
+          <p class="eyebrow">Created Pieces</p>
+          <h2>ForLoop files</h2>
+          <ul class="file-list">
+            <li><code>public/forloop-control-panel/index.html</code> - main developer UI shell</li>
+            <li><code>public/forloop-control-panel/forloop-control-panel.css</code> - styling and responsive layout</li>
+            <li><code>public/forloop-control-panel/forloop-control-panel.js</code> - gate, demo mode, API tools, logs, exports</li>
+            <li><code>server/index.js</code> - ForLoop admin endpoints and access verification</li>
+            <li><code>server/forloopAdmin.js</code> - safe mock/template admin helpers</li>
+            <li><code>FORLOOP_CONTROL_PANEL.md</code> - developer documentation</li>
+          </ul>
+        </article>
+
+        <article class="card panel">
+          <p class="eyebrow">What You Can Check</p>
+          <h2>Current developer features</h2>
+          <ul class="meta-list">
+            <li>Developer access gate with session-only unlock</li>
+            <li>Backend health and service monitoring</li>
+            <li>AI explanation and story preview tools</li>
+            <li>News dry-run and parsing tools</li>
+            <li>Simulation plan preview tools</li>
+            <li>Feedback inspector, logs, action history, and report export</li>
+            <li>Local fallback mode and separate demo mode</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="card panel" style="margin-top: 20px;">
+        <p class="eyebrow">Run Notes</p>
+        <h2>How to view it</h2>
+        <ul class="meta-list">
+          <li>
+            Start the main app from <code>C:\Users\moham\Downloads\Sciloop 3</code> with
+            <code>npm run dev</code>
+          </li>
+          <li>Open <code>http://localhost:3000/forloop-control-panel.html</code> for this launcher page</li>
+          <li>Open <code>http://localhost:3000/forloop-control-panel/</code> for the full control panel</li>
+          <li>Open <code>http://localhost:3001/forloop-control-panel/</code> when you want ForLoop served by the backend control API</li>
+          <li class="warning">ForLoop is still a developer-only surface and is not linked from the SciLoop user UI</li>
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>

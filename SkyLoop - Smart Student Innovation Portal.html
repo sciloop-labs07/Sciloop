@@ -1,0 +1,2932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyLoop - Smart Student Innovation Portal</title>
+  <style>
+    :root {
+      --bg: #06111f;
+      --bg-deep: #08182c;
+      --bg-soft: #0d2139;
+      --panel: rgba(13, 28, 48, 0.74);
+      --panel-strong: rgba(12, 27, 48, 0.92);
+      --line: rgba(125, 179, 255, 0.18);
+      --line-strong: rgba(125, 179, 255, 0.3);
+      --text: #ebf5ff;
+      --muted: #9ab1ca;
+      --primary: #5ba7ff;
+      --primary-strong: #3191ff;
+      --secondary: #74dfff;
+      --success: #41dba6;
+      --warning: #ffbe63;
+      --danger: #ff728e;
+      --shadow: 0 22px 50px rgba(2, 8, 19, 0.5);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --card-pad: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(61, 140, 255, 0.16), transparent 28%),
+        radial-gradient(circle at 85% 15%, rgba(75, 219, 255, 0.12), transparent 22%),
+        radial-gradient(circle at 70% 75%, rgba(49, 145, 255, 0.14), transparent 24%),
+        linear-gradient(155deg, #040b15 0%, #071423 45%, #091c31 100%);
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: auto;
+      width: 340px;
+      height: 340px;
+      border-radius: 50%;
+      filter: blur(40px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.42;
+      animation: drift 16s ease-in-out infinite;
+    }
+
+    body::before {
+      top: -120px;
+      left: -80px;
+      background: rgba(52, 141, 255, 0.28);
+    }
+
+    body::after {
+      right: -100px;
+      bottom: -120px;
+      background: rgba(82, 221, 255, 0.18);
+      animation-delay: -7s;
+    }
+
+    @keyframes drift {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+      }
+      50% {
+        transform: translate(14px, -18px) scale(1.08);
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .screen {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .glass {
+      background: linear-gradient(180deg, rgba(18, 36, 60, 0.84), rgba(9, 22, 38, 0.72));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(122, 179, 255, 0.2);
+      background: rgba(10, 25, 45, 0.65);
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .section-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(91, 167, 255, 0.12);
+      border: 1px solid rgba(91, 167, 255, 0.25);
+      color: #cfe7ff;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .button,
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .button {
+      border: none;
+      cursor: pointer;
+      border-radius: 14px;
+      padding: 12px 18px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+    }
+
+    .button-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #04111f;
+      box-shadow: 0 14px 28px rgba(64, 149, 255, 0.28);
+      font-weight: 700;
+    }
+
+    .button-secondary {
+      background: rgba(16, 36, 61, 0.95);
+      color: var(--text);
+      border: 1px solid rgba(123, 177, 255, 0.18);
+    }
+
+    .button-danger {
+      background: linear-gradient(135deg, rgba(255, 114, 142, 0.85), rgba(255, 161, 117, 0.82));
+      color: #180810;
+      font-weight: 700;
+    }
+
+    .auth-screen {
+      display: grid;
+      place-items: center;
+      padding: 28px;
+    }
+
+    .auth-shell {
+      width: min(1180px, 100%);
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 24px;
+      animation: fadeUp 0.8s ease;
+    }
+
+    .brand-panel,
+    .auth-card {
+      border-radius: var(--radius-xl);
+      padding: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand-panel::after,
+    .auth-card::after,
+    .panel::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.06), transparent 35%);
+      pointer-events: none;
+    }
+
+    .brand-panel h1 {
+      margin: 16px 0 12px;
+      font-size: clamp(2.3rem, 4vw, 4rem);
+      line-height: 1;
+    }
+
+    .brand-panel p {
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 620px;
+    }
+
+    .brand-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 26px;
+    }
+
+    .feature-mini {
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(9, 23, 41, 0.58);
+      border: 1px solid rgba(122, 179, 255, 0.12);
+    }
+
+    .feature-mini strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 1.02rem;
+    }
+
+    .feature-mini span {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    .orbit-line {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .orbit-line div {
+      height: 7px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(91, 167, 255, 0.18), rgba(116, 223, 255, 0.8));
+      opacity: 0.8;
+    }
+
+    .orbit-line div:nth-child(2) {
+      opacity: 0.6;
+      animation: glowPulse 2s ease-in-out infinite;
+    }
+
+    .orbit-line div:nth-child(3) {
+      opacity: 0.5;
+      animation: glowPulse 2s ease-in-out infinite 0.35s;
+    }
+
+    .orbit-line div:nth-child(4) {
+      opacity: 0.35;
+      animation: glowPulse 2s ease-in-out infinite 0.7s;
+    }
+
+    @keyframes glowPulse {
+      0%, 100% {
+        transform: scaleX(1);
+      }
+      50% {
+        transform: scaleX(1.08);
+      }
+    }
+
+    .auth-card h2 {
+      margin: 14px 0 8px;
+      font-size: 2rem;
+    }
+
+    .auth-card p {
+      margin-top: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      color: #d8e9ff;
+      font-size: 0.95rem;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      border: 1px solid rgba(123, 177, 255, 0.18);
+      background: rgba(6, 18, 34, 0.88);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 13px 14px;
+      outline: none;
+      transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .field textarea {
+      min-height: 130px;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: rgba(116, 223, 255, 0.5);
+      box-shadow: 0 0 0 4px rgba(91, 167, 255, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .auth-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .auth-status {
+      min-height: 26px;
+      margin-top: 16px;
+      color: #d7ebff;
+      font-size: 0.95rem;
+    }
+
+    .auth-status.success {
+      color: var(--success);
+    }
+
+    .auth-status.error {
+      color: #ff9bb0;
+    }
+
+    .auth-note {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(123, 177, 255, 0.14);
+      background: rgba(5, 16, 29, 0.6);
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.93rem;
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: rgba(123, 177, 255, 0.12);
+    }
+
+    .google-panel {
+      margin-top: 16px;
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(7, 18, 31, 0.68);
+      border: 1px solid rgba(123, 177, 255, 0.12);
+      display: grid;
+      gap: 14px;
+    }
+
+    .google-button-shell {
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .google-status {
+      min-height: 22px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .google-status.success {
+      color: var(--success);
+    }
+
+    .google-status.error {
+      color: #ff9bb0;
+    }
+
+    .google-setup {
+      border-radius: 16px;
+      border: 1px solid rgba(123, 177, 255, 0.12);
+      background: rgba(5, 16, 29, 0.55);
+      padding: 14px;
+    }
+
+    .google-setup summary {
+      cursor: pointer;
+      list-style: none;
+      font-weight: 700;
+      color: #dbeeff;
+    }
+
+    .google-setup summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .google-setup p {
+      margin-bottom: 0;
+    }
+
+    .inline-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(2, 8, 17, 0.74);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .modal-card {
+      width: min(560px, 100%);
+      border-radius: var(--radius-xl);
+      padding: 26px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .modal-card h3 {
+      margin: 12px 0 8px;
+      font-size: 1.85rem;
+    }
+
+    .modal-card p {
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 22px;
+      padding: 22px;
+      animation: fadeUp 0.7s ease;
+    }
+
+    .sidebar {
+      border-radius: var(--radius-xl);
+      padding: 22px;
+      min-height: calc(100vh - 44px);
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      position: sticky;
+      top: 22px;
+    }
+
+    .brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(91, 167, 255, 0.96), rgba(116, 223, 255, 0.92));
+      color: #05101c;
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      box-shadow: 0 14px 28px rgba(91, 167, 255, 0.28);
+    }
+
+    .brand-copy h2 {
+      margin: 0;
+      font-size: 1.3rem;
+    }
+
+    .brand-copy span {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .profile-card {
+      border-radius: 22px;
+      padding: 18px;
+      background: rgba(7, 18, 31, 0.72);
+      border: 1px solid rgba(123, 177, 255, 0.12);
+    }
+
+    .profile-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: #04101e;
+      background: linear-gradient(135deg, var(--secondary), #c6f7ff);
+    }
+
+    .profile-top strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 1.02rem;
+    }
+
+    .profile-top span,
+    .profile-details span {
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    .profile-details {
+      display: grid;
+      gap: 10px;
+    }
+
+    .profile-details div {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(123, 177, 255, 0.1);
+    }
+
+    .profile-details div:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .nav-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .nav-button {
+      width: 100%;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid transparent;
+      background: rgba(8, 20, 35, 0.42);
+      color: var(--text);
+      cursor: pointer;
+      transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+    }
+
+    .nav-button:hover {
+      transform: translateX(4px);
+      border-color: rgba(123, 177, 255, 0.22);
+      background: rgba(11, 26, 46, 0.78);
+    }
+
+    .nav-button.active {
+      background: linear-gradient(135deg, rgba(91, 167, 255, 0.2), rgba(116, 223, 255, 0.12));
+      border-color: rgba(123, 177, 255, 0.28);
+    }
+
+    .nav-button small {
+      color: var(--muted);
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      display: grid;
+      gap: 12px;
+    }
+
+    .main-content {
+      display: grid;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .topbar {
+      padding: 20px 22px;
+      border-radius: var(--radius-xl);
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .topbar h1 {
+      margin: 4px 0 6px;
+      font-size: clamp(1.7rem, 2.8vw, 2.5rem);
+    }
+
+    .topbar p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .topbar-right {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .panel-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .section-panel {
+      display: none;
+    }
+
+    .section-panel.active {
+      display: grid;
+      gap: 18px;
+      animation: fadeUp 0.45s ease;
+    }
+
+    .hero-banner,
+    .panel {
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-banner h2,
+    .panel h2 {
+      margin: 12px 0 10px;
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+    }
+
+    .hero-banner p,
+    .panel p,
+    .module-note,
+    .muted {
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .stats-grid,
+    .portal-grid,
+    .info-grid,
+    .team-grid,
+    .objectives-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .stats-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .portal-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .info-grid {
+      grid-template-columns: 1.08fr 0.92fr;
+    }
+
+    .objectives-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .team-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .stat-card,
+    .portal-card,
+    .quick-card,
+    .news-card,
+    .team-card,
+    .objective-card,
+    .flow-step,
+    .metric-card {
+      border-radius: 22px;
+      padding: 20px;
+      background: rgba(8, 20, 35, 0.72);
+      border: 1px solid rgba(123, 177, 255, 0.12);
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .portal-card {
+      cursor: pointer;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .portal-card:nth-child(1) {
+      animation-delay: 0.06s;
+    }
+
+    .portal-card:nth-child(2) {
+      animation-delay: 0.14s;
+    }
+
+    .portal-card:nth-child(3) {
+      animation-delay: 0.22s;
+    }
+
+    .portal-card:nth-child(4) {
+      animation-delay: 0.3s;
+    }
+
+    .stat-card:hover,
+    .portal-card:hover,
+    .quick-card:hover,
+    .news-card:hover,
+    .team-card:hover,
+    .objective-card:hover,
+    .flow-step:hover,
+    .metric-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(123, 177, 255, 0.28);
+      box-shadow: 0 18px 34px rgba(4, 12, 24, 0.4);
+    }
+
+    .stat-label,
+    .portal-card p,
+    .quick-card p,
+    .news-card p,
+    .team-card p,
+    .objective-card p,
+    .flow-step p {
+      color: var(--muted);
+      margin: 8px 0 0;
+      line-height: 1.55;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-top: 8px;
+    }
+
+    .portal-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .portal-badge {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: #03111f;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      box-shadow: 0 14px 24px rgba(91, 167, 255, 0.26);
+    }
+
+    .portal-card h3,
+    .quick-card h3,
+    .news-card h3,
+    .team-card h3,
+    .objective-card h3,
+    .flow-step h3 {
+      margin: 0;
+      font-size: 1.15rem;
+    }
+
+    .portal-card small {
+      color: #c6dfff;
+    }
+
+    .two-column {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+    }
+
+    .news-controls {
+      display: grid;
+      grid-template-columns: 1.15fr 0.75fr auto;
+      gap: 14px;
+      align-items: end;
+    }
+
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .news-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .news-category {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(91, 167, 255, 0.12);
+      color: #d7ecff;
+      border: 1px solid rgba(91, 167, 255, 0.18);
+      font-size: 0.85rem;
+    }
+
+    .news-footer {
+      margin-top: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .empty-state {
+      padding: 28px;
+      border-radius: 20px;
+      text-align: center;
+      background: rgba(7, 19, 33, 0.72);
+      border: 1px dashed rgba(123, 177, 255, 0.2);
+      color: var(--muted);
+    }
+
+    .lab-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .lab-card {
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      background: rgba(8, 21, 37, 0.82);
+      border: 1px solid rgba(123, 177, 255, 0.12);
+      display: grid;
+      gap: 18px;
+    }
+
+    .lab-card.projectile-card {
+      grid-column: 1 / -1;
+    }
+
+    .lab-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .lab-header p {
+      margin: 8px 0 0;
+      color: var(--muted);
+    }
+
+    .lab-badge {
+      min-width: 62px;
+      height: 62px;
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: #04111f;
+      background: linear-gradient(135deg, rgba(116, 223, 255, 0.96), rgba(91, 167, 255, 0.88));
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric-card strong {
+      display: block;
+      font-size: 1.3rem;
+      margin-top: 10px;
+    }
+
+    .canvas-shell {
+      padding: 16px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(5, 16, 29, 0.95), rgba(8, 18, 35, 0.82));
+      border: 1px solid rgba(123, 177, 255, 0.1);
+    }
+
+    #trajectoryCanvas {
+      width: 100%;
+      height: 260px;
+      display: block;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(8, 20, 36, 0.9), rgba(3, 10, 20, 0.95));
+    }
+
+    .result-box {
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(6, 17, 30, 0.8);
+      border: 1px solid rgba(123, 177, 255, 0.12);
+    }
+
+    .result-box strong {
+      font-size: 1.6rem;
+      display: block;
+      margin-top: 8px;
+    }
+
+    .ph-scale {
+      position: relative;
+      height: 18px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #fb5f7e, #ffb25d, #f0f98a, #5ce7a8, #4ac7ff, #6587ff);
+      overflow: hidden;
+      margin: 14px 0 8px;
+    }
+
+    .ph-indicator {
+      position: absolute;
+      top: -4px;
+      width: 16px;
+      height: 26px;
+      border-radius: 999px;
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.12);
+      transition: left 0.25s ease;
+    }
+
+    .feedback-layout {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 18px;
+    }
+
+    .stars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .star-button {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      border: 1px solid rgba(123, 177, 255, 0.14);
+      background: rgba(8, 20, 35, 0.78);
+      color: #9ab1ca;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .star-button:hover,
+    .star-button.active {
+      transform: translateY(-2px);
+      background: linear-gradient(135deg, rgba(255, 190, 99, 0.9), rgba(255, 223, 118, 0.92));
+      color: #1c1300;
+    }
+
+    .feedback-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .feedback-list {
+      display: grid;
+      gap: 14px;
+      max-height: 560px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .feedback-card {
+      border-radius: 20px;
+      padding: 18px;
+      background: rgba(8, 19, 34, 0.85);
+      border: 1px solid rgba(123, 177, 255, 0.12);
+    }
+
+    .feedback-card-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .feedback-card strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .feedback-card span,
+    .feedback-card small {
+      color: var(--muted);
+    }
+
+    .feedback-card p {
+      margin-bottom: 0;
+      line-height: 1.65;
+      color: #d8e9ff;
+    }
+
+    .rating-pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 190, 99, 0.12);
+      border: 1px solid rgba(255, 190, 99, 0.18);
+      color: #ffe2a8;
+      white-space: nowrap;
+    }
+
+    .about-layout {
+      display: grid;
+      gap: 18px;
+    }
+
+    .tech-stack {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .tech-chip {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(7, 18, 32, 0.8);
+      border: 1px solid rgba(123, 177, 255, 0.12);
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .flow-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .flow-step {
+      position: relative;
+    }
+
+    .flow-step::after {
+      content: "";
+      position: absolute;
+      top: 38px;
+      right: -14px;
+      width: 14px;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(91, 167, 255, 0.6), rgba(116, 223, 255, 0.15));
+    }
+
+    .flow-step:last-child::after {
+      display: none;
+    }
+
+    .flow-index {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(91, 167, 255, 0.92), rgba(116, 223, 255, 0.86));
+      color: #06111f;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: var(--muted);
+      padding: 12px 0 4px;
+      font-size: 0.92rem;
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(115, 171, 255, 0.24);
+      border-radius: 999px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(3, 9, 16, 0.3);
+    }
+
+    @media (max-width: 1100px) {
+      .auth-shell,
+      .app-shell,
+      .two-column,
+      .feedback-layout,
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        min-height: auto;
+        position: static;
+      }
+
+      .stats-grid,
+      .portal-grid,
+      .team-grid,
+      .flow-grid,
+      .tech-stack {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .news-grid,
+      .lab-grid,
+      .feedback-summary,
+      .objectives-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .auth-screen,
+      .app-shell {
+        padding: 16px;
+      }
+
+      .brand-panel,
+      .auth-card,
+      .sidebar,
+      .topbar,
+      .hero-banner,
+      .panel,
+      .lab-card {
+        padding: 20px;
+      }
+
+      .field-grid,
+      .auth-actions,
+      .news-controls,
+      .metric-row,
+      .stats-grid,
+      .portal-grid,
+      .team-grid,
+      .flow-grid,
+      .tech-stack {
+        grid-template-columns: 1fr;
+      }
+
+      .brand-grid,
+      .orbit-line {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        align-items: start;
+        flex-direction: column;
+      }
+
+      .topbar-right {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="screen auth-screen" id="authScreen">
+    <div class="auth-shell">
+      <div class="brand-panel glass">
+        <span class="section-tag">College Project Demo</span>
+        <h1>SkyLoop</h1>
+        <p>
+          Smart Student Innovation Portal is a clean educational platform that combines campus news,
+          mini experiments, feedback collection, and project information inside one polished interface
+          that is realistic enough for faculty viva and demo presentation.
+        </p>
+
+        <div class="orbit-line" aria-hidden="true">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+
+        <div class="brand-grid">
+          <div class="feature-mini">
+            <strong>News Portal</strong>
+            <span>Technology, science, education, and college updates in one student-friendly module.</span>
+          </div>
+          <div class="feature-mini">
+            <strong>Mini Experiment Lab</strong>
+            <span>Three easy calculators with visuals for practical understanding during the demo.</span>
+          </div>
+          <div class="feature-mini">
+            <strong>Feedback Portal</strong>
+            <span>Collect responses, ratings, and suggestions directly in the browser with localStorage.</span>
+          </div>
+          <div class="feature-mini">
+            <strong>About SkyLoop</strong>
+            <span>Clear explanation of project objective, technologies used, and module flowchart.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-card glass">
+        <span class="section-tag">Student Access</span>
+        <h2>Login / Register</h2>
+        <p>Register once with your student details. After that, login using your saved email and password.</p>
+
+        <form id="authForm" novalidate>
+          <div class="field-grid">
+            <div class="field full">
+              <label for="fullName">Full Name</label>
+              <input id="fullName" name="fullName" type="text" placeholder="Enter your full name">
+            </div>
+
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" placeholder="student@college.edu">
+            </div>
+
+            <div class="field">
+              <label for="rollNumber">College Roll Number</label>
+              <input id="rollNumber" name="rollNumber" type="text" placeholder="Example: CSE24017">
+            </div>
+
+            <div class="field">
+              <label for="department">Department</label>
+              <input id="department" name="department" type="text" placeholder="Computer Science">
+            </div>
+
+            <div class="field">
+              <label for="password">Password</label>
+              <input id="password" name="password" type="password" placeholder="Create or enter password">
+            </div>
+          </div>
+
+          <div class="auth-actions">
+            <button type="button" class="button button-secondary" id="loginBtn">Login</button>
+            <button type="button" class="button button-primary" id="registerBtn">Register</button>
+          </div>
+        </form>
+
+        <div class="auth-divider"><span>or continue with</span></div>
+
+        <div class="google-panel">
+          <div class="google-button-shell" id="googleButtonMount"></div>
+          <div class="google-status" id="googleStatus">
+            Google Sign-In can be enabled here for the SkyLoop login page.
+          </div>
+
+          <details class="google-setup" id="googleSetup">
+            <summary>Google Sign-In setup</summary>
+            <p class="muted" style="margin-top: 12px;">
+              Paste your Google Web Client ID and open SkyLoop from <code>http://localhost</code> or an
+              <code>https://</code> URL that you have authorized in Google Cloud.
+            </p>
+            <div class="field" style="margin-top: 14px;">
+              <label for="googleClientIdInput">Google Web Client ID</label>
+              <input
+                id="googleClientIdInput"
+                type="text"
+                placeholder="1234567890-abc123def456.apps.googleusercontent.com"
+              >
+            </div>
+            <div class="inline-actions" style="margin-top: 14px;">
+              <button type="button" class="button button-secondary" id="saveGoogleClientIdBtn">Save Client ID</button>
+              <button type="button" class="button button-secondary" id="clearGoogleClientIdBtn">Clear</button>
+            </div>
+          </details>
+        </div>
+
+        <div class="auth-status" id="authStatus"></div>
+        <div class="auth-note" id="authNote">
+          This project stores user registration, active login session, and feedback records only in this browser using localStorage.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="modal-backdrop hidden" id="googleProfileModal">
+    <div class="modal-card glass">
+      <span class="section-tag">Complete Google Profile</span>
+      <h3>Finish Student Registration</h3>
+      <p>
+        Google provided your name and email. Add your college roll number and department so SkyLoop can
+        complete your student profile before opening the dashboard.
+      </p>
+
+      <div class="field-grid">
+        <div class="field full">
+          <label for="googleProfileName">Full Name</label>
+          <input id="googleProfileName" type="text" placeholder="Full name from Google">
+        </div>
+        <div class="field full">
+          <label for="googleProfileEmail">Email</label>
+          <input id="googleProfileEmail" type="email" readonly>
+        </div>
+        <div class="field">
+          <label for="googleProfileRoll">College Roll Number</label>
+          <input id="googleProfileRoll" type="text" placeholder="Example: CSE24017">
+        </div>
+        <div class="field">
+          <label for="googleProfileDepartment">Department</label>
+          <input id="googleProfileDepartment" type="text" placeholder="Computer Science">
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="button button-primary" id="completeGoogleProfileBtn">Continue to Dashboard</button>
+        <button type="button" class="button button-secondary" id="cancelGoogleProfileBtn">Cancel</button>
+      </div>
+
+      <div class="google-status" id="googleProfileStatus" style="margin-top: 14px;"></div>
+    </div>
+  </div>
+
+  <section class="screen hidden" id="appScreen">
+    <div class="app-shell">
+      <aside class="sidebar glass">
+        <div class="brand-lockup">
+          <div class="brand-icon">SK</div>
+          <div class="brand-copy">
+            <h2>SkyLoop</h2>
+            <span>Smart Student Innovation Portal</span>
+          </div>
+        </div>
+
+        <div class="profile-card">
+          <div class="profile-top">
+            <div class="avatar" id="profileAvatar">SL</div>
+            <div>
+              <strong id="profileName">Student Name</strong>
+              <span id="profileDepartment">Department</span>
+            </div>
+          </div>
+          <div class="profile-details">
+            <div><span>Roll Number</span><strong id="profileRoll">-</strong></div>
+            <div><span>Email</span><strong id="profileEmail">-</strong></div>
+            <div><span>Feedback Count</span><strong id="profileFeedbackCount">0</strong></div>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <button class="nav-button active" data-section="home">
+            <span>Dashboard Home</span>
+            <small>Overview</small>
+          </button>
+          <button class="nav-button" data-section="news">
+            <span>News Portal</span>
+            <small>Updates</small>
+          </button>
+          <button class="nav-button" data-section="lab">
+            <span>Mini Experiment Lab</span>
+            <small>Practical</small>
+          </button>
+          <button class="nav-button" data-section="feedback">
+            <span>Feedback Portal</span>
+            <small>Responses</small>
+          </button>
+          <button class="nav-button" data-section="about">
+            <span>About SkyLoop</span>
+            <small>Project Info</small>
+          </button>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <div class="pill" id="sessionChip">Active session</div>
+          <button class="button button-danger" id="logoutBtn" type="button">Logout</button>
+        </div>
+      </aside>
+
+      <div class="main-content">
+        <header class="topbar glass">
+          <div>
+            <span class="section-tag" id="topbarTag">Dashboard</span>
+            <h1 id="topbarTitle">Welcome to SkyLoop</h1>
+            <p id="topbarSubtitle">A smart student portal with clear and practical college project modules.</p>
+          </div>
+          <div class="topbar-right">
+            <div class="pill">News Items: <strong id="topNewsCount">0</strong></div>
+            <div class="pill">Feedback: <strong id="topFeedbackCount">0</strong></div>
+            <div class="pill" id="liveClock">--:--:--</div>
+          </div>
+        </header>
+
+        <main class="panel-stack">
+          <section class="section-panel active" id="section-home">
+            <div class="hero-banner glass">
+              <span class="section-tag">Dashboard Home</span>
+              <h2 id="welcomeTitle">Welcome, Student</h2>
+              <p>
+                SkyLoop is organized into four easy-to-explain modules so faculty can quickly understand
+                the project flow: student login, updates portal, mini practical calculators, and feedback collection.
+              </p>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-label">Registered Students</div>
+                <div class="stat-value" id="statStudents">0</div>
+                <p class="muted">Users stored in browser localStorage.</p>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">News Available</div>
+                <div class="stat-value" id="statNews">0</div>
+                <p class="muted">Sample updates for education and science.</p>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Mini Experiments</div>
+                <div class="stat-value">3</div>
+                <p class="muted">Projectile Motion, pH Calculator, Ohm's Law.</p>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Feedback Received</div>
+                <div class="stat-value" id="statFeedback">0</div>
+                <p class="muted">Student opinions collected through the portal.</p>
+              </div>
+            </div>
+
+            <div class="portal-grid">
+              <div class="portal-card" data-section="news">
+                <div class="portal-top">
+                  <div class="portal-badge">NP</div>
+                  <small>Portal 1</small>
+                </div>
+                <h3>News Portal</h3>
+                <p>This module keeps students updated with technology, science, education, and campus news.</p>
+              </div>
+
+              <div class="portal-card" data-section="lab">
+                <div class="portal-top">
+                  <div class="portal-badge">LAB</div>
+                  <small>Portal 2</small>
+                </div>
+                <h3>Mini Experiment Lab</h3>
+                <p>This module helps students learn practically using simple interactive calculators and graphs.</p>
+              </div>
+
+              <div class="portal-card" data-section="feedback">
+                <div class="portal-top">
+                  <div class="portal-badge">FB</div>
+                  <small>Portal 3</small>
+                </div>
+                <h3>Feedback Portal</h3>
+                <p>This module collects student opinions, ratings, and suggestions for continuous improvement.</p>
+              </div>
+
+              <div class="portal-card" data-section="about">
+                <div class="portal-top">
+                  <div class="portal-badge">INFO</div>
+                  <small>Portal 4</small>
+                </div>
+                <h3>About SkyLoop</h3>
+                <p>This module explains the concept, objectives, technologies, team structure, and project flow.</p>
+              </div>
+            </div>
+
+            <div class="two-column">
+              <div class="panel glass">
+                <span class="section-tag">Student Profile</span>
+                <h2>Your Academic Snapshot</h2>
+                <div class="profile-details">
+                  <div><span>Name</span><strong id="homeStudentName">-</strong></div>
+                  <div><span>Email</span><strong id="homeStudentEmail">-</strong></div>
+                  <div><span>Department</span><strong id="homeStudentDepartment">-</strong></div>
+                  <div><span>Roll Number</span><strong id="homeStudentRoll">-</strong></div>
+                </div>
+              </div>
+
+              <div class="panel glass">
+                <span class="section-tag">Quick Demo Guide</span>
+                <h2>How to Explain It in Viva</h2>
+                <div class="quick-card">
+                  <h3>1. Login and Data Storage</h3>
+                  <p>Student details are saved in localStorage to simulate user registration and login session handling.</p>
+                </div>
+                <div class="quick-card" style="margin-top: 14px;">
+                  <h3>2. Explore the Four Portals</h3>
+                  <p>Each portal has one clear purpose: updates, practical learning, feedback collection, and project explanation.</p>
+                </div>
+                <div class="quick-card" style="margin-top: 14px;">
+                  <h3>3. Show Real Interactions</h3>
+                  <p>Use the search, calculators, rating system, and admin feedback cards to demonstrate working features.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="section-panel" id="section-news">
+            <div class="hero-banner glass">
+              <span class="section-tag">News Portal</span>
+              <h2>Latest Student-Focused Updates</h2>
+              <p>This module keeps students updated with technology, science, education, and college information.</p>
+            </div>
+
+            <div class="panel glass">
+              <div class="news-controls">
+                <div class="field">
+                  <label for="newsSearch">Search News</label>
+                  <input id="newsSearch" type="text" placeholder="Search by title, source, or keyword">
+                </div>
+                <div class="field">
+                  <label for="newsCategory">Category Filter</label>
+                  <select id="newsCategory">
+                    <option value="All">All Categories</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Science">Science</option>
+                    <option value="Education">Education</option>
+                    <option value="College Updates">College Updates</option>
+                  </select>
+                </div>
+                <button class="button button-primary" id="refreshNewsBtn" type="button">Refresh News</button>
+              </div>
+
+              <div class="news-footer" style="margin-top: 18px;">
+                <span>Showing curated sample data for offline project demo.</span>
+                <span id="newsRefreshStatus">Last refreshed: Initial load</span>
+              </div>
+            </div>
+
+            <div class="news-grid" id="newsGrid"></div>
+          </section>
+
+          <section class="section-panel" id="section-lab">
+            <div class="hero-banner glass">
+              <span class="section-tag">Mini Experiment Lab</span>
+              <h2>Easy Practical Simulations</h2>
+              <p>This module helps students learn practically through simple and interactive calculations.</p>
+            </div>
+
+            <div class="lab-grid">
+              <div class="lab-card projectile-card">
+                <div class="lab-header">
+                  <div>
+                    <span class="section-tag">Simulation 1</span>
+                    <h2>Projectile Motion</h2>
+                    <p>Enter launch speed and angle to calculate range, flight time, and display the trajectory graph.</p>
+                  </div>
+                  <div class="lab-badge">PM</div>
+                </div>
+
+                <div class="field-grid">
+                  <div class="field">
+                    <label for="projectileSpeed">Speed (m/s)</label>
+                    <input id="projectileSpeed" type="number" min="1" step="0.1" value="28">
+                  </div>
+                  <div class="field">
+                    <label for="projectileAngle">Angle (degrees)</label>
+                    <input id="projectileAngle" type="number" min="1" max="89" step="0.1" value="42">
+                  </div>
+                </div>
+
+                <div class="metric-row">
+                  <div class="metric-card">
+                    <span class="muted">Range</span>
+                    <strong id="projectileRange">0 m</strong>
+                  </div>
+                  <div class="metric-card">
+                    <span class="muted">Time of Flight</span>
+                    <strong id="projectileTime">0 s</strong>
+                  </div>
+                  <div class="metric-card">
+                    <span class="muted">Maximum Height</span>
+                    <strong id="projectileHeight">0 m</strong>
+                  </div>
+                </div>
+
+                <div class="canvas-shell">
+                  <canvas id="trajectoryCanvas"></canvas>
+                </div>
+              </div>
+
+              <div class="lab-card">
+                <div class="lab-header">
+                  <div>
+                    <span class="section-tag">Simulation 2</span>
+                    <h2>pH Calculator</h2>
+                    <p>Choose acid or base and enter the strength to calculate the pH value.</p>
+                  </div>
+                  <div class="lab-badge">PH</div>
+                </div>
+
+                <div class="field-grid">
+                  <div class="field">
+                    <label for="phType">Solution Type</label>
+                    <select id="phType">
+                      <option value="acid">Acid</option>
+                      <option value="base">Base</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="phStrength">Strength (mol/L)</label>
+                    <input id="phStrength" type="number" min="0.000001" step="0.0001" value="0.01">
+                  </div>
+                </div>
+
+                <div class="result-box">
+                  <span class="muted">Calculated pH</span>
+                  <strong id="phResult">7.00</strong>
+                  <div class="ph-scale">
+                    <div class="ph-indicator" id="phIndicator"></div>
+                  </div>
+                  <span class="muted" id="phRemark">Neutral reference value</span>
+                </div>
+              </div>
+
+              <div class="lab-card">
+                <div class="lab-header">
+                  <div>
+                    <span class="section-tag">Simulation 3</span>
+                    <h2>Ohm's Law Calculator</h2>
+                    <p>Enter voltage and resistance values to calculate electric current.</p>
+                  </div>
+                  <div class="lab-badge">OHM</div>
+                </div>
+
+                <div class="field-grid">
+                  <div class="field">
+                    <label for="voltageInput">Voltage (V)</label>
+                    <input id="voltageInput" type="number" min="0" step="0.1" value="24">
+                  </div>
+                  <div class="field">
+                    <label for="resistanceInput">Resistance (ohms)</label>
+                    <input id="resistanceInput" type="number" min="0.1" step="0.1" value="12">
+                  </div>
+                </div>
+
+                <div class="result-box">
+                  <span class="muted">Calculated Current</span>
+                  <strong id="currentResult">2.00 A</strong>
+                  <span class="muted" id="ohmRemark">Current is computed using I = V / R.</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="section-panel" id="section-feedback">
+            <div class="hero-banner glass">
+              <span class="section-tag">Feedback Portal</span>
+              <h2>Collect Student Opinions</h2>
+              <p>This module collects student opinions, ratings, and suggestions to improve the platform.</p>
+            </div>
+
+            <div class="feedback-layout">
+              <div class="panel glass">
+                <span class="section-tag">Submit Feedback</span>
+                <h2>Share Your Suggestion</h2>
+                <form id="feedbackForm" novalidate>
+                  <div class="field-grid">
+                    <div class="field full">
+                      <label for="feedbackName">Name</label>
+                      <input id="feedbackName" type="text" placeholder="Student name">
+                    </div>
+                    <div class="field">
+                      <label for="feedbackEmail">Email</label>
+                      <input id="feedbackEmail" type="email" placeholder="student@college.edu">
+                    </div>
+                    <div class="field">
+                      <label for="feedbackDepartment">Department</label>
+                      <input id="feedbackDepartment" type="text" placeholder="Department">
+                    </div>
+                    <div class="field full">
+                      <label>Rating (1 to 5 stars)</label>
+                      <div class="stars" id="ratingStars">
+                        <button type="button" class="star-button" data-rating="1">★</button>
+                        <button type="button" class="star-button" data-rating="2">★</button>
+                        <button type="button" class="star-button" data-rating="3">★</button>
+                        <button type="button" class="star-button" data-rating="4">★</button>
+                        <button type="button" class="star-button" data-rating="5">★</button>
+                      </div>
+                    </div>
+                    <div class="field full">
+                      <label for="feedbackSuggestions">Suggestions</label>
+                      <textarea id="feedbackSuggestions" placeholder="Write your suggestions for SkyLoop"></textarea>
+                    </div>
+                  </div>
+
+                  <div style="display: flex; gap: 12px; align-items: center; margin-top: 18px; flex-wrap: wrap;">
+                    <button type="submit" class="button button-primary">Submit Feedback</button>
+                    <span class="muted" id="feedbackStatus">Your response will be saved locally in the browser.</span>
+                  </div>
+                </form>
+              </div>
+
+              <div class="panel glass">
+                <span class="section-tag">Admin View</span>
+                <h2>Submitted Feedback Cards</h2>
+                <div class="feedback-summary">
+                  <div class="metric-card">
+                    <span class="muted">Total Feedback</span>
+                    <strong id="feedbackTotal">0</strong>
+                  </div>
+                  <div class="metric-card">
+                    <span class="muted">Average Rating</span>
+                    <strong id="feedbackAverage">0.0</strong>
+                  </div>
+                  <div class="metric-card">
+                    <span class="muted">Latest Department</span>
+                    <strong id="feedbackLatestDepartment">-</strong>
+                  </div>
+                </div>
+                <div class="feedback-list" id="feedbackList"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="section-panel" id="section-about">
+            <div class="hero-banner glass">
+              <span class="section-tag">About SkyLoop</span>
+              <h2>Project Overview</h2>
+              <p>
+                SkyLoop is a student-friendly educational portal combining news, experiments, and feedback
+                into one smart platform. It is designed to demonstrate a practical and realistic final year project.
+              </p>
+            </div>
+
+            <div class="about-layout">
+              <div class="info-grid">
+                <div class="panel glass">
+                  <span class="section-tag">What Is SkyLoop?</span>
+                  <h2>Student-Centered Digital Platform</h2>
+                  <p>
+                    SkyLoop is built to help students stay informed, learn through simple simulations,
+                    and share opinions using one integrated browser-based system. It is designed using only
+                    HTML, CSS, JavaScript, and localStorage.
+                  </p>
+                </div>
+
+                <div class="panel glass">
+                  <span class="section-tag">Objectives</span>
+                  <h2>Project Goals</h2>
+                  <div class="objectives-grid">
+                    <div class="objective-card">
+                      <h3>Improve Student Awareness</h3>
+                      <p>Provide educational, technical, and campus-related updates in one place.</p>
+                    </div>
+                    <div class="objective-card">
+                      <h3>Improve Practical Learning</h3>
+                      <p>Use easy experiments to support academic understanding during demo and learning.</p>
+                    </div>
+                    <div class="objective-card">
+                      <h3>Collect Student Feedback</h3>
+                      <p>Allow users to submit ratings and suggestions for continuous improvement.</p>
+                    </div>
+                    <div class="objective-card">
+                      <h3>Build Smart Campus Tools</h3>
+                      <p>Show how digital student services can be organized in one responsive platform.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel glass">
+                <span class="section-tag">Technology Used</span>
+                <h2>Core Stack</h2>
+                <div class="tech-stack">
+                  <div class="tech-chip">HTML</div>
+                  <div class="tech-chip">CSS</div>
+                  <div class="tech-chip">JavaScript</div>
+                  <div class="tech-chip">localStorage</div>
+                </div>
+              </div>
+
+              <div class="panel glass">
+                <span class="section-tag">Team Members</span>
+                <h2>Project Team Placeholder</h2>
+                <div class="team-grid">
+                  <div class="team-card">
+                    <h3>Member 1</h3>
+                    <p>Frontend design, layout, and portal structuring.</p>
+                  </div>
+                  <div class="team-card">
+                    <h3>Member 2</h3>
+                    <p>JavaScript logic, localStorage handling, and calculators.</p>
+                  </div>
+                  <div class="team-card">
+                    <h3>Member 3</h3>
+                    <p>Testing, documentation, presentation, and viva support.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel glass">
+                <span class="section-tag">Guide / Flowchart</span>
+                <h2>Project Flow</h2>
+                <div class="flow-grid">
+                  <div class="flow-step">
+                    <div class="flow-index">1</div>
+                    <h3>Login / Register</h3>
+                    <p>Student enters details and data is stored in localStorage.</p>
+                  </div>
+                  <div class="flow-step">
+                    <div class="flow-index">2</div>
+                    <h3>Open Dashboard</h3>
+                    <p>Student sees overview cards and profile details.</p>
+                  </div>
+                  <div class="flow-step">
+                    <div class="flow-index">3</div>
+                    <h3>Use Portals</h3>
+                    <p>Explore news, experiments, feedback, and project information.</p>
+                  </div>
+                  <div class="flow-step">
+                    <div class="flow-index">4</div>
+                    <h3>Save Output</h3>
+                    <p>Feedback, users, and session status remain available on this browser.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="footer-note">SkyLoop - Smart Student Innovation Portal | Browser-ready college project demo</div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  </section>
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script>
+    const STORAGE_KEYS = {
+      users: "skyloop_users",
+      session: "skyloop_session",
+      feedback: "skyloop_feedback",
+      googleClientId: "skyloop_google_client_id"
+    };
+
+    const sectionMeta = {
+      home: {
+        tag: "Dashboard",
+        title: "Welcome to SkyLoop",
+        subtitle: "A clear student dashboard that connects all four project modules."
+      },
+      news: {
+        tag: "News Portal",
+        title: "Student News Center",
+        subtitle: "Search and filter updates across technology, science, education, and campus life."
+      },
+      lab: {
+        tag: "Experiment Lab",
+        title: "Mini Experiment Lab",
+        subtitle: "Simple interactive simulations designed for practical demonstration."
+      },
+      feedback: {
+        tag: "Feedback Portal",
+        title: "Student Feedback Module",
+        subtitle: "Collect ratings and suggestions directly inside the browser."
+      },
+      about: {
+        tag: "About Project",
+        title: "About SkyLoop",
+        subtitle: "Project objectives, technologies used, and the complete flowchart."
+      }
+    };
+
+    const sampleNewsData = [
+      {
+        title: "College robotics team builds low-cost campus delivery rover",
+        category: "Technology",
+        source: "Campus Tech Bulletin",
+        date: "2026-04-21",
+        summary: "Students designed a compact delivery rover to transport lab materials and library books across campus blocks."
+      },
+      {
+        title: "New student coding bootcamp focuses on web accessibility",
+        category: "Education",
+        source: "Learning Desk",
+        date: "2026-04-20",
+        summary: "A new bootcamp helps students learn practical front-end development with emphasis on responsive and accessible design."
+      },
+      {
+        title: "Physics department hosts model rocket workshop for first years",
+        category: "Science",
+        source: "Department Circular",
+        date: "2026-04-19",
+        summary: "The workshop introduces projectile motion, launch angles, and measurement using safe classroom demonstrations."
+      },
+      {
+        title: "Annual innovation fair registration opens for final year teams",
+        category: "College Updates",
+        source: "Campus Announcements",
+        date: "2026-04-18",
+        summary: "Students can register projects for the innovation fair and present solutions from software, electronics, and mechanical domains."
+      },
+      {
+        title: "Students create AI-free note summarizer using browser JavaScript",
+        category: "Technology",
+        source: "Student Projects Desk",
+        date: "2026-04-17",
+        summary: "A lightweight text processing tool built with plain JavaScript helps classmates revise important lecture notes quickly."
+      },
+      {
+        title: "Biology club schedules water quality awareness seminar",
+        category: "Science",
+        source: "Science Society",
+        date: "2026-04-16",
+        summary: "The upcoming seminar will explain pH levels, water testing basics, and environmental monitoring for student projects."
+      },
+      {
+        title: "Library extends evening study hours during assessment month",
+        category: "College Updates",
+        source: "College Administration",
+        date: "2026-04-15",
+        summary: "Extended hours are introduced to support group study, project preparation, and final submissions."
+      },
+      {
+        title: "Faculty release open lab schedule for weekend practical sessions",
+        category: "Education",
+        source: "Academic Office",
+        date: "2026-04-14",
+        summary: "The schedule allows students to practice circuit experiments, report work, and project testing with supervision."
+      },
+      {
+        title: "Smart attendance dashboard wins departmental mini hackathon",
+        category: "Technology",
+        source: "Innovation Cell",
+        date: "2026-04-13",
+        summary: "A student-built dashboard visualizes attendance trends and highlights subjects needing academic follow-up."
+      },
+      {
+        title: "Astronomy club prepares campus telescope night for beginners",
+        category: "Science",
+        source: "Student Activity Board",
+        date: "2026-04-12",
+        summary: "The event introduces telescope handling, sky observation basics, and simple reporting methods for students."
+      },
+      {
+        title: "Peer mentoring program starts revision support for semester exams",
+        category: "Education",
+        source: "Academic Support Cell",
+        date: "2026-04-11",
+        summary: "Senior students will help juniors with subject-wise doubt clearing, exam planning, and project documentation tips."
+      },
+      {
+        title: "College announces digital showcase week for student projects",
+        category: "College Updates",
+        source: "Principal's Office",
+        date: "2026-04-10",
+        summary: "All departments will present working models, websites, posters, and lab demonstrations in one campus-wide event."
+      }
+    ];
+
+    let currentUser = null;
+    let currentRating = 0;
+    let newsData = [...sampleNewsData];
+    let lastProjectileResult = null;
+    let googleClientLoaded = false;
+    let pendingGoogleProfile = null;
+
+    const authScreen = document.getElementById("authScreen");
+    const appScreen = document.getElementById("appScreen");
+    const authStatus = document.getElementById("authStatus");
+    const authNote = document.getElementById("authNote");
+    const topbarTag = document.getElementById("topbarTag");
+    const topbarTitle = document.getElementById("topbarTitle");
+    const topbarSubtitle = document.getElementById("topbarSubtitle");
+    const liveClock = document.getElementById("liveClock");
+    const newsGrid = document.getElementById("newsGrid");
+    const feedbackList = document.getElementById("feedbackList");
+    const trajectoryCanvas = document.getElementById("trajectoryCanvas");
+    const googleUi = {
+      buttonMount: document.getElementById("googleButtonMount"),
+      status: document.getElementById("googleStatus"),
+      setup: document.getElementById("googleSetup"),
+      clientIdInput: document.getElementById("googleClientIdInput"),
+      saveButton: document.getElementById("saveGoogleClientIdBtn"),
+      clearButton: document.getElementById("clearGoogleClientIdBtn"),
+      profileModal: document.getElementById("googleProfileModal"),
+      profileName: document.getElementById("googleProfileName"),
+      profileEmail: document.getElementById("googleProfileEmail"),
+      profileRoll: document.getElementById("googleProfileRoll"),
+      profileDepartment: document.getElementById("googleProfileDepartment"),
+      profileStatus: document.getElementById("googleProfileStatus"),
+      profileContinue: document.getElementById("completeGoogleProfileBtn"),
+      profileCancel: document.getElementById("cancelGoogleProfileBtn")
+    };
+
+    const authForm = {
+      fullName: document.getElementById("fullName"),
+      email: document.getElementById("email"),
+      rollNumber: document.getElementById("rollNumber"),
+      department: document.getElementById("department"),
+      password: document.getElementById("password")
+    };
+
+    const feedbackFormFields = {
+      name: document.getElementById("feedbackName"),
+      email: document.getElementById("feedbackEmail"),
+      department: document.getElementById("feedbackDepartment"),
+      suggestions: document.getElementById("feedbackSuggestions"),
+      status: document.getElementById("feedbackStatus")
+    };
+
+    function loadCollection(key) {
+      try {
+        return JSON.parse(localStorage.getItem(key)) || [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveCollection(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function getGoogleClientId() {
+      return localStorage.getItem(STORAGE_KEYS.googleClientId) || "";
+    }
+
+    function setGoogleClientId(clientId) {
+      localStorage.setItem(STORAGE_KEYS.googleClientId, clientId);
+    }
+
+    function clearGoogleClientId() {
+      localStorage.removeItem(STORAGE_KEYS.googleClientId);
+    }
+
+    function getUsers() {
+      return loadCollection(STORAGE_KEYS.users);
+    }
+
+    function getFeedback() {
+      return loadCollection(STORAGE_KEYS.feedback);
+    }
+
+    function getSession() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.session));
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function setSession(user) {
+      localStorage.setItem(
+        STORAGE_KEYS.session,
+        JSON.stringify({
+          email: user.email,
+          loginTime: new Date().toISOString()
+        })
+      );
+    }
+
+    function clearSession() {
+      localStorage.removeItem(STORAGE_KEYS.session);
+    }
+
+    function showAuthStatus(message, type) {
+      authStatus.textContent = message;
+      authStatus.className = "auth-status";
+      if (type) {
+        authStatus.classList.add(type);
+      }
+    }
+
+    function showGoogleStatus(message, type) {
+      googleUi.status.textContent = message;
+      googleUi.status.className = "google-status";
+      if (type) {
+        googleUi.status.classList.add(type);
+      }
+    }
+
+    function showGoogleProfileStatus(message, type) {
+      googleUi.profileStatus.textContent = message;
+      googleUi.profileStatus.className = "google-status";
+      if (type) {
+        googleUi.profileStatus.classList.add(type);
+      }
+    }
+
+    function updateAuthNote() {
+      const users = getUsers();
+      authNote.textContent = users.length
+        ? `${users.length} student account(s) are already saved in this browser. Register with full details once, then login with email and password.`
+        : "This project stores user registration, active login session, and feedback records only in this browser using localStorage.";
+    }
+
+    function isGoogleOriginSupported() {
+      if (window.location.protocol === "https:") {
+        return true;
+      }
+
+      if (window.location.protocol !== "http:") {
+        return false;
+      }
+
+      const allowedHosts = ["localhost", "127.0.0.1", "[::1]"];
+      return allowedHosts.includes(window.location.hostname);
+    }
+
+    function looksLikeGoogleClientId(clientId) {
+      return /.+\.apps\.googleusercontent\.com$/i.test(clientId);
+    }
+
+    function decodeJwtPayload(token) {
+      const [, payload] = token.split(".");
+      const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+      const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+      const binary = atob(padded);
+      const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+      return JSON.parse(new TextDecoder().decode(bytes));
+    }
+
+    function syncGoogleSetupState() {
+      const clientId = getGoogleClientId();
+      googleUi.clientIdInput.value = clientId;
+      googleUi.setup.open = !looksLikeGoogleClientId(clientId);
+    }
+
+    function initializeGoogleLogin() {
+      syncGoogleSetupState();
+      googleUi.buttonMount.innerHTML = "";
+
+      if (!isGoogleOriginSupported()) {
+        showGoogleStatus(
+          "Google login is disabled on this file URL. Open SkyLoop from http://localhost or an HTTPS site after authorizing that origin in Google Cloud.",
+          "error"
+        );
+        return;
+      }
+
+      const clientId = getGoogleClientId().trim();
+      if (!looksLikeGoogleClientId(clientId)) {
+        showGoogleStatus("Add your Google Web Client ID below to enable the Google login button.", "error");
+        return;
+      }
+
+      if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+        showGoogleStatus("Loading Google Sign-In library...", "");
+        return;
+      }
+
+      googleClientLoaded = true;
+      google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleGoogleCredentialResponse,
+        ux_mode: "popup",
+        context: "signin",
+        auto_select: false,
+        use_fedcm_for_button: true
+      });
+
+      google.accounts.id.renderButton(googleUi.buttonMount, {
+        type: "standard",
+        theme: "filled_blue",
+        size: "large",
+        text: "continue_with",
+        shape: "pill",
+        logo_alignment: "left",
+        width: 320
+      });
+
+      showGoogleStatus(
+        "Google Sign-In is ready. Use the same authorized localhost or HTTPS origin that you configured in Google Cloud.",
+        "success"
+      );
+      googleUi.setup.open = false;
+    }
+
+    function openGoogleProfileModal(profile) {
+      pendingGoogleProfile = profile;
+      googleUi.profileName.value = profile.fullName || "";
+      googleUi.profileEmail.value = profile.email || "";
+      googleUi.profileRoll.value = "";
+      googleUi.profileDepartment.value = "";
+      showGoogleProfileStatus("", "");
+      googleUi.profileModal.classList.remove("hidden");
+    }
+
+    function closeGoogleProfileModal() {
+      pendingGoogleProfile = null;
+      googleUi.profileModal.classList.add("hidden");
+      showGoogleProfileStatus("", "");
+    }
+
+    function handleGoogleCredentialResponse(response) {
+      try {
+        const payload = decodeJwtPayload(response.credential);
+        const email = normalizeText(payload.email || "").toLowerCase();
+        const fullName = normalizeText(payload.name || authForm.fullName.value || "Student User");
+
+        if (!email) {
+          showGoogleStatus("Google login did not return an email address for this account.", "error");
+          return;
+        }
+
+        const users = getUsers();
+        const existingUser = users.find((entry) => entry.email === email);
+
+        if (existingUser) {
+          const updatedUser = {
+            ...existingUser,
+            fullName: existingUser.fullName || fullName,
+            googleLinked: true,
+            googleSub: payload.sub || existingUser.googleSub || "",
+            authProvider: existingUser.authProvider || "manual"
+          };
+
+          saveCollection(
+            STORAGE_KEYS.users,
+            users.map((entry) => (entry.email === email ? updatedUser : entry))
+          );
+
+          setSession(updatedUser);
+          showAuthStatus("Google login successful. Welcome back to SkyLoop.", "success");
+          showGoogleStatus("Google account verified and connected successfully.", "success");
+          enterApp(updatedUser);
+          return;
+        }
+
+        showGoogleStatus("Google account verified. Please complete your student profile.", "success");
+        openGoogleProfileModal({
+          fullName,
+          email,
+          googleSub: payload.sub || "",
+          picture: payload.picture || ""
+        });
+      } catch (error) {
+        showGoogleStatus("Google login failed while reading the returned account token.", "error");
+      }
+    }
+
+    function completeGoogleProfile() {
+      if (!pendingGoogleProfile) {
+        return;
+      }
+
+      const fullName = normalizeText(googleUi.profileName.value);
+      const email = normalizeText(googleUi.profileEmail.value).toLowerCase();
+      const rollNumber = normalizeText(googleUi.profileRoll.value).toUpperCase();
+      const department = normalizeText(googleUi.profileDepartment.value);
+
+      if (!fullName || !email || !rollNumber || !department) {
+        showGoogleProfileStatus("Please complete all profile fields before continuing.", "error");
+        return;
+      }
+
+      const users = getUsers();
+      const duplicateRoll = users.some(
+        (entry) => entry.rollNumber === rollNumber && entry.email !== email
+      );
+
+      if (duplicateRoll) {
+        showGoogleProfileStatus("This roll number is already used by another saved account.", "error");
+        return;
+      }
+
+      const newUser = {
+        id: `user_${Date.now()}`,
+        fullName,
+        email,
+        rollNumber,
+        department,
+        password: "",
+        authProvider: "google",
+        googleLinked: true,
+        googleSub: pendingGoogleProfile.googleSub || "",
+        picture: pendingGoogleProfile.picture || "",
+        createdAt: new Date().toISOString()
+      };
+
+      users.push(newUser);
+      saveCollection(STORAGE_KEYS.users, users);
+      setSession(newUser);
+      updateAuthNote();
+      closeGoogleProfileModal();
+      showAuthStatus("Google login successful. Your student profile has been created.", "success");
+      enterApp(newUser);
+    }
+
+    function normalizeText(value) {
+      return value.trim();
+    }
+
+    function setCurrentUser(user) {
+      currentUser = user;
+      document.getElementById("profileName").textContent = user.fullName;
+      document.getElementById("profileDepartment").textContent = user.department;
+      document.getElementById("profileRoll").textContent = user.rollNumber;
+      document.getElementById("profileEmail").textContent = user.email;
+      document.getElementById("profileAvatar").textContent = getInitials(user.fullName);
+      document.getElementById("welcomeTitle").textContent = `Welcome, ${user.fullName}`;
+      document.getElementById("homeStudentName").textContent = user.fullName;
+      document.getElementById("homeStudentEmail").textContent = user.email;
+      document.getElementById("homeStudentDepartment").textContent = user.department;
+      document.getElementById("homeStudentRoll").textContent = user.rollNumber;
+      document.getElementById("sessionChip").textContent = `Logged in: ${user.fullName}`;
+      populateFeedbackDefaults();
+    }
+
+    function getInitials(name) {
+      return name
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0].toUpperCase())
+        .join("") || "SL";
+    }
+
+    function enterApp(user) {
+      setCurrentUser(user);
+      authScreen.classList.add("hidden");
+      appScreen.classList.remove("hidden");
+      renderDashboardStats();
+      renderNews();
+      renderFeedback();
+      openSection("home");
+      updateClock();
+      runAllCalculators();
+    }
+
+    function returnToAuth() {
+      currentUser = null;
+      authScreen.classList.remove("hidden");
+      appScreen.classList.add("hidden");
+      showAuthStatus("", "");
+      authForm.password.value = "";
+      initializeGoogleLogin();
+    }
+
+    function validateRegistrationFields() {
+      const fullName = normalizeText(authForm.fullName.value);
+      const email = normalizeText(authForm.email.value).toLowerCase();
+      const rollNumber = normalizeText(authForm.rollNumber.value).toUpperCase();
+      const department = normalizeText(authForm.department.value);
+      const password = authForm.password.value.trim();
+
+      if (!fullName || !email || !rollNumber || !department || !password) {
+        showAuthStatus("Please fill all fields for registration.", "error");
+        return null;
+      }
+
+      return { fullName, email, rollNumber, department, password };
+    }
+
+    function handleRegister() {
+      const payload = validateRegistrationFields();
+      if (!payload) {
+        return;
+      }
+
+      const users = getUsers();
+      const exists = users.some(
+        (user) => user.email === payload.email || user.rollNumber === payload.rollNumber
+      );
+
+      if (exists) {
+        showAuthStatus("An account with this email or roll number already exists. Please login.", "error");
+        return;
+      }
+
+      const newUser = {
+        id: `user_${Date.now()}`,
+        ...payload,
+        authProvider: "manual",
+        googleLinked: false,
+        createdAt: new Date().toISOString()
+      };
+
+      users.push(newUser);
+      saveCollection(STORAGE_KEYS.users, users);
+      setSession(newUser);
+      updateAuthNote();
+      showAuthStatus("Registration successful. Opening your dashboard...", "success");
+      enterApp(newUser);
+    }
+
+    function handleLogin() {
+      const email = normalizeText(authForm.email.value).toLowerCase();
+      const password = authForm.password.value.trim();
+      const users = getUsers();
+
+      if (!email || !password) {
+        showAuthStatus("Enter your email and password to login.", "error");
+        return;
+      }
+
+      const user = users.find(
+        (entry) => entry.email === email && entry.password === password
+      );
+
+      if (!user) {
+        const googleUser = users.find(
+          (entry) => entry.email === email && (entry.authProvider === "google" || entry.googleLinked)
+        );
+        if (googleUser) {
+          showAuthStatus("This account uses Google login. Please use the Google Sign-In button below.", "error");
+          return;
+        }
+        showAuthStatus("Account not found. Please register first or check your credentials.", "error");
+        return;
+      }
+
+      setSession(user);
+      showAuthStatus("Login successful. Welcome back to SkyLoop.", "success");
+      enterApp(user);
+    }
+
+    function hydrateSession() {
+      updateAuthNote();
+      const session = getSession();
+      if (!session || !session.email) {
+        returnToAuth();
+        return;
+      }
+
+      const user = getUsers().find((entry) => entry.email === session.email);
+      if (!user) {
+        clearSession();
+        returnToAuth();
+        return;
+      }
+
+      enterApp(user);
+    }
+
+    function openSection(sectionName) {
+      document.querySelectorAll(".nav-button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.section === sectionName);
+      });
+
+      document.querySelectorAll(".section-panel").forEach((section) => {
+        section.classList.toggle("active", section.id === `section-${sectionName}`);
+      });
+
+      const meta = sectionMeta[sectionName];
+      if (meta) {
+        topbarTag.textContent = meta.tag;
+        topbarTitle.textContent = meta.title;
+        topbarSubtitle.textContent = meta.subtitle;
+      }
+
+      if (sectionName === "lab") {
+        drawProjectileGraph(lastProjectileResult);
+      }
+    }
+
+    function renderDashboardStats() {
+      const users = getUsers();
+      const feedback = getFeedback();
+      const currentUserFeedback = currentUser
+        ? feedback.filter((item) => item.email === currentUser.email)
+        : [];
+
+      document.getElementById("statStudents").textContent = users.length;
+      document.getElementById("statNews").textContent = newsData.length;
+      document.getElementById("statFeedback").textContent = feedback.length;
+      document.getElementById("topNewsCount").textContent = newsData.length;
+      document.getElementById("topFeedbackCount").textContent = feedback.length;
+      document.getElementById("profileFeedbackCount").textContent = currentUserFeedback.length;
+    }
+
+    function shuffleNews() {
+      const shuffled = [...newsData];
+      for (let index = shuffled.length - 1; index > 0; index -= 1) {
+        const swapIndex = Math.floor(Math.random() * (index + 1));
+        [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+      }
+      newsData = shuffled;
+      document.getElementById("newsRefreshStatus").textContent =
+        `Last refreshed: ${new Date().toLocaleTimeString()}`;
+      renderNews();
+    }
+
+    function renderNews() {
+      const query = document.getElementById("newsSearch").value.trim().toLowerCase();
+      const category = document.getElementById("newsCategory").value;
+
+      const filtered = newsData.filter((item) => {
+        const matchesCategory = category === "All" || item.category === category;
+        const matchesQuery =
+          !query ||
+          item.title.toLowerCase().includes(query) ||
+          item.summary.toLowerCase().includes(query) ||
+          item.source.toLowerCase().includes(query);
+        return matchesCategory && matchesQuery;
+      });
+
+      if (!filtered.length) {
+        newsGrid.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            No news matches the current search and filter.
+          </div>
+        `;
+        return;
+      }
+
+      newsGrid.innerHTML = filtered
+        .map(
+          (item) => `
+            <article class="news-card">
+              <div class="news-meta">
+                <span class="news-category">${item.category}</span>
+                <span class="muted">${formatDate(item.date)}</span>
+              </div>
+              <h3>${item.title}</h3>
+              <p>${item.summary}</p>
+              <div class="news-footer">
+                <span>${item.source}</span>
+                <span>This module keeps students updated.</span>
+              </div>
+            </article>
+          `
+        )
+        .join("");
+    }
+
+    function formatDate(dateString) {
+      return new Date(dateString).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+      });
+    }
+
+    function calculateProjectile() {
+      const speed = Math.max(0, Number(document.getElementById("projectileSpeed").value));
+      const angleInput = Math.max(1, Math.min(89, Number(document.getElementById("projectileAngle").value)));
+      const angleRad = (angleInput * Math.PI) / 180;
+      const gravity = 9.81;
+
+      if (!speed || Number.isNaN(speed) || Number.isNaN(angleInput)) {
+        return;
+      }
+
+      const range = (speed * speed * Math.sin(2 * angleRad)) / gravity;
+      const time = (2 * speed * Math.sin(angleRad)) / gravity;
+      const maxHeight = (speed * speed * Math.sin(angleRad) * Math.sin(angleRad)) / (2 * gravity);
+
+      lastProjectileResult = {
+        speed,
+        angle: angleInput,
+        range,
+        time,
+        maxHeight
+      };
+
+      document.getElementById("projectileRange").textContent = `${range.toFixed(2)} m`;
+      document.getElementById("projectileTime").textContent = `${time.toFixed(2)} s`;
+      document.getElementById("projectileHeight").textContent = `${maxHeight.toFixed(2)} m`;
+      drawProjectileGraph(lastProjectileResult);
+    }
+
+    function drawProjectileGraph(result) {
+      if (!trajectoryCanvas || !result) {
+        return;
+      }
+
+      const context = trajectoryCanvas.getContext("2d");
+      const ratio = window.devicePixelRatio || 1;
+      const width = trajectoryCanvas.clientWidth || 640;
+      const height = 260;
+
+      trajectoryCanvas.width = width * ratio;
+      trajectoryCanvas.height = height * ratio;
+      context.setTransform(1, 0, 0, 1, 0, 0);
+      context.scale(ratio, ratio);
+      context.clearRect(0, 0, width, height);
+
+      const padding = { left: 46, right: 22, top: 18, bottom: 34 };
+      const plotWidth = width - padding.left - padding.right;
+      const plotHeight = height - padding.top - padding.bottom;
+      const xMax = Math.max(result.range * 1.1, 1);
+      const yMax = Math.max(result.maxHeight * 1.3, 1);
+
+      context.fillStyle = "rgba(8, 20, 37, 0.9)";
+      context.fillRect(0, 0, width, height);
+
+      context.strokeStyle = "rgba(123, 177, 255, 0.13)";
+      context.lineWidth = 1;
+      for (let x = 0; x <= 6; x += 1) {
+        const gx = padding.left + (plotWidth / 6) * x;
+        context.beginPath();
+        context.moveTo(gx, padding.top);
+        context.lineTo(gx, height - padding.bottom);
+        context.stroke();
+      }
+      for (let y = 0; y <= 4; y += 1) {
+        const gy = padding.top + (plotHeight / 4) * y;
+        context.beginPath();
+        context.moveTo(padding.left, gy);
+        context.lineTo(width - padding.right, gy);
+        context.stroke();
+      }
+
+      context.strokeStyle = "rgba(230, 242, 255, 0.85)";
+      context.lineWidth = 1.5;
+      context.beginPath();
+      context.moveTo(padding.left, padding.top);
+      context.lineTo(padding.left, height - padding.bottom);
+      context.lineTo(width - padding.right, height - padding.bottom);
+      context.stroke();
+
+      const gradient = context.createLinearGradient(0, padding.top, 0, height - padding.bottom);
+      gradient.addColorStop(0, "rgba(116, 223, 255, 0.88)");
+      gradient.addColorStop(1, "rgba(91, 167, 255, 0.22)");
+
+      context.beginPath();
+      for (let step = 0; step <= 80; step += 1) {
+        const x = (result.range / 80) * step;
+        const angleRad = (result.angle * Math.PI) / 180;
+        const y =
+          Math.tan(angleRad) * x -
+          (9.81 * x * x) / (2 * result.speed * result.speed * Math.cos(angleRad) * Math.cos(angleRad));
+
+        const canvasX = padding.left + (x / xMax) * plotWidth;
+        const canvasY = height - padding.bottom - (Math.max(y, 0) / yMax) * plotHeight;
+
+        if (step === 0) {
+          context.moveTo(canvasX, canvasY);
+        } else {
+          context.lineTo(canvasX, canvasY);
+        }
+      }
+      context.strokeStyle = gradient;
+      context.lineWidth = 3;
+      context.stroke();
+
+      context.fillStyle = "#d8ebff";
+      context.font = '12px "Trebuchet MS", sans-serif';
+      context.fillText("Height", 10, padding.top + 2);
+      context.fillText("Range", width / 2 - 18, height - 8);
+      context.fillText(`Max Range: ${result.range.toFixed(2)} m`, width - 150, 20);
+      context.fillText(`Max Height: ${result.maxHeight.toFixed(2)} m`, width - 154, 36);
+    }
+
+    function calculatePh() {
+      const type = document.getElementById("phType").value;
+      const strength = Math.max(0.000001, Number(document.getElementById("phStrength").value));
+      let phValue = 7;
+
+      if (type === "acid") {
+        phValue = -Math.log10(strength);
+      } else {
+        const poh = -Math.log10(strength);
+        phValue = 14 - poh;
+      }
+
+      phValue = Math.min(14, Math.max(0, phValue));
+      const indicatorLeft = (phValue / 14) * 100;
+
+      document.getElementById("phResult").textContent = phValue.toFixed(2);
+      document.getElementById("phIndicator").style.left = `calc(${indicatorLeft}% - 8px)`;
+      document.getElementById("phRemark").textContent =
+        phValue < 7 ? "The solution is acidic." : phValue > 7 ? "The solution is basic." : "The solution is neutral.";
+    }
+
+    function calculateOhm() {
+      const voltage = Math.max(0, Number(document.getElementById("voltageInput").value));
+      const resistance = Math.max(0.1, Number(document.getElementById("resistanceInput").value));
+      const current = voltage / resistance;
+
+      document.getElementById("currentResult").textContent = `${current.toFixed(2)} A`;
+      document.getElementById("ohmRemark").textContent =
+        `Using I = V / R with ${voltage.toFixed(2)} V and ${resistance.toFixed(2)} ohms.`;
+    }
+
+    function runAllCalculators() {
+      calculateProjectile();
+      calculatePh();
+      calculateOhm();
+    }
+
+    function setRating(value) {
+      currentRating = value;
+      document.querySelectorAll(".star-button").forEach((button) => {
+        button.classList.toggle("active", Number(button.dataset.rating) <= value);
+      });
+    }
+
+    function populateFeedbackDefaults() {
+      if (!currentUser) {
+        return;
+      }
+
+      feedbackFormFields.name.value = currentUser.fullName;
+      feedbackFormFields.email.value = currentUser.email;
+      feedbackFormFields.department.value = currentUser.department;
+    }
+
+    function submitFeedback(event) {
+      event.preventDefault();
+
+      const name = normalizeText(feedbackFormFields.name.value);
+      const email = normalizeText(feedbackFormFields.email.value).toLowerCase();
+      const department = normalizeText(feedbackFormFields.department.value);
+      const suggestions = normalizeText(feedbackFormFields.suggestions.value);
+
+      if (!name || !email || !department || !suggestions || !currentRating) {
+        feedbackFormFields.status.textContent = "Please complete all fields and select a rating before submitting.";
+        feedbackFormFields.status.style.color = "#ff9bb0";
+        return;
+      }
+
+      const feedback = getFeedback();
+      feedback.unshift({
+        id: `feedback_${Date.now()}`,
+        name,
+        email,
+        department,
+        suggestions,
+        rating: currentRating,
+        createdAt: new Date().toISOString()
+      });
+
+      saveCollection(STORAGE_KEYS.feedback, feedback);
+      feedbackFormFields.status.textContent = "Feedback submitted successfully and stored in localStorage.";
+      feedbackFormFields.status.style.color = "var(--success)";
+      feedbackFormFields.suggestions.value = "";
+      setRating(0);
+      renderFeedback();
+      renderDashboardStats();
+    }
+
+    function renderFeedback() {
+      const feedback = getFeedback();
+      const average = feedback.length
+        ? feedback.reduce((sum, item) => sum + item.rating, 0) / feedback.length
+        : 0;
+      const latestDepartment = feedback.length ? feedback[0].department : "-";
+
+      document.getElementById("feedbackTotal").textContent = feedback.length;
+      document.getElementById("feedbackAverage").textContent = average.toFixed(1);
+      document.getElementById("feedbackLatestDepartment").textContent = latestDepartment;
+
+      if (!feedback.length) {
+        feedbackList.innerHTML = `
+          <div class="empty-state">
+            No feedback submitted yet. Add a response from the left panel to populate the admin view.
+          </div>
+        `;
+      } else {
+        feedbackList.innerHTML = feedback
+          .map(
+            (item) => `
+              <article class="feedback-card">
+                <div class="feedback-card-header">
+                  <div>
+                    <strong>${item.name}</strong>
+                    <span>${item.email}</span><br>
+                    <small>${item.department} | ${formatDate(item.createdAt)}</small>
+                  </div>
+                  <div class="rating-pill">${"★".repeat(item.rating)}${"☆".repeat(5 - item.rating)}</div>
+                </div>
+                <p>${item.suggestions}</p>
+              </article>
+            `
+          )
+          .join("");
+      }
+
+      renderDashboardStats();
+    }
+
+    function updateClock() {
+      liveClock.textContent = new Date().toLocaleTimeString();
+    }
+
+    function attachEvents() {
+      document.getElementById("registerBtn").addEventListener("click", handleRegister);
+      document.getElementById("loginBtn").addEventListener("click", handleLogin);
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        if (window.google && window.google.accounts && window.google.accounts.id) {
+          google.accounts.id.disableAutoSelect();
+        }
+        clearSession();
+        returnToAuth();
+      });
+
+      googleUi.saveButton.addEventListener("click", () => {
+        const clientId = normalizeText(googleUi.clientIdInput.value);
+        if (!looksLikeGoogleClientId(clientId)) {
+          showGoogleStatus("Enter a valid Google Web Client ID before saving.", "error");
+          return;
+        }
+        setGoogleClientId(clientId);
+        initializeGoogleLogin();
+      });
+
+      googleUi.clearButton.addEventListener("click", () => {
+        clearGoogleClientId();
+        initializeGoogleLogin();
+      });
+
+      googleUi.profileContinue.addEventListener("click", completeGoogleProfile);
+      googleUi.profileCancel.addEventListener("click", closeGoogleProfileModal);
+
+      document.querySelectorAll(".nav-button").forEach((button) => {
+        button.addEventListener("click", () => openSection(button.dataset.section));
+      });
+
+      document.querySelectorAll(".portal-card").forEach((card) => {
+        card.addEventListener("click", () => openSection(card.dataset.section));
+      });
+
+      document.getElementById("newsSearch").addEventListener("input", renderNews);
+      document.getElementById("newsCategory").addEventListener("change", renderNews);
+      document.getElementById("refreshNewsBtn").addEventListener("click", shuffleNews);
+
+      document.getElementById("projectileSpeed").addEventListener("input", calculateProjectile);
+      document.getElementById("projectileAngle").addEventListener("input", calculateProjectile);
+      document.getElementById("phType").addEventListener("change", calculatePh);
+      document.getElementById("phStrength").addEventListener("input", calculatePh);
+      document.getElementById("voltageInput").addEventListener("input", calculateOhm);
+      document.getElementById("resistanceInput").addEventListener("input", calculateOhm);
+      document.getElementById("feedbackForm").addEventListener("submit", submitFeedback);
+
+      document.querySelectorAll(".star-button").forEach((button) => {
+        button.addEventListener("click", () => setRating(Number(button.dataset.rating)));
+      });
+
+      authForm.email.addEventListener("blur", () => {
+        const email = normalizeText(authForm.email.value).toLowerCase();
+        if (!email) {
+          return;
+        }
+        const user = getUsers().find((entry) => entry.email === email);
+        if (user) {
+          authForm.fullName.value = authForm.fullName.value || user.fullName;
+          authForm.rollNumber.value = authForm.rollNumber.value || user.rollNumber;
+          authForm.department.value = authForm.department.value || user.department;
+          showAuthStatus(
+            user.authProvider === "google" || user.googleLinked
+              ? "Existing Google-linked student found. Use the Google Sign-In button below."
+              : "Existing student found. Enter password to login.",
+            "success"
+          );
+        }
+      });
+
+      window.addEventListener("resize", () => drawProjectileGraph(lastProjectileResult));
+      setInterval(updateClock, 1000);
+    }
+
+    function init() {
+      window.onGoogleLibraryLoad = () => {
+        googleClientLoaded = true;
+        initializeGoogleLogin();
+      };
+      attachEvents();
+      hydrateSession();
+      renderNews();
+      renderFeedback();
+      updateClock();
+      setRating(0);
+      feedbackFormFields.status.textContent = "Your response will be saved locally in the browser.";
+      initializeGoogleLogin();
+      runAllCalculators();
+    }
+
+    init();
+  </script>
+</body>
+</html>

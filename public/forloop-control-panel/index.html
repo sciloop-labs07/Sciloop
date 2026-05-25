@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ForLoop Control Panel</title>
+    <meta
+      name="description"
+      content="Developer mission control for SciLoop portals, AI engines, simulations, APIs, logs, and feedback."
+    />
+    <link rel="stylesheet" href="/forloop-control-panel/forloop-control-panel.css" />
+  </head>
+  <body>
+    <div class="forloop-shell">
+      <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+      <section class="access-gate" id="access-gate">
+        <div class="gate-card panel">
+          <p class="eyebrow">Developer Access</p>
+          <h1>ForLoop Developer Access</h1>
+          <p class="subtitle">Developer-only mission control for SciLoop.</p>
+          <form id="access-form" class="gate-form">
+            <label for="access-code-input">Access code</label>
+            <input id="access-code-input" type="password" autocomplete="off" />
+            <button class="action-button" type="submit">Unlock Control Panel</button>
+          </form>
+          <p class="gate-message" id="gate-message"></p>
+        </div>
+      </section>
+
+      <div id="forloop-app" hidden>
+        <header class="topbar panel">
+          <div>
+            <p class="eyebrow">Developer Mission Control</p>
+            <h1>ForLoop Control Panel</h1>
+            <p class="subtitle">
+              Developer mission control for SciLoop portals, AI engines, simulations, APIs,
+              logs, and feedback.
+            </p>
+          </div>
+          <div class="topbar-meta">
+            <div class="topbar-actions">
+              <button class="secondary-button" type="button" id="demo-toggle-button">Enable Demo Mode</button>
+              <button class="danger-button" type="button" id="lock-forloop-button">Lock ForLoop</button>
+            </div>
+            <span class="environment-badge">LOCAL DEV</span>
+            <div class="status-chip-grid" id="status-chip-grid"></div>
+          </div>
+        </header>
+
+        <div class="mini-status panel" id="mini-status" aria-live="polite"></div>
+
+        <div class="workspace">
+          <aside class="sidebar panel" aria-label="ForLoop sections">
+            <div class="sidebar-header">
+              <h2>Systems</h2>
+              <p>Developer-only sections for observing, testing, and hardening SciLoop.</p>
+            </div>
+            <nav class="section-nav" id="section-nav"></nav>
+          </aside>
+
+          <main class="dashboard">
+            <section class="panel hero-panel">
+              <div>
+                <p class="eyebrow">Command 4 Scope</p>
+                <h2>Secure, polished, developer-only mission control for safe local and demo workflows.</h2>
+              </div>
+              <div class="quick-actions" id="quick-actions"></div>
+            </section>
+
+            <section class="overview-stack">
+              <section class="panel">
+                <div class="section-heading compact-heading">
+                  <div>
+                    <p class="eyebrow">Connection Status</p>
+                    <h2>Backend link</h2>
+                  </div>
+                </div>
+                <div class="connection-grid" id="connection-grid"></div>
+              </section>
+
+              <section class="panel">
+                <div class="section-heading compact-heading">
+                  <div>
+                    <p class="eyebrow">Health Check Timeline</p>
+                    <h2>Latest checks</h2>
+                  </div>
+                </div>
+                <div class="timeline-list" id="timeline-list"></div>
+              </section>
+            </section>
+
+            <section class="panel" data-section="Overview">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Overview</p>
+                  <h2>System snapshot</h2>
+                </div>
+                <p class="section-copy">
+                  Safe live checks when backend is available, local fallback and demo workflows when it is not.
+                </p>
+              </div>
+              <div class="metric-grid" id="overview-grid"></div>
+              <div class="meter-grid" id="meter-grid"></div>
+            </section>
+
+            <section class="panel" data-section="Services" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Services</p>
+                  <h2>Service monitor</h2>
+                </div>
+              </div>
+              <div class="service-grid" id="services-grid"></div>
+            </section>
+
+            <section class="panel" data-section="Runtime Console" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Runtime Console</p>
+                  <h2>Browser-based backend control</h2>
+                </div>
+                <p class="section-copy">
+                  Allowlisted local controls for starting, stopping, and observing SciLoop systems without opening a separate terminal.
+                </p>
+              </div>
+              <div class="runtime-layout">
+                <section class="tool-card">
+                  <div class="runtime-toolbar">
+                    <button class="action-button" type="button" id="runtime-refresh-button">Refresh Runtime Status</button>
+                    <button class="secondary-button" type="button" id="runtime-load-logs-button">Load Runtime Logs</button>
+                  </div>
+                  <div class="runtime-target-grid" id="runtime-target-grid"></div>
+                </section>
+                <section class="tool-card terminal-card">
+                  <div class="terminal-header">
+                    <div>
+                      <p class="eyebrow">Visible Terminal</p>
+                      <h3>ForLoop Runtime Output</h3>
+                    </div>
+                    <span class="service-chip status-local">Allowlisted</span>
+                  </div>
+                  <div class="terminal-stream" id="runtime-terminal-stream" aria-live="polite" aria-atomic="false"></div>
+                  <form class="runtime-command-form" id="runtime-command-form">
+                    <label for="runtime-command-input">Approved command</label>
+                    <div class="runtime-command-row">
+                      <input
+                        id="runtime-command-input"
+                        type="text"
+                        placeholder="Try: status, start sciloop-frontend, stop sciloop-frontend, logs"
+                      />
+                      <button class="action-button" type="submit">Run</button>
+                    </div>
+                  </form>
+                </section>
+              </div>
+            </section>
+
+            <section class="panel" data-section="Portal Registry" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Portal Registry</p>
+                  <h2>Developer registry</h2>
+                </div>
+              </div>
+              <div class="registry-grid" id="portal-grid"></div>
+            </section>
+
+            <section class="panel" data-section="AI Pipeline" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">AI Pipeline</p>
+                  <h2>Developer pipeline map</h2>
+                </div>
+              </div>
+              <div class="pipeline-grid" id="pipeline-grid"></div>
+            </section>
+
+            <section class="panel" data-section="SciLoop AI Panel" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">SciLoop AI Panel</p>
+                  <h2>Specialist AI launch control</h2>
+                </div>
+                <p class="section-copy">
+                  The TR readiness box and any 3 specialist APIs must be green before the News AI backend starts.
+                </p>
+              </div>
+
+              <div class="sciloop-ai-launch-grid">
+                <section class="tool-card launch-card">
+                  <div class="launch-status" id="sciloop-ai-launch-status"></div>
+                  <div class="tool-actions">
+                    <button class="secondary-button" type="button" id="sciloop-ai-refresh-button">Refresh Panel</button>
+                    <button class="secondary-button" type="button" id="sciloop-ai-check-all-button">Check All Specialists</button>
+                    <button class="danger-button big-start-button" type="button" id="sciloop-ai-start-button" disabled>
+                      Start SciLoop AI Server
+                    </button>
+                  </div>
+                </section>
+
+                <section class="tool-card">
+                  <h3>TR Box</h3>
+                  <div class="tr-check-grid" id="sciloop-ai-tr-grid"></div>
+                </section>
+              </div>
+
+              <form class="provider-key-grid" id="sciloop-ai-key-form"></form>
+              <div class="sciloop-ai-log" id="sciloop-ai-log"></div>
+            </section>
+
+            <section class="panel" data-section="Unity AI Bridge" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Unity AI Bridge</p>
+                  <h2>Quantum possibility simulation control</h2>
+                </div>
+                <p class="section-copy">
+                  Connects News Portal possibility generation to the Reality Engine and prepares Unity WebGL scene bundles.
+                </p>
+              </div>
+
+              <div class="unity-ai-grid">
+                <section class="tool-card unity-ai-status-card">
+                  <div id="unity-ai-status"></div>
+                  <div class="tool-actions">
+                    <button class="secondary-button" type="button" id="unity-ai-refresh-button">Check Unity AI Bridge</button>
+                    <button class="action-button" type="button" id="unity-ai-test-button">Generate Test Possibility</button>
+                  </div>
+                </section>
+
+                <form class="tool-card" id="unity-ai-test-form">
+                  <label for="unity-ai-title-input">Demo news title</label>
+                  <input id="unity-ai-title-input" type="text" value="Scientists develop new battery material" />
+                  <label for="unity-ai-summary-input">Demo summary</label>
+                  <textarea id="unity-ai-summary-input">Researchers created a material that may improve battery storage and reduce energy system friction.</textarea>
+                  <label for="unity-ai-field-input">Field</label>
+                  <input id="unity-ai-field-input" type="text" value="Energy" />
+                </form>
+              </div>
+
+              <div class="unity-ai-grid">
+                <section class="tool-card">
+                  <h3>Latest News Portal Scene</h3>
+                  <div class="output-view" id="unity-ai-latest-scene"></div>
+                </section>
+                <section class="tool-card">
+                  <h3>Unity Scene Bundle Preview</h3>
+                  <pre class="output-raw" id="unity-ai-output-raw">No Unity AI bridge output yet.</pre>
+                </section>
+              </div>
+            </section>
+
+            <section class="panel" data-section="AI Test Lab" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">AI Test Lab</p>
+                  <h2>Explanation testing</h2>
+                </div>
+              </div>
+              <div class="tool-grid">
+                <form class="tool-card" id="ai-test-form">
+                  <div class="tool-meta" id="ai-meta"></div>
+                  <label for="ai-test-input">Scientific news or concept</label>
+                  <textarea id="ai-test-input" placeholder="Paste scientific news or a complex concept to simplify."></textarea>
+                  <label for="ai-style-select">Output style</label>
+                  <select id="ai-style-select">
+                    <option value="simple">Simple Explanation</option>
+                    <option value="kid">Kid Explanation</option>
+                    <option value="student">Student Exam Explanation</option>
+                    <option value="investor">Investor Demo Explanation</option>
+                    <option value="first_principles">First-Principles Explanation</option>
+                  </select>
+                  <div class="tool-actions">
+                    <button class="action-button" type="submit">Run AI Explanation Test</button>
+                    <button class="secondary-button" type="button" id="ai-mock-button">Run Mock Explanation</button>
+                  </div>
+                </form>
+                <section class="tool-card">
+                  <h3>Output Preview</h3>
+                  <div class="empty-state" id="ai-empty">No AI explanation output yet.</div>
+                  <div class="output-view" id="ai-output-view"></div>
+                  <pre class="output-raw" id="ai-output-raw"></pre>
+                </section>
+              </div>
+            </section>
+
+            <section class="panel" data-section="Story Builder Lab" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Story Builder Lab</p>
+                  <h2>SciLoop story preview</h2>
+                </div>
+              </div>
+              <div class="tool-grid">
+                <form class="tool-card" id="story-form">
+                  <label for="story-input">Discovery or news text</label>
+                  <textarea id="story-input" placeholder="Paste a discovery/news item."></textarea>
+                  <label for="story-format-select">Story format</label>
+                  <select id="story-format-select">
+                    <option value="emoji_timeline">Emoji Timeline</option>
+                    <option value="discovery_journey">Discovery Journey</option>
+                    <option value="inventor_story">Inventor Story</option>
+                    <option value="problem_breakthrough_impact">Problem -> Breakthrough -> Impact</option>
+                    <option value="kid_visual_story">Kid Visual Story</option>
+                  </select>
+                  <div class="tool-actions">
+                    <button class="action-button" type="submit">Generate Story Preview</button>
+                    <button class="secondary-button" type="button" id="story-mock-button">Generate Mock Story</button>
+                  </div>
+                </form>
+                <section class="tool-card">
+                  <h3>Story Preview</h3>
+                  <div class="empty-state" id="story-empty">No story preview yet.</div>
+                  <div class="output-view" id="story-output-view"></div>
+                  <pre class="output-raw" id="story-output-raw"></pre>
+                </section>
+              </div>
+            </section>
+
+            <section class="panel" data-section="News Pipeline Lab" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">News Pipeline Lab</p>
+                  <h2>News dry-runs and parsing</h2>
+                </div>
+              </div>
+              <div class="tool-grid">
+                <form class="tool-card" id="news-form">
+                  <label for="news-source-mode">Source mode</label>
+                  <select id="news-source-mode">
+                    <option value="mock">Mock Source</option>
+                    <option value="manual">Manual URL/Text</option>
+                    <option value="existing">Existing News Engine</option>
+                  </select>
+                  <label for="news-category">Category</label>
+                  <select id="news-category">
+                    <option>Physics</option>
+                    <option>AI</option>
+                    <option>Biology</option>
+                    <option>Chemistry</option>
+                    <option>Space</option>
+                    <option>Engineering</option>
+                    <option>Climate</option>
+                    <option>Medicine</option>
+                  </select>
+                  <label for="news-input">Manual URL or text</label>
+                  <textarea id="news-input" placeholder="Paste a URL or science news text."></textarea>
+                  <div class="tool-actions">
+                    <button class="action-button" type="submit">Run News Dry Run</button>
+                    <button class="secondary-button" type="button" id="news-parse-button">Parse Manual Text</button>
+                    <button class="secondary-button" type="button" id="news-mock-button">Generate Mock News Batch</button>
+                  </div>
+                </form>
+                <section class="tool-card">
+                  <h3>Pipeline Output</h3>
+                  <div class="empty-state" id="news-empty">No news pipeline output yet.</div>
+                  <div class="output-view" id="news-output-view"></div>
+                  <pre class="output-raw" id="news-output-raw"></pre>
+                </section>
+              </div>
+            </section>
+
+            <section class="panel" data-section="Simulation Planner" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Simulation Planner</p>
+                  <h2>Visual plan generation</h2>
+                </div>
+              </div>
+              <div class="tool-grid">
+                <form class="tool-card" id="simulation-form">
+                  <label for="simulation-topic">Topic</label>
+                  <textarea id="simulation-topic" placeholder="Example: black hole gravity, photosynthesis, CPU scheduling, quantum tunneling"></textarea>
+                  <label for="simulation-domain">Domain</label>
+                  <select id="simulation-domain">
+                    <option value="physics">Physics</option>
+                    <option value="biology">Biology</option>
+                    <option value="chemistry">Chemistry</option>
+                    <option value="space/cosmic">Space/Cosmic</option>
+                    <option value="computer science">Computer Science</option>
+                    <option value="mathematics">Mathematics</option>
+                    <option value="local problem">Local Problem</option>
+                  </select>
+                  <label for="simulation-level">Simulation level</label>
+                  <select id="simulation-level">
+                    <option value="text">Text-only plan</option>
+                    <option value="2d">Simple 2D scene</option>
+                    <option value="advanced_prompt">Advanced visual prompt</option>
+                  </select>
+                  <div class="tool-actions">
+                    <button class="action-button" type="submit">Generate Simulation Plan</button>
+                    <button class="secondary-button" type="button" id="simulation-mock-button">Generate Mock Physics Scene</button>
+                  </div>
+                </form>
+                <section class="tool-card">
+                  <h3>Simulation Plan</h3>
+                  <div class="empty-state" id="simulation-empty">No simulation plan yet.</div>
+                  <div class="output-view" id="simulation-output-view"></div>
+                  <pre class="output-raw" id="simulation-output-raw"></pre>
+                </section>
+              </div>
+            </section>
+
+            <section class="panel" data-section="Feedback Inspector" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Feedback Inspector</p>
+                  <h2>Developer review notes</h2>
+                </div>
+              </div>
+              <div class="tool-grid">
+                <form class="tool-card" id="feedback-form">
+                  <div class="tool-meta" id="feedback-meta"></div>
+                  <label for="feedback-type">Category</label>
+                  <select id="feedback-type">
+                    <option value="Bug Reports">Bug Reports</option>
+                    <option value="Feature Requests">Feature Requests</option>
+                    <option value="Confusing UI">Confusing UI</option>
+                    <option value="Portal Improvement Ideas">Portal Improvement Ideas</option>
+                    <option value="Teacher/Demo Feedback">Teacher/Demo Feedback</option>
+                  </select>
+                  <label for="feedback-note">Developer note</label>
+                  <textarea id="feedback-note" placeholder="Paste or write a developer feedback note."></textarea>
+                  <div class="tool-actions">
+                    <button class="action-button" type="submit">Add Dev Feedback Note</button>
+                    <button class="secondary-button" type="button" id="feedback-clear-button">Clear Local Feedback Notes</button>
+                  </div>
+                </form>
+                <section class="tool-card">
+                  <h3>Feedback List</h3>
+                  <div class="feedback-list" id="feedback-list"></div>
+                </section>
+              </div>
+            </section>
+
+            <section class="panel" data-section="Dev Report Exporter" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Dev Report Exporter</p>
+                  <h2>Local developer report</h2>
+                </div>
+              </div>
+              <div class="tool-grid">
+                <section class="tool-card">
+                  <h3>Export Tools</h3>
+                  <p class="section-copy">
+                    The exported report includes safe status metadata, latest logs, feedback note counts, and demo mode markers.
+                  </p>
+                  <div class="tool-actions">
+                    <button class="action-button" type="button" id="export-report-button">Export ForLoop Dev Report</button>
+                    <button class="secondary-button" type="button" id="copy-report-button">Copy Report JSON</button>
+                  </div>
+                </section>
+                <section class="tool-card">
+                  <h3>Report Preview</h3>
+                  <div class="empty-state" id="report-empty">No report exported yet.</div>
+                  <pre class="output-raw" id="report-preview"></pre>
+                </section>
+              </div>
+            </section>
+
+            <section class="panel" data-section="Action History / Logs" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Action History / Logs</p>
+                  <h2>Developer event stream</h2>
+                </div>
+              </div>
+              <div class="tool-card">
+                <div class="filter-row">
+                  <select id="log-level-filter" aria-label="Filter logs by level">
+                    <option value="all">All Levels</option>
+                    <option value="info">Info</option>
+                    <option value="warn">Warn</option>
+                    <option value="error">Error</option>
+                    <option value="action">Action</option>
+                  </select>
+                  <select id="log-source-filter" aria-label="Filter logs by source">
+                    <option value="all">All Sources</option>
+                    <option value="system">System</option>
+                    <option value="ai">AI</option>
+                    <option value="news">News</option>
+                    <option value="simulation">Simulation</option>
+                    <option value="feedback">Feedback</option>
+                    <option value="runtime">Runtime</option>
+                  </select>
+                  <button class="secondary-button" type="button" id="load-backend-logs-button">Load Backend Logs</button>
+                  <button class="secondary-button" type="button" id="export-logs-button">Export Logs JSON</button>
+                </div>
+                <div class="log-only-panel" id="log-only-panel"></div>
+              </div>
+            </section>
+
+            <section class="panel" data-section="Production Readiness" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Production Readiness</p>
+                  <h2>ForLoop Production Checklist</h2>
+                </div>
+              </div>
+              <div class="checklist-grid" id="production-checklist"></div>
+            </section>
+
+            <section class="panel" data-section="Settings" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Settings</p>
+                  <h2>Local developer preferences</h2>
+                </div>
+              </div>
+              <form class="backend-url-form" id="backend-url-form">
+                <label for="backend-url-input">SciLoop Backend URL</label>
+                <div class="backend-url-controls">
+                  <input id="backend-url-input" name="backendUrl" type="url" />
+                  <button class="action-button" type="submit">Save Backend URL</button>
+                </div>
+              </form>
+              <div class="tool-actions">
+                <button class="secondary-button" type="button" id="reset-state-button">Reset Local ForLoop State</button>
+              </div>
+              <form class="settings-grid" id="settings-grid"></form>
+            </section>
+          </main>
+
+          <aside class="console panel">
+            <div class="console-header">
+              <div>
+                <p class="eyebrow">System Console</p>
+                <h2>ForLoop Event Stream</h2>
+              </div>
+              <button class="danger-button" type="button" id="clear-console-button">Clear Console</button>
+            </div>
+            <div class="log-stream" id="log-stream" aria-live="polite" aria-atomic="false"></div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <script src="/forloop-control-panel/forloop-control-panel.js" defer></script>
+  </body>
+</html>
