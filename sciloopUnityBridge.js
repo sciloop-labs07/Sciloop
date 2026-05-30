@@ -476,10 +476,15 @@
   function resetSimulation() {
     state.frame = 0;
     state.collisionCount = 0;
-    state.averageSpeed = state.speed;
-    state.averageEnergy = state.energy;
-    state.aliveAgents = Math.round(state.population);
-    resetFallbackAgents();
+    state.averageSpeed = 0;
+    state.averageEnergy = 0;
+    state.aliveAgents = 0;
+    state.stabilityScore = 1;
+    resetFallbackAgents(true);
+    if (state.animationId) {
+      cancelAnimationFrame(state.animationId);
+      state.animationId = null;
+    }
     const instance = findUnityInstance();
     if (instance && typeof instance.SendMessage === "function") {
       try {
@@ -488,7 +493,16 @@
         // Unity reset is optional; the SciLoop fallback still resets immediately.
       }
     }
-    updateBridge();
+    renderResults({
+      aliveAgents: 0,
+      averageEnergy: 0,
+      collisionCount: 0,
+      stabilityScore: 1
+    });
+    const text = byId("unityExplanationText");
+    if (text) {
+      text.textContent = "Simulation reset. Press Start / Send to Unity to run the AI-agent sandbox again.";
+    }
   }
 
   function updateOutput(id, value) {
@@ -603,6 +617,7 @@
   }
 
   function sendCurrentCommand() {
+    if (!state.animationId) drawFallbackFrame();
     const command = generateSimulationCommand();
     const result = sendToUnity(command);
     updateJsonPreview(command);
@@ -686,11 +701,11 @@
     if (input) input.value = String(value);
   }
 
-  function resetFallbackAgents() {
+  function resetFallbackAgents(empty = false) {
     state.particles = [];
     state.resources = [];
-    state.averageEnergy = state.energy;
-    state.aliveAgents = Math.round(state.population);
+    state.averageEnergy = empty ? 0 : state.energy;
+    state.aliveAgents = empty ? 0 : Math.round(state.population);
   }
 
   function ensureParticles(width, height) {
