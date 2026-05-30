@@ -1,21 +1,30 @@
 {
-  "simulationType": "ecosystem-dynamics",
+  "source": "SciLoop",
+  "target": "Unity",
+  "version": "1.0",
+  "simulationType": "ecosystem",
   "entities": [
     {
-      "id": "agents",
-      "type": "sphere-agent",
+      "id": "ai_agents",
+      "type": "agent",
+      "name": "AI Agent",
       "count": 34,
-      "behavior": "wander-collide-stabilize"
+      "energy": 62,
+      "speed": 1.2,
+      "behavior": ["wander", "seek_energy", "avoid_walls"]
     },
     {
-      "id": "energy_field",
-      "type": "field-plane",
-      "intensity": 0.62
+      "id": "energy_particles",
+      "type": "resource",
+      "name": "Energy Particle",
+      "count": 10,
+      "energyValue": 25
     },
     {
-      "id": "temperature_layer",
-      "type": "environment-gradient",
-      "value": 24
+      "id": "environment",
+      "type": "field",
+      "name": "Simulation Chamber",
+      "role": "gravity and temperature boundary"
     }
   ],
   "variables": {
@@ -27,9 +36,9 @@
   },
   "causalRelations": [
     {
-      "from": "energy",
-      "to": "averageSpeed",
-      "relation": "higher energy increases agent motion"
+      "from": "energyParticles",
+      "to": "averageEnergy",
+      "relation": "agents recover energy when they reach a particle"
     },
     {
       "from": "population",
@@ -49,10 +58,14 @@
   ],
   "visualModel": {
     "renderer": "unity-webgl-or-canvas-fallback",
-    "scene": "SciLoop simulation chamber",
+    "scene": "dark scientific AI sandbox",
     "camera": "orbit",
+    "prefabs": {
+      "agent": "AI agent sphere",
+      "resource": "energy particle orb"
+    },
     "palette": ["#7dd3fc", "#63f5d5", "#ffd166", "#ff6b6b"],
-    "effects": ["agent trails", "collision flashes", "energy glow", "temperature haze"]
+    "effects": ["agent trails", "energy glow", "collision flashes", "temperature haze"]
   },
   "controls": {
     "gravity": 9.8,
@@ -62,14 +75,14 @@
     "temperature": 24
   },
   "resultsRequest": {
-    "objectCount": true,
-    "averageSpeed": true,
+    "aliveAgents": true,
+    "averageEnergy": true,
     "collisionCount": true,
     "stabilityScore": true
   },
   "bridgeMeta": {
-    "protocol": "sciloop-unity-simulation-bridge",
-    "version": "0.1",
+    "protocol": "sciloop-unity-ai-sandbox",
+    "version": "0.2",
     "targetObject": "SciLoopUnityBridge",
     "targetMethod": "LoadSimulation",
     "generatedAt": "2026-05-30T00:00:00.000Z"

@@ -4,39 +4,41 @@ using UnityEngine;
 
 public class SciLoopUnityBridge : MonoBehaviour
 {
-    [Header("Scene Objects")]
+    [Header("Prefabs")]
     [SerializeField] private GameObject agentPrefab;
+    [SerializeField] private GameObject energyParticlePrefab;
     [SerializeField] private GameObject fieldPrefab;
     [SerializeField] private Transform simulationRoot;
 
     [Header("Runtime")]
-    [SerializeField] private float spawnRadius = 5f;
+    [SerializeField] private float spawnRadius = 6f;
     [SerializeField] private float reportIntervalSeconds = 0.5f;
     [SerializeField] private bool reportToBrowser = true;
 
     [Serializable]
     public class SimulationCommand
     {
-        public string simulationType = "ecosystem-dynamics";
+        public string source = "SciLoop";
+        public string target = "Unity";
+        public string version = "1.0";
+        public string simulationType = "ecosystem";
         public EntityDefinition[] entities = Array.Empty<EntityDefinition>();
         public SimulationVariables variables = new SimulationVariables();
-        public CausalRelation[] causalRelations = Array.Empty<CausalRelation>();
-        public VisualModel visualModel = new VisualModel();
         public SimulationVariables controls = new SimulationVariables();
         public ResultsRequest resultsRequest = new ResultsRequest();
-        public BridgeMeta bridgeMeta = new BridgeMeta();
     }
 
     [Serializable]
     public class EntityDefinition
     {
         public string id = "";
-        public string type = "sphere-agent";
+        public string type = "";
+        public string name = "";
         public int count = 1;
-        public string behavior = "";
-        public string role = "";
-        public float intensity = 1f;
-        public float value = 0f;
+        public float energy = 62f;
+        public float speed = 1.2f;
+        public float energyValue = 25f;
+        public string[] behavior = Array.Empty<string>();
     }
 
     [Serializable]
@@ -50,52 +52,25 @@ public class SciLoopUnityBridge : MonoBehaviour
     }
 
     [Serializable]
-    public class CausalRelation
-    {
-        public string from = "";
-        public string to = "";
-        public string relation = "";
-    }
-
-    [Serializable]
-    public class VisualModel
-    {
-        public string renderer = "";
-        public string scene = "";
-        public string camera = "";
-        public string[] palette = Array.Empty<string>();
-        public string[] effects = Array.Empty<string>();
-    }
-
-    [Serializable]
     public class ResultsRequest
     {
-        public bool objectCount = true;
-        public bool averageSpeed = true;
+        public bool aliveAgents = true;
+        public bool averageEnergy = true;
         public bool collisionCount = true;
         public bool stabilityScore = true;
     }
 
     [Serializable]
-    public class BridgeMeta
-    {
-        public string protocol = "";
-        public string version = "";
-        public string targetObject = "";
-        public string targetMethod = "";
-        public string generatedAt = "";
-    }
-
-    [Serializable]
     public class SimulationResults
     {
-        public int objectCount;
-        public float averageSpeed;
+        public int aliveAgents;
+        public float averageEnergy;
         public int collisionCount;
         public float stabilityScore;
     }
 
-    private readonly List<Rigidbody> activeBodies = new List<Rigidbody>();
+    private readonly List<AgentAI> activeAgents = new List<AgentAI>();
+    private readonly List<EnergyParticle> activeResources = new List<EnergyParticle>();
     private readonly List<GameObject> spawnedObjects = new List<GameObject>();
     private SimulationVariables currentVariables = new SimulationVariables();
     private float nextReportTime;
@@ -129,6 +104,12 @@ public class SciLoopUnityBridge : MonoBehaviour
         ApplyCommand(command);
     }
 
+    public void ResetSimulation()
+    {
+        ResetSceneRoot();
+        SendResultsToBrowser();
+    }
+
     public void UpdateGravity(float value)
     {
         currentVariables.gravity = Mathf.Max(0f, value);
@@ -138,12 +119,25 @@ public class SciLoopUnityBridge : MonoBehaviour
     public void UpdateSpeed(float value)
     {
         currentVariables.speed = Mathf.Clamp(value, 0.05f, 12f);
+        foreach (var agent in activeAgents)
+        {
+            if (agent != null) agent.SetSpeed(currentVariables.speed);
+        }
     }
 
     public void UpdatePopulation(int value)
     {
         currentVariables.population = Mathf.Clamp(value, 1, 250);
-        ReconcilePopulation(currentVariables.population);
+        ReconcileAgents(currentVariables.population);
+    }
+
+    public void UpdateEnergy(float value)
+    {
+        currentVariables.energy = Mathf.Clamp(value, 0f, 100f);
+        foreach (var agent in activeAgents)
+        {
+            if (agent != null) agent.SetStartingEnergy(currentVariables.energy);
+        }
     }
 
     public void UpdateTemperature(float value)
@@ -151,22 +145,19 @@ public class SciLoopUnityBridge : MonoBehaviour
         currentVariables.temperature = Mathf.Clamp(value, -100f, 160f);
     }
 
-    public void UpdateEnergy(float value)
+    public void RegisterCollision()
     {
-        currentVariables.energy = Mathf.Clamp(value, 0f, 100f);
+        collisionCount += 1;
     }
 
     private void ApplyCommand(SimulationCommand command)
     {
-        var variables = command.variables ?? command.controls ?? new SimulationVariables();
-        currentVariables = variables;
-        UpdateGravity(variables.gravity);
-        UpdateSpeed(variables.speed);
-        UpdateEnergy(variables.energy);
-        UpdateTemperature(variables.temperature);
+        currentVariables = command.variables ?? command.controls ?? new SimulationVariables();
+        UpdateGravity(currentVariables.gravity);
         ResetSceneRoot();
-        SpawnField(command);
-        ReconcilePopulation(Mathf.Clamp(variables.population, 1, 250));
+        SpawnField();
+        ReconcileAgents(Mathf.Clamp(currentVariables.population, 1, 250));
+        SpawnResources(Mathf.Max(4, Mathf.RoundToInt(currentVariables.population / 4f)), Mathf.Max(8f, currentVariables.energy / 3f));
         SendResultsToBrowser();
     }
 
@@ -180,92 +171,111 @@ public class SciLoopUnityBridge : MonoBehaviour
 
         foreach (var spawned in spawnedObjects)
         {
-            if (spawned != null)
-            {
-                Destroy(spawned);
-            }
+            if (spawned != null) Destroy(spawned);
         }
 
         spawnedObjects.Clear();
-        activeBodies.Clear();
+        activeAgents.Clear();
+        activeResources.Clear();
         collisionCount = 0;
     }
 
-    private void SpawnField(SimulationCommand command)
+    private void SpawnField()
     {
         GameObject field = fieldPrefab != null
             ? Instantiate(fieldPrefab, simulationRoot)
             : GameObject.CreatePrimitive(PrimitiveType.Cylinder);
 
-        field.name = "SciLoop Energy Field";
+        field.name = "SciLoop AI Sandbox Field";
         field.transform.SetParent(simulationRoot, false);
         field.transform.position = new Vector3(0f, -0.08f, 0f);
-        field.transform.localScale = new Vector3(8f, 0.05f, 8f);
+        field.transform.localScale = new Vector3(9f, 0.05f, 9f);
         ApplyColor(field, ColorFromTemperature(currentVariables.temperature, currentVariables.energy), 0.48f);
         spawnedObjects.Add(field);
     }
 
-    private void ReconcilePopulation(int desiredCount)
+    private void ReconcileAgents(int desiredCount)
     {
-        while (activeBodies.Count < desiredCount)
+        while (activeAgents.Count < desiredCount)
         {
-            SpawnAgent(activeBodies.Count);
+            SpawnAgent(activeAgents.Count);
         }
 
-        while (activeBodies.Count > desiredCount)
+        while (activeAgents.Count > desiredCount)
         {
-            var lastIndex = activeBodies.Count - 1;
-            var body = activeBodies[lastIndex];
-            activeBodies.RemoveAt(lastIndex);
-
-            if (body != null)
+            var lastIndex = activeAgents.Count - 1;
+            var agent = activeAgents[lastIndex];
+            activeAgents.RemoveAt(lastIndex);
+            if (agent != null)
             {
-                spawnedObjects.Remove(body.gameObject);
-                Destroy(body.gameObject);
+                spawnedObjects.Remove(agent.gameObject);
+                Destroy(agent.gameObject);
             }
         }
     }
 
     private void SpawnAgent(int index)
     {
-        GameObject agent = agentPrefab != null
+        GameObject agentObject = agentPrefab != null
             ? Instantiate(agentPrefab, simulationRoot)
             : GameObject.CreatePrimitive(PrimitiveType.Sphere);
 
-        agent.name = "SciLoop Agent " + index;
-        agent.transform.SetParent(simulationRoot, false);
+        agentObject.name = "SciLoop AI Agent " + index;
+        agentObject.transform.SetParent(simulationRoot, false);
         var angle = index * 137.5f * Mathf.Deg2Rad;
         var radius = Mathf.Sqrt(index + 1f) / Mathf.Sqrt(Mathf.Max(1, currentVariables.population)) * spawnRadius;
-        agent.transform.position = new Vector3(Mathf.Cos(angle) * radius, 1f + (index % 5) * 0.18f, Mathf.Sin(angle) * radius);
-        agent.transform.localScale = Vector3.one * Mathf.Lerp(0.18f, 0.46f, Mathf.Clamp01(currentVariables.energy / 100f));
-        ApplyColor(agent, Color.Lerp(new Color(0.35f, 0.92f, 1f), new Color(1f, 0.82f, 0.32f), Mathf.Clamp01(currentVariables.energy / 100f)), 0.86f);
+        agentObject.transform.position = new Vector3(Mathf.Cos(angle) * radius, 1f, Mathf.Sin(angle) * radius);
+        agentObject.transform.localScale = Vector3.one * Mathf.Lerp(0.22f, 0.5f, Mathf.Clamp01(currentVariables.energy / 100f));
+        ApplyColor(agentObject, Color.Lerp(new Color(0.35f, 0.92f, 1f), new Color(1f, 0.82f, 0.32f), Mathf.Clamp01(currentVariables.energy / 100f)), 0.9f);
 
-        var body = agent.GetComponent<Rigidbody>();
-        if (body == null)
-        {
-            body = agent.AddComponent<Rigidbody>();
-        }
-
+        var body = agentObject.GetComponent<Rigidbody>();
+        if (body == null) body = agentObject.AddComponent<Rigidbody>();
         body.mass = Mathf.Lerp(0.6f, 1.8f, Mathf.Clamp01(currentVariables.gravity / 20f));
         body.drag = 0.2f;
         body.angularDrag = 0.35f;
-        body.AddForce(UnityEngine.Random.insideUnitSphere * currentVariables.speed * 2.4f, ForceMode.VelocityChange);
 
-        var relay = agent.GetComponent<SciLoopCollisionRelay>();
-        if (relay == null)
+        var agent = agentObject.GetComponent<AgentAI>();
+        if (agent == null) agent = agentObject.AddComponent<AgentAI>();
+        agent.Initialize(this, currentVariables.speed, currentVariables.energy, spawnRadius);
+        activeAgents.Add(agent);
+        spawnedObjects.Add(agentObject);
+    }
+
+    private void SpawnResources(int count, float energyValue)
+    {
+        for (var i = 0; i < count; i += 1)
         {
-            relay = agent.AddComponent<SciLoopCollisionRelay>();
-        }
-        relay.Owner = this;
+            GameObject resourceObject = energyParticlePrefab != null
+                ? Instantiate(energyParticlePrefab, simulationRoot)
+                : GameObject.CreatePrimitive(PrimitiveType.Sphere);
 
-        activeBodies.Add(body);
-        spawnedObjects.Add(agent);
+            resourceObject.name = "SciLoop Energy Particle " + i;
+            resourceObject.transform.SetParent(simulationRoot, false);
+            resourceObject.transform.localScale = Vector3.one * 0.18f;
+            resourceObject.transform.position = RandomPointOnFloor();
+            ApplyColor(resourceObject, new Color(1f, 0.82f, 0.32f), 0.95f);
+
+            var resource = resourceObject.GetComponent<EnergyParticle>();
+            if (resource == null) resource = resourceObject.AddComponent<EnergyParticle>();
+            resource.Initialize(energyValue, spawnRadius);
+            activeResources.Add(resource);
+            spawnedObjects.Add(resourceObject);
+        }
+    }
+
+    public List<EnergyParticle> GetResources()
+    {
+        return activeResources;
+    }
+
+    public Vector3 RandomPointOnFloor()
+    {
+        var circle = UnityEngine.Random.insideUnitCircle * spawnRadius;
+        return new Vector3(circle.x, 0.35f, circle.y);
     }
 
     private void Update()
     {
-        DriveAgents();
-
         if (Time.time >= nextReportTime)
         {
             nextReportTime = Time.time + Mathf.Max(0.1f, reportIntervalSeconds);
@@ -273,36 +283,15 @@ public class SciLoopUnityBridge : MonoBehaviour
         }
     }
 
-    private void DriveAgents()
-    {
-        var energyFactor = Mathf.Clamp01(currentVariables.energy / 100f);
-        var temperatureStress = Mathf.Clamp01(Mathf.Abs(currentVariables.temperature - 24f) / 80f);
-        var impulse = currentVariables.speed * Mathf.Lerp(0.4f, 1.2f, energyFactor) * Time.deltaTime;
-
-        foreach (var body in activeBodies)
-        {
-            if (body == null) continue;
-            var centerPull = -body.transform.position;
-            centerPull.y = 0f;
-            body.AddForce(centerPull.normalized * impulse * 0.32f, ForceMode.Acceleration);
-            body.AddForce(UnityEngine.Random.insideUnitSphere * impulse * (1f + temperatureStress), ForceMode.Acceleration);
-        }
-    }
-
-    public void RegisterCollision()
-    {
-        collisionCount += 1;
-    }
-
     private SimulationResults CalculateResults()
     {
-        var totalSpeed = 0f;
-        var count = 0;
-        foreach (var body in activeBodies)
+        var aliveCount = 0;
+        var energyTotal = 0f;
+        foreach (var agent in activeAgents)
         {
-            if (body == null) continue;
-            totalSpeed += body.velocity.magnitude;
-            count += 1;
+            if (agent == null || !agent.IsAlive) continue;
+            aliveCount += 1;
+            energyTotal += agent.CurrentEnergy;
         }
 
         var temperatureStress = Mathf.Clamp01(Mathf.Abs(currentVariables.temperature - 24f) / 80f);
@@ -312,8 +301,8 @@ public class SciLoopUnityBridge : MonoBehaviour
 
         return new SimulationResults
         {
-            objectCount = count,
-            averageSpeed = count > 0 ? totalSpeed / count : 0f,
+            aliveAgents = aliveCount,
+            averageEnergy = aliveCount > 0 ? energyTotal / aliveCount : 0f,
             collisionCount = collisionCount,
             stabilityScore = stability
         };
@@ -321,13 +310,12 @@ public class SciLoopUnityBridge : MonoBehaviour
 
     private void SendResultsToBrowser()
     {
-        var results = CalculateResults();
-        var json = JsonUtility.ToJson(results);
+        var json = JsonUtility.ToJson(CalculateResults());
         Debug.Log("[SciLoop Unity Bridge] Results: " + json);
-
         if (!reportToBrowser) return;
 
 #if UNITY_WEBGL && !UNITY_EDITOR
+        Application.ExternalCall("receiveUnityResults", json);
         Application.ExternalCall("receiveSciLoopUnityResults", json);
 #endif
     }
@@ -352,15 +340,5 @@ public class SciLoopUnityBridge : MonoBehaviour
         var tempMix = Mathf.InverseLerp(-20f, 80f, temperature);
         var color = Color.Lerp(cool, hot, tempMix);
         return Color.Lerp(color, warm, Mathf.Clamp01(energy / 140f));
-    }
-}
-
-public class SciLoopCollisionRelay : MonoBehaviour
-{
-    public SciLoopUnityBridge Owner { get; set; }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        Owner?.RegisterCollision();
     }
 }

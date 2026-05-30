@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const BRIDGE_VERSION = "0.1";
+  const BRIDGE_VERSION = "0.2";
   const UNITY_OBJECT_NAME = "SciLoopUnityBridge";
   const UNITY_METHOD_NAME = "LoadSimulation";
 
@@ -11,12 +11,15 @@
     population: 34,
     energy: 62,
     temperature: 24,
-    simulationType: "ecosystem-dynamics",
+    simulationType: "ecosystem",
     frame: 0,
     collisionCount: 0,
     averageSpeed: 1.2,
+    averageEnergy: 62,
+    aliveAgents: 34,
     stabilityScore: 0.78,
     particles: [],
+    resources: [],
     lastJson: null,
     canvasContext: null,
     animationId: null,
@@ -24,11 +27,28 @@
   };
 
   const sampleSimulation = {
-    simulationType: "ecosystem-dynamics",
+    source: "SciLoop",
+    target: "Unity",
+    version: "1.0",
+    simulationType: "ecosystem",
     entities: [
-      { id: "population_cluster", type: "agent_swarm", count: 34, role: "moving system agents" },
-      { id: "energy_field", type: "field", role: "resource pressure" },
-      { id: "temperature_layer", type: "environment", role: "thermal constraint" }
+      {
+        id: "ai_agents",
+        type: "agent",
+        name: "AI Agent",
+        count: 34,
+        energy: 62,
+        speed: 1.2,
+        behavior: ["wander", "seek_energy", "avoid_walls"]
+      },
+      {
+        id: "energy_particles",
+        type: "resource",
+        name: "Energy Particle",
+        count: 10,
+        energyValue: 25
+      },
+      { id: "environment", type: "field", name: "Simulation Chamber", role: "gravity and temperature boundary" }
     ],
     variables: {
       gravity: 9.8,
@@ -38,7 +58,7 @@
       temperature: 24
     },
     causalRelations: [
-      { from: "energy", to: "averageSpeed", relation: "higher energy increases motion" },
+      { from: "energy", to: "averageEnergy", relation: "energy particles keep agents alive" },
       { from: "temperature", to: "stabilityScore", relation: "extreme temperature reduces stability" },
       { from: "population", to: "collisionCount", relation: "more agents increase interactions" },
       { from: "gravity", to: "settling", relation: "higher gravity pulls agents downward" }
@@ -60,6 +80,12 @@
       population: { min: 5, max: 120, unit: "agents" },
       energy: { min: 0, max: 100, unit: "%" },
       temperature: { min: -20, max: 80, unit: "C" }
+    },
+    resultsRequest: {
+      aliveAgents: true,
+      averageEnergy: true,
+      collisionCount: true,
+      stabilityScore: true
     }
   };
 
@@ -164,6 +190,24 @@
       .unity-control input[type="range"] {
         width: 100%;
         accent-color: var(--unity-cyan);
+      }
+      .unity-select-row {
+        display: grid;
+        gap: 0.45rem;
+        margin-bottom: 0.85rem;
+      }
+      .unity-select-row label {
+        color: rgba(225, 240, 255, 0.76);
+        font-size: 0.86rem;
+      }
+      .unity-select-row select {
+        width: 100%;
+        min-height: 2.6rem;
+        border: 1px solid rgba(125, 211, 252, 0.2);
+        border-radius: 8px;
+        background: rgba(3, 7, 17, 0.88);
+        color: #f5fbff;
+        padding: 0 0.75rem;
       }
       .unity-button-row {
         display: flex;
@@ -286,13 +330,13 @@
     const section = document.createElement("section");
     section.id = "unitySimulationBridgePortal";
     section.className = "portal";
-    section.setAttribute("aria-label", "Unity Simulation Bridge");
+    section.setAttribute("aria-label", "Unity AI Sandbox");
     section.innerHTML = `
       <div class="unity-bridge-shell">
         <article class="unity-bridge-hero">
-          <div class="lab-label">Unity WebGL integration</div>
-          <h2>Unity Simulation Bridge</h2>
-          <p>Control a SciLoop simulation from the web UI, send structured JSON into Unity WebGL, and keep a browser fallback running when Unity is not loaded.</p>
+          <div class="lab-label">Unity WebGL AI simulation</div>
+          <h2>Unity AI Sandbox</h2>
+          <p>SciLoop creates the intelligence model, JSON carries the command, and Unity visualizes the 3D simulation. When Unity is not loaded, the same model runs in the SciLoop canvas fallback.</p>
         </article>
 
         <div class="unity-status-row" aria-live="polite">
@@ -305,9 +349,20 @@
         <div class="unity-bridge-grid">
           <article class="unity-bridge-panel">
             <div class="lab-label">Live controls</div>
+            <div class="unity-select-row">
+              <label for="unitySimulationType">Simulation type</label>
+              <select id="unitySimulationType">
+                <option value="ecosystem">AI ecosystem</option>
+                <option value="molecular">Molecular swarm</option>
+                <option value="climate">Climate pressure</option>
+                <option value="population">Population dynamics</option>
+                <option value="neural">Neural signal field</option>
+              </select>
+            </div>
             <div class="unity-control-stack" id="unityControlStack"></div>
             <div class="unity-button-row">
-              <button class="unity-bridge-button" id="unitySendButton" type="button">Send to Unity</button>
+              <button class="unity-bridge-button" id="unitySendButton" type="button">Start / Send to Unity</button>
+              <button class="unity-bridge-button" id="unityResetButton" type="button">Reset</button>
               <button class="unity-bridge-button" id="unitySampleButton" type="button">Load sample</button>
               <button class="unity-bridge-button" id="unityCopyJsonButton" type="button">Copy JSON</button>
             </div>
@@ -326,12 +381,12 @@
           <article class="unity-bridge-panel">
             <div class="lab-label">Unity results</div>
             <div class="unity-results-grid">
-              <div class="unity-result-card"><span>Objects</span><strong id="unityResultObjects">34</strong></div>
-              <div class="unity-result-card"><span>Average speed</span><strong id="unityResultSpeed">1.20</strong></div>
+              <div class="unity-result-card"><span>Alive agents</span><strong id="unityResultAlive">34</strong></div>
+              <div class="unity-result-card"><span>Average energy</span><strong id="unityResultEnergy">62%</strong></div>
               <div class="unity-result-card"><span>Collisions</span><strong id="unityResultCollisions">0</strong></div>
               <div class="unity-result-card"><span>Stability</span><strong id="unityResultStability">78%</strong></div>
             </div>
-            <p class="unity-explanation" id="unityExplanationText">The fallback engine is running a lightweight agent simulation. Higher energy and speed increase motion, while extreme temperature and crowding reduce stability.</p>
+            <p class="unity-explanation" id="unityExplanationText">The fallback engine is running a lightweight AI-agent simulation. Agents wander, avoid walls, seek energy particles, lose energy over time, and die when energy reaches zero.</p>
           </article>
 
           <article class="unity-bridge-panel">
@@ -376,8 +431,14 @@
         updateBridge();
       });
     });
+    byId("unitySimulationType")?.addEventListener("change", () => {
+      readControls();
+      resetFallbackAgents();
+      updateBridge();
+    });
 
     byId("unitySendButton")?.addEventListener("click", () => sendCurrentCommand());
+    byId("unityResetButton")?.addEventListener("click", () => resetSimulation());
     byId("unitySampleButton")?.addEventListener("click", () => loadSampleSimulation());
     byId("unityCopyJsonButton")?.addEventListener("click", copyCurrentJson);
   }
@@ -398,16 +459,36 @@
   }
 
   function readControls() {
+    state.simulationType = byId("unitySimulationType")?.value || state.simulationType;
     state.gravity = Number(byId("unityGravity")?.value || state.gravity);
     state.speed = Number(byId("unitySpeed")?.value || state.speed);
     state.population = Number(byId("unityPopulation")?.value || state.population);
     state.energy = Number(byId("unityEnergy")?.value || state.energy);
     state.temperature = Number(byId("unityTemperature")?.value || state.temperature);
+    updateOutput("unitySimulationLabel", state.simulationType.replace(/-/g, " "));
     updateOutput("unityGravityValue", round(state.gravity, 1));
     updateOutput("unitySpeedValue", `${round(state.speed, 1)}x`);
     updateOutput("unityPopulationValue", Math.round(state.population));
     updateOutput("unityEnergyValue", `${Math.round(state.energy)}%`);
     updateOutput("unityTemperatureValue", `${Math.round(state.temperature)}C`);
+  }
+
+  function resetSimulation() {
+    state.frame = 0;
+    state.collisionCount = 0;
+    state.averageSpeed = state.speed;
+    state.averageEnergy = state.energy;
+    state.aliveAgents = Math.round(state.population);
+    resetFallbackAgents();
+    const instance = findUnityInstance();
+    if (instance && typeof instance.SendMessage === "function") {
+      try {
+        instance.SendMessage(UNITY_OBJECT_NAME, "ResetSimulation", "");
+      } catch {
+        // Unity reset is optional; the SciLoop fallback still resets immediately.
+      }
+    }
+    updateBridge();
   }
 
   function updateOutput(id, value) {
@@ -424,26 +505,37 @@
     const collisionRate = Math.max(0, Math.round((state.population * state.speed * (1 + crowdStress) * 0.04) - stability * 2));
 
     state.averageSpeed = averageSpeed;
+    state.averageEnergy = clamp(state.averageEnergy || state.energy, 0, 100);
+    state.aliveAgents = state.particles.length ? state.particles.filter((particle) => particle.alive !== false).length : Math.round(state.population);
     state.collisionCount += Math.max(0, Math.floor(collisionRate / 3));
     state.stabilityScore = stability;
 
     const command = {
+      source: "SciLoop",
+      target: "Unity",
+      version: "1.0",
       simulationType: state.simulationType,
       entities: [
         {
-          id: "agents",
-          type: "sphere-agent",
+          id: "ai_agents",
+          type: "agent",
+          name: "AI Agent",
           count: Math.round(state.population),
-          behavior: "wander-collide-stabilize"
+          energy: Math.round(state.energy),
+          speed: round(state.speed, 2),
+          behavior: ["wander", "seek_energy", "avoid_walls"]
         },
         {
-          id: "energy_field",
-          type: "field-plane",
-          intensity: round(state.energy / 100, 2)
+          id: "energy_particles",
+          type: "resource",
+          name: "Energy Particle",
+          count: Math.max(4, Math.round(state.population / 4)),
+          energyValue: Math.max(8, Math.round(state.energy / 3))
         },
         {
-          id: "temperature_layer",
-          type: "environment-gradient",
+          id: "environment",
+          type: "field",
+          name: "Simulation Chamber",
           value: Math.round(state.temperature)
         }
       ],
@@ -455,7 +547,7 @@
         temperature: Math.round(state.temperature)
       },
       causalRelations: [
-        { from: "energy", to: "averageSpeed", relation: "higher energy increases agent motion" },
+        { from: "energyParticles", to: "averageEnergy", relation: "agents recover energy when they reach a particle" },
         { from: "population", to: "collisionCount", relation: "more agents create more collisions" },
         { from: "temperature", to: "stabilityScore", relation: "temperature far from the comfort zone lowers stability" },
         { from: "gravity", to: "verticalSettling", relation: "higher gravity pulls the simulation closer to the floor plane" }
@@ -475,8 +567,8 @@
         temperature: state.temperature
       },
       resultsRequest: {
-        objectCount: true,
-        averageSpeed: true,
+        aliveAgents: true,
+        averageEnergy: true,
         collisionCount: true,
         stabilityScore: true
       },
@@ -547,13 +639,15 @@
 
   function renderResults(results) {
     const data = results || {
-      objectCount: Math.round(state.population),
-      averageSpeed: state.averageSpeed,
+      aliveAgents: state.aliveAgents,
+      averageEnergy: state.averageEnergy,
       collisionCount: state.collisionCount,
       stabilityScore: state.stabilityScore
     };
-    updateOutput("unityResultObjects", data.objectCount ?? Math.round(state.population));
-    updateOutput("unityResultSpeed", round(data.averageSpeed ?? state.averageSpeed, 2));
+    const aliveAgents = data.aliveAgents ?? data.objectCount ?? data.objects ?? Math.round(state.population);
+    const averageEnergy = data.averageEnergy ?? data.energy ?? state.averageEnergy ?? state.energy;
+    updateOutput("unityResultAlive", Math.round(aliveAgents));
+    updateOutput("unityResultEnergy", `${Math.round(averageEnergy)}%`);
     updateOutput("unityResultCollisions", data.collisionCount ?? state.collisionCount);
     updateOutput("unityResultStability", `${Math.round((data.stabilityScore ?? state.stabilityScore) * 100)}%`);
   }
@@ -563,7 +657,7 @@
     if (!text) return;
     const stability = Math.round(state.stabilityScore * 100);
     const mode = sendResult && sendResult.ok ? "Unity is receiving the live JSON." : "SciLoop is using the canvas fallback.";
-    text.textContent = `${mode} The scene has ${Math.round(state.population)} agents. Energy and speed raise motion, population raises collisions, and temperature far from the comfort zone lowers stability. Current stability is ${stability}%.`;
+    text.textContent = `${mode} The scene has ${Math.round(state.aliveAgents || state.population)} living agents. They wander, avoid walls, seek energy particles, and lose energy over time. Population raises collisions, while extreme temperature lowers stability. Current stability is ${stability}%.`;
   }
 
   function copyCurrentJson() {
@@ -576,18 +670,27 @@
   }
 
   function loadSampleSimulation() {
+    setControlValue("unitySimulationType", sampleSimulation.simulationType);
     setControlValue("unityGravity", sampleSimulation.variables.gravity);
     setControlValue("unitySpeed", sampleSimulation.variables.speed);
     setControlValue("unityPopulation", sampleSimulation.variables.population);
     setControlValue("unityEnergy", sampleSimulation.variables.energy);
     setControlValue("unityTemperature", sampleSimulation.variables.temperature);
     readControls();
+    resetFallbackAgents();
     updateBridge();
   }
 
   function setControlValue(id, value) {
     const input = byId(id);
     if (input) input.value = String(value);
+  }
+
+  function resetFallbackAgents() {
+    state.particles = [];
+    state.resources = [];
+    state.averageEnergy = state.energy;
+    state.aliveAgents = Math.round(state.population);
   }
 
   function ensureParticles(width, height) {
@@ -599,10 +702,44 @@
         vx: (Math.random() - 0.5) * 1.8,
         vy: (Math.random() - 0.5) * 1.8,
         radius: 3 + Math.random() * 4,
-        hue: Math.random()
+        hue: Math.random(),
+        energy: state.energy,
+        alive: true
       });
     }
     while (state.particles.length > desired) state.particles.pop();
+    for (const particle of state.particles) {
+      if (typeof particle.energy !== "number") particle.energy = state.energy;
+      if (particle.energy > 0) particle.alive = true;
+    }
+  }
+
+  function ensureResources(width, height) {
+    const desired = Math.max(4, Math.round(state.population / 4));
+    while (state.resources.length < desired) {
+      state.resources.push({
+        x: 32 + Math.random() * Math.max(1, width - 64),
+        y: 32 + Math.random() * Math.max(1, height - 64),
+        value: Math.max(8, state.energy / 3),
+        pulse: Math.random() * Math.PI * 2
+      });
+    }
+    while (state.resources.length > desired) state.resources.pop();
+  }
+
+  function findNearestResource(agent) {
+    let nearest = null;
+    let nearestDistance = Infinity;
+    for (const resource of state.resources) {
+      const dx = resource.x - agent.x;
+      const dy = resource.y - agent.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearest = resource;
+      }
+    }
+    return { resource: nearest, distance: nearestDistance };
   }
 
   function drawFallbackFrame() {
@@ -621,6 +758,7 @@
     if (!ctx) return;
     state.canvasContext = ctx;
     ensureParticles(width, height);
+    ensureResources(width, height);
     state.frame += 1;
 
     const energy = state.energy / 100;
@@ -654,8 +792,34 @@
     ctx.restore();
 
     let collisions = 0;
+    let aliveAgents = 0;
+    let energyTotal = 0;
     for (const p of state.particles) {
+      if (p.energy <= 0) {
+        p.alive = false;
+      }
+      if (p.alive === false) continue;
+
+      const nearest = findNearestResource(p);
+      if (nearest.resource) {
+        const dx = nearest.resource.x - p.x;
+        const dy = nearest.resource.y - p.y;
+        const distance = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+        p.vx += (dx / distance) * 0.018 * speed;
+        p.vy += (dy / distance) * 0.018 * speed;
+        if (nearest.distance < 18 * dpr) {
+          p.energy = clamp(p.energy + nearest.resource.value, 0, 100);
+          nearest.resource.x = 32 + Math.random() * Math.max(1, width - 64);
+          nearest.resource.y = 32 + Math.random() * Math.max(1, height - 64);
+        }
+      }
+
+      p.energy = clamp(p.energy - (0.018 + state.speed * 0.006 + Math.abs(state.temperature - 24) * 0.0008), 0, 100);
       p.vy += gravity;
+      p.vx += (Math.random() - 0.5) * 0.04;
+      p.vy += (Math.random() - 0.5) * 0.04;
+      p.vx = clamp(p.vx, -2.8, 2.8);
+      p.vy = clamp(p.vy, -2.8, 2.8);
       p.x += p.vx * speed * dpr;
       p.y += p.vy * speed * dpr;
 
@@ -669,15 +833,40 @@
       }
       p.x = clamp(p.x, 18, width - 18);
       p.y = clamp(p.y, 18, height - 18);
+      aliveAgents += 1;
+      energyTotal += p.energy;
     }
 
     state.collisionCount += Math.floor(collisions / 10);
+    state.aliveAgents = aliveAgents;
+    state.averageEnergy = aliveAgents > 0 ? energyTotal / aliveAgents : 0;
+    if (state.frame % 15 === 0) {
+      renderResults();
+      updateExplanation({ ok: isUnityReady(), mode: isUnityReady() ? "unity-webgl" : "fallback" });
+    }
 
     ctx.save();
+    for (const resource of state.resources) {
+      resource.pulse += 0.045;
+      const radius = (6 + Math.sin(resource.pulse) * 2) * dpr;
+      ctx.beginPath();
+      ctx.fillStyle = "rgba(255, 209, 102, 0.92)";
+      ctx.shadowColor = "rgba(255, 209, 102, 0.55)";
+      ctx.shadowBlur = 22 * dpr;
+      ctx.arc(resource.x, resource.y, radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
     for (const p of state.particles) {
+      if (p.alive === false) {
+        ctx.beginPath();
+        ctx.strokeStyle = "rgba(255, 107, 107, 0.26)";
+        ctx.arc(p.x, p.y, p.radius * dpr, 0, Math.PI * 2);
+        ctx.stroke();
+        continue;
+      }
       const color = p.hue > 0.66 ? "125, 211, 252" : p.hue > 0.33 ? "99, 245, 213" : "255, 209, 102";
       ctx.beginPath();
-      ctx.fillStyle = `rgba(${color}, 0.86)`;
+      ctx.fillStyle = `rgba(${color}, ${0.38 + p.energy / 170})`;
       ctx.shadowColor = `rgba(${color}, 0.42)`;
       ctx.shadowBlur = 18 * dpr;
       ctx.arc(p.x, p.y, p.radius * dpr, 0, Math.PI * 2);
@@ -705,8 +894,8 @@
       }
     }
     renderResults({
-      objectCount: Number(results.objectCount ?? results.objects ?? state.population),
-      averageSpeed: Number(results.averageSpeed ?? state.averageSpeed),
+      aliveAgents: Number(results.aliveAgents ?? results.objectCount ?? results.objects ?? state.population),
+      averageEnergy: Number(results.averageEnergy ?? results.energy ?? state.averageEnergy),
       collisionCount: Number(results.collisionCount ?? state.collisionCount),
       stabilityScore: Number(results.stabilityScore ?? state.stabilityScore)
     });
@@ -720,7 +909,7 @@
     button.id = "unitySimulationBridgeTab";
     button.className = "portal-btn";
     button.type = "button";
-    button.textContent = "Unity Simulation Bridge";
+    button.textContent = "Unity AI Sandbox";
     button.addEventListener("click", () => activateUnityPortal());
     const anchor = byId("realityVisualizationTab") || byId("universalVisualTab") || byId("newsTab");
     if (anchor && anchor.parentElement === tabs) {
@@ -753,10 +942,10 @@
     byId("unitySimulationBridgeTab")?.classList.add("active");
     const footer = byId("footerNote");
     if (footer) {
-      footer.textContent = "Unity Simulation Bridge sends SciLoop JSON into Unity WebGL and keeps a canvas fallback active when Unity is offline.";
+      footer.textContent = "Unity AI Sandbox sends SciLoop JSON into Unity WebGL and keeps an AI-agent canvas fallback active when Unity is offline.";
     }
-    if (location.hash !== "#unity-simulation-bridge") {
-      history.replaceState(null, "", "#unity-simulation-bridge");
+    if (location.hash !== "#unity-ai-sandbox") {
+      history.replaceState(null, "", "#unity-ai-sandbox");
     }
     requestAnimationFrame(() => {
       byId("unitySimulationBridgePortal")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -795,6 +984,7 @@
     sendToUnity,
     sendCurrentCommand,
     receiveUnityResults,
+    resetSimulation,
     loadSampleSimulation,
     setUnityFrameUrl: configureUnityFrame,
     setUnityInstance(instance) {
@@ -804,6 +994,7 @@
     }
   };
   window.receiveSciLoopUnityResults = receiveUnityResults;
+  window.receiveUnityResults = receiveUnityResults;
 
   window.addEventListener("hashchange", () => {
     if (location.hash.toLowerCase().includes("unity")) {
