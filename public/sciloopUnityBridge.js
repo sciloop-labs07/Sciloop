@@ -133,6 +133,7 @@
       .unity-bridge-shell {
         display: grid;
         gap: 1rem;
+        animation: unitySandboxArrive 560ms ease both;
       }
       .unity-bridge-hero,
       .unity-bridge-panel {
@@ -140,6 +141,27 @@
         background: linear-gradient(180deg, rgba(7, 16, 29, 0.88), rgba(4, 9, 18, 0.92));
         box-shadow: 0 24px 80px rgba(0, 0, 0, 0.26);
         border-radius: 8px;
+        position: relative;
+        overflow: hidden;
+        transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+      }
+      .unity-bridge-hero::before,
+      .unity-bridge-panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 18% 0%, rgba(125, 211, 252, 0.13), transparent 30%),
+          linear-gradient(115deg, transparent 0%, rgba(255, 255, 255, 0.045) 46%, transparent 58%);
+        opacity: 0.72;
+        transform: translateX(-18%);
+        animation: unityPanelSheen 7.5s ease-in-out infinite;
+      }
+      .unity-bridge-panel:hover {
+        transform: translateY(-2px);
+        border-color: rgba(125, 211, 252, 0.34);
+        box-shadow: 0 28px 92px rgba(0, 0, 0, 0.34), 0 0 34px rgba(125, 211, 252, 0.08);
       }
       .unity-bridge-hero {
         padding: clamp(1.25rem, 2vw, 2rem);
@@ -175,6 +197,12 @@
         border: 1px solid rgba(255, 255, 255, 0.08);
         background: rgba(255, 255, 255, 0.035);
         border-radius: 8px;
+        transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+      }
+      .unity-control:hover {
+        border-color: rgba(125, 211, 252, 0.24);
+        background: rgba(125, 211, 252, 0.055);
+        transform: translateX(2px);
       }
       .unity-control label {
         display: flex;
@@ -190,6 +218,12 @@
       .unity-control input[type="range"] {
         width: 100%;
         accent-color: var(--unity-cyan);
+      }
+      .unity-control input[type="range"]:focus-visible,
+      .unity-select-row select:focus-visible,
+      .unity-bridge-button:focus-visible {
+        outline: 2px solid rgba(125, 211, 252, 0.75);
+        outline-offset: 3px;
       }
       .unity-select-row {
         display: grid;
@@ -223,10 +257,29 @@
         color: #f5fbff;
         padding: 0.6rem 0.95rem;
         cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+      }
+      .unity-bridge-button::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+        transform: translateX(-120%);
+        transition: transform 420ms ease;
       }
       .unity-bridge-button:hover {
         border-color: rgba(125, 211, 252, 0.5);
         background: rgba(125, 211, 252, 0.16);
+        box-shadow: 0 0 24px rgba(125, 211, 252, 0.15);
+        transform: translateY(-1px);
+      }
+      .unity-bridge-button:hover::after {
+        transform: translateX(120%);
+      }
+      .unity-bridge-button:active {
+        transform: translateY(0) scale(0.985);
       }
       .unity-status-row,
       .unity-results-grid {
@@ -241,6 +294,13 @@
         background: rgba(255, 255, 255, 0.035);
         border-radius: 8px;
         padding: 0.75rem;
+        transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+      }
+      .unity-status-pill:hover,
+      .unity-result-card:hover {
+        border-color: rgba(255, 209, 102, 0.26);
+        background: rgba(255, 209, 102, 0.05);
+        transform: translateY(-1px);
       }
       .unity-status-pill span,
       .unity-result-card span {
@@ -256,6 +316,7 @@
         margin-top: 0.3rem;
         color: #ffffff;
         font-size: 1.35rem;
+        text-shadow: 0 0 18px rgba(125, 211, 252, 0.2);
       }
       .unity-viewport {
         position: relative;
@@ -264,6 +325,18 @@
         border: 1px solid rgba(125, 211, 252, 0.16);
         border-radius: 8px;
         background: #030711;
+        box-shadow: inset 0 0 46px rgba(125, 211, 252, 0.07);
+      }
+      .unity-viewport::before {
+        content: "";
+        position: absolute;
+        inset: -20%;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 25% 30%, rgba(99, 245, 213, 0.1), transparent 24%),
+          radial-gradient(circle at 72% 62%, rgba(255, 209, 102, 0.08), transparent 22%);
+        animation: unityAmbientDrift 12s ease-in-out infinite alternate;
+        z-index: 1;
       }
       .unity-webgl-frame,
       #unityFallbackCanvas {
@@ -294,6 +367,8 @@
         border-radius: 8px;
         padding: 0.75rem;
         backdrop-filter: blur(12px);
+        z-index: 2;
+        animation: unitySoftPulse 3.4s ease-in-out infinite;
       }
       .unity-json-preview {
         max-height: 320px;
@@ -311,6 +386,60 @@
       .unity-explanation {
         color: rgba(225, 240, 255, 0.76);
         line-height: 1.7;
+      }
+      @keyframes unitySandboxArrive {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes unityPanelSheen {
+        0%, 52%, 100% {
+          opacity: 0.36;
+          transform: translateX(-28%);
+        }
+        68% {
+          opacity: 0.9;
+          transform: translateX(28%);
+        }
+      }
+      @keyframes unityAmbientDrift {
+        from {
+          transform: translate3d(-2%, -1%, 0) rotate(0deg);
+          opacity: 0.68;
+        }
+        to {
+          transform: translate3d(2%, 1%, 0) rotate(7deg);
+          opacity: 1;
+        }
+      }
+      @keyframes unitySoftPulse {
+        0%, 100% {
+          box-shadow: 0 0 0 rgba(125, 211, 252, 0);
+        }
+        50% {
+          box-shadow: 0 0 24px rgba(125, 211, 252, 0.12);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .unity-bridge-shell,
+        .unity-bridge-hero::before,
+        .unity-bridge-panel::before,
+        .unity-viewport::before,
+        .unity-overlay-note {
+          animation: none;
+        }
+        .unity-bridge-panel,
+        .unity-control,
+        .unity-bridge-button,
+        .unity-status-pill,
+        .unity-result-card {
+          transition: none;
+        }
       }
       @media (max-width: 980px) {
         .unity-bridge-grid,
@@ -711,9 +840,13 @@
   function ensureParticles(width, height) {
     const desired = Math.round(state.population);
     while (state.particles.length < desired) {
+      const x = Math.random() * width;
+      const y = Math.random() * height;
       state.particles.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
+        x,
+        y,
+        previousX: x,
+        previousY: y,
         vx: (Math.random() - 0.5) * 1.8,
         vy: (Math.random() - 0.5) * 1.8,
         radius: 3 + Math.random() * 4,
@@ -785,8 +918,11 @@
     bg.addColorStop(0, "#030711");
     bg.addColorStop(0.5, temp > 0.58 ? "#160c12" : "#061321");
     bg.addColorStop(1, "#02050c");
+    ctx.save();
+    ctx.globalAlpha = 0.94;
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, width, height);
+    ctx.restore();
 
     ctx.save();
     ctx.strokeStyle = "rgba(125, 211, 252, 0.08)";
@@ -835,6 +971,8 @@
       p.vy += (Math.random() - 0.5) * 0.04;
       p.vx = clamp(p.vx, -2.8, 2.8);
       p.vy = clamp(p.vy, -2.8, 2.8);
+      p.previousX = p.x;
+      p.previousY = p.y;
       p.x += p.vx * speed * dpr;
       p.y += p.vy * speed * dpr;
 
@@ -864,6 +1002,14 @@
     for (const resource of state.resources) {
       resource.pulse += 0.045;
       const radius = (6 + Math.sin(resource.pulse) * 2) * dpr;
+      const halo = radius * 3.6;
+      const gradient = ctx.createRadialGradient(resource.x, resource.y, radius * 0.4, resource.x, resource.y, halo);
+      gradient.addColorStop(0, "rgba(255, 209, 102, 0.28)");
+      gradient.addColorStop(1, "rgba(255, 209, 102, 0)");
+      ctx.beginPath();
+      ctx.fillStyle = gradient;
+      ctx.arc(resource.x, resource.y, halo, 0, Math.PI * 2);
+      ctx.fill();
       ctx.beginPath();
       ctx.fillStyle = "rgba(255, 209, 102, 0.92)";
       ctx.shadowColor = "rgba(255, 209, 102, 0.55)";
@@ -880,6 +1026,12 @@
         continue;
       }
       const color = p.hue > 0.66 ? "125, 211, 252" : p.hue > 0.33 ? "99, 245, 213" : "255, 209, 102";
+      ctx.beginPath();
+      ctx.strokeStyle = `rgba(${color}, ${0.08 + p.energy / 520})`;
+      ctx.lineWidth = Math.max(1, p.radius * 0.58) * dpr;
+      ctx.moveTo(p.previousX || p.x, p.previousY || p.y);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
       ctx.beginPath();
       ctx.fillStyle = `rgba(${color}, ${0.38 + p.energy / 170})`;
       ctx.shadowColor = `rgba(${color}, 0.42)`;
