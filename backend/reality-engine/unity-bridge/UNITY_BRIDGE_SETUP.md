@@ -3,6 +3,9 @@
 This folder now contains the first safe Unity receiver for the SciLoop visual bridge:
 
 - `SciLoopRealitySceneController.cs`
+- `SciLoopUnityBridge.cs`
+
+Use `SciLoopRealitySceneController` for visual-plan scenes and `SciLoopUnityBridge` for runtime simulations controlled by SciLoop sliders.
 
 ## Purpose
 
@@ -30,6 +33,17 @@ The browser and backend expect this GameObject + method:
 
 - GameObject name: `SciLoopRealitySceneController`
 - Method: `LoadSceneJson(string json)`
+
+The new simulation bridge expects:
+
+- GameObject name: `SciLoopUnityBridge`
+- Method: `LoadSimulation(string json)`
+
+Simulation results are sent back to the browser through:
+
+```csharp
+Application.ExternalCall("receiveSciLoopUnityResults", json);
+```
 
 ## Unity setup
 

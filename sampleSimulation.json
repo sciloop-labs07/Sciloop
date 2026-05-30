@@ -1,0 +1,77 @@
+{
+  "simulationType": "ecosystem-dynamics",
+  "entities": [
+    {
+      "id": "agents",
+      "type": "sphere-agent",
+      "count": 34,
+      "behavior": "wander-collide-stabilize"
+    },
+    {
+      "id": "energy_field",
+      "type": "field-plane",
+      "intensity": 0.62
+    },
+    {
+      "id": "temperature_layer",
+      "type": "environment-gradient",
+      "value": 24
+    }
+  ],
+  "variables": {
+    "gravity": 9.8,
+    "speed": 1.2,
+    "population": 34,
+    "energy": 62,
+    "temperature": 24
+  },
+  "causalRelations": [
+    {
+      "from": "energy",
+      "to": "averageSpeed",
+      "relation": "higher energy increases agent motion"
+    },
+    {
+      "from": "population",
+      "to": "collisionCount",
+      "relation": "more agents create more collisions"
+    },
+    {
+      "from": "temperature",
+      "to": "stabilityScore",
+      "relation": "temperature far from the comfort zone lowers stability"
+    },
+    {
+      "from": "gravity",
+      "to": "verticalSettling",
+      "relation": "higher gravity pulls the simulation closer to the floor plane"
+    }
+  ],
+  "visualModel": {
+    "renderer": "unity-webgl-or-canvas-fallback",
+    "scene": "SciLoop simulation chamber",
+    "camera": "orbit",
+    "palette": ["#7dd3fc", "#63f5d5", "#ffd166", "#ff6b6b"],
+    "effects": ["agent trails", "collision flashes", "energy glow", "temperature haze"]
+  },
+  "controls": {
+    "gravity": 9.8,
+    "speed": 1.2,
+    "population": 34,
+    "energy": 62,
+    "temperature": 24
+  },
+  "resultsRequest": {
+    "objectCount": true,
+    "averageSpeed": true,
+    "collisionCount": true,
+    "stabilityScore": true
+  },
+  "bridgeMeta": {
+    "protocol": "sciloop-unity-simulation-bridge",
+    "version": "0.1",
+    "targetObject": "SciLoopUnityBridge",
+    "targetMethod": "LoadSimulation",
+    "generatedAt": "2026-05-30T00:00:00.000Z"
+  }
+}
