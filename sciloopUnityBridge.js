@@ -574,7 +574,7 @@
 
   function getUnityFrameUrl() {
     const params = new URLSearchParams(window.location.search || "");
-    return params.get("unityUrl") || window.SCILOOP_UNITY_WEBGL_URL || "";
+    return params.get("unityUrl") || window.SCILOOP_UNITY_WEBGL_URL || "/unity-build/index.html";
   }
 
   function configureUnityFrame(url) {
