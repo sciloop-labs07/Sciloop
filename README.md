@@ -1,5 +1,7 @@
 # SciLoop Local Development
 
+<!-- Production deployment marker: unified public workflow -->
+
 ## Launch Routes
 
 The root route redirects to the canonical public interface:
