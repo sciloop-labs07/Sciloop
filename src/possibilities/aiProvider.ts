@@ -294,7 +294,13 @@ export async function generatePossibilityJson(
       attempts.push({ provider, model: MODELS[provider], status: "failed", reason: reasonFor(error) });
     }
   }
-  return null;
+  if (!attempts.length) return null;
+  const lastAttempt = attempts[attempts.length - 1];
+  return {
+    provider: lastAttempt.provider,
+    content: "",
+    attempts,
+  };
 }
 
 export function configuredPossibilityProviders() {

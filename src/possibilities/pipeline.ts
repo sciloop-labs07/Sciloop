@@ -9,7 +9,7 @@ import {
   type VisualSpec,
 } from "./types";
 import { validateEvidenceBrief, validateScenarioSet, validateVisualSpec } from "./validator";
-import { generatePossibilityJson, possibilityProviderStatus } from "./aiProvider";
+import { configuredPossibilityProviders, generatePossibilityJson } from "./aiProvider";
 import { buildQuantumAnalysis, QUANTUM_REASONING_SYSTEM_PROMPT, type QuantumAnalysis } from "./quantum";
 
 export interface PossibilityPipelineOptions {
@@ -181,6 +181,129 @@ function parseJsonObject(content: string): unknown | undefined {
   }
 }
 
+function normalizeStringList(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return value.map((item) => {
+    if (typeof item === "string") return item;
+    if (!item || typeof item !== "object") return String(item ?? "");
+    const record = item as Record<string, unknown>;
+    return String(record.explanation || record.label || record.text || "").trim();
+  }).filter(Boolean);
+}
+
+function normalizeScenarioSetCandidate(value: unknown, brief: EvidenceBrief, lens: PossibilityLens) {
+  if (!value || typeof value !== "object") return undefined;
+  const raw = value as Record<string, unknown>;
+  const scenarios = Array.isArray(raw.scenarios) ? raw.scenarios.map((item, index) => {
+    if (!item || typeof item !== "object") return item;
+    const scenario = item as Record<string, unknown>;
+    const scenarioId = String(scenario.id || `scenario-${index + 1}`);
+    const horizon = ["near", "medium", "long"].includes(String(scenario.horizon)) ? String(scenario.horizon) : (["near", "medium", "long"][index] || "long");
+    const classification = ["supported", "plausible", "speculative"].includes(String(scenario.classification)) ? String(scenario.classification) : (horizon === "near" ? "supported" : horizon === "medium" ? "plausible" : "speculative");
+    const causalChain = Array.isArray(scenario.causalChain)
+      ? scenario.causalChain.map((step, stepIndex) => {
+        if (!step || typeof step !== "object") return step;
+        const normalizedStep = step as Record<string, unknown>;
+        return {
+          ...normalizedStep,
+          id: String(normalizedStep.id || `${scenarioId}-step-${stepIndex}`),
+          label: String(normalizedStep.label || `Causal step ${stepIndex + 1}`),
+          explanation: String(normalizedStep.explanation || normalizedStep.label || "Further validation is required."),
+          evidenceIds: normalizeStringList(normalizedStep.evidenceIds),
+        };
+      })
+      : [];
+    const safeCausalChain = causalChain.length ? causalChain : [{
+      id: `${scenarioId}-step-1`,
+      label: "Current evidence",
+      explanation: brief.currentState,
+      evidenceIds: [brief.evidence[0]?.id || "unreferenced"],
+    }];
+    const trigger = Array.isArray(scenario.trigger)
+      ? normalizeStringList(scenario.trigger)[0] || "Further validation is required."
+      : String(scenario.trigger || "Further validation is required.");
+    return {
+      ...scenario,
+      id: scenarioId,
+      title: String(scenario.title || `${brief.field} conditional pathway`),
+      summary: String(scenario.summary || "A conditional pathway that requires further validation."),
+      classification,
+      horizon,
+      trigger,
+      lens: ["scientific", "technical", "economic", "social", "environmental", "governance"].includes(String(scenario.lens))
+        ? scenario.lens
+        : lens,
+      causalChain: safeCausalChain,
+      requiredConditions: normalizeStringList(scenario.requiredConditions),
+      potentialBenefits: normalizeStringList(scenario.potentialBenefits),
+      risks: normalizeStringList(scenario.risks),
+      unknowns: normalizeStringList(scenario.unknowns),
+      falsifiers: normalizeStringList(scenario.falsifiers),
+      evidenceIds: normalizeStringList(scenario.evidenceIds).length ? normalizeStringList(scenario.evidenceIds) : [brief.evidence[0]?.id || "unreferenced"],
+    };
+  }) : [];
+  return {
+    ...raw,
+    id: String(raw.id || `${brief.id}-scenarios`),
+    scenarios,
+    schemaVersion: POSSIBILITY_SCHEMA_VERSION,
+    briefId: brief.id,
+    generatedBy: "ai-scenario-engine",
+    disclaimer: String(raw.disclaimer || "Conditional scenarios, not predictions."),
+  };
+}
+
+function normalizeEvidenceBriefCandidate(value: unknown, sourceBrief: EvidenceBrief) {
+  if (!value || typeof value !== "object") return undefined;
+  const raw = value as Record<string, unknown>;
+  const sourceFallback = sourceBrief.sources[0];
+  const sources = (Array.isArray(raw.sources) && raw.sources.length ? raw.sources : sourceBrief.sources).map((item, index) => {
+    const source = item && typeof item === "object" ? item as Record<string, unknown> : {};
+    const sourceType = ["paper", "official", "dataset", "report", "news", "user-input", "unknown"].includes(String(source.sourceType))
+      ? String(source.sourceType)
+      : "unknown";
+    return {
+      ...source,
+      id: String(source.id || `source-${index + 1}`),
+      title: String(source.title || sourceFallback?.title || "Supplied source"),
+      publisher: String(source.publisher || sourceFallback?.publisher || "Supplied source"),
+      sourceType,
+      url: typeof source.url === "string" ? source.url : "",
+    };
+  });
+  const evidence = (Array.isArray(raw.evidence) && raw.evidence.length ? raw.evidence : sourceBrief.evidence).map((item, index) => {
+    const entry = item && typeof item === "object" ? item as Record<string, unknown> : {};
+    const kind = ["fact", "inference", "speculation", "unknown"].includes(String(entry.kind)) ? String(entry.kind) : "unknown";
+    const strength = ["strong", "moderate", "weak", "unverified"].includes(String(entry.strength)) ? String(entry.strength) : "unverified";
+    return {
+      ...entry,
+      id: String(entry.id || `evidence-${index + 1}`),
+      statement: String(entry.statement || "Evidence statement requires review."),
+      kind,
+      strength,
+      sourceIds: normalizeStringList(entry.sourceIds).length ? normalizeStringList(entry.sourceIds) : [String(sources[0]?.id || "source-1")],
+      rationale: typeof entry.rationale === "string" ? entry.rationale : "AI-prepared from the supplied brief.",
+    };
+  });
+  return {
+    ...raw,
+    schemaVersion: POSSIBILITY_SCHEMA_VERSION,
+    id: String(raw.id || sourceBrief.id),
+    subject: String(raw.subject || sourceBrief.subject),
+    title: String(raw.title || sourceBrief.title),
+    field: String(raw.field || sourceBrief.field),
+    currentState: String(raw.currentState || sourceBrief.currentState),
+    mechanism: String(raw.mechanism || sourceBrief.mechanism),
+    history: normalizeStringList(raw.history).length ? normalizeStringList(raw.history) : sourceBrief.history || [],
+    evidence,
+    constraints: normalizeStringList(raw.constraints).length ? normalizeStringList(raw.constraints) : sourceBrief.constraints,
+    dependencies: normalizeStringList(raw.dependencies).length ? normalizeStringList(raw.dependencies) : sourceBrief.dependencies,
+    unknowns: normalizeStringList(raw.unknowns).length ? normalizeStringList(raw.unknowns) : sourceBrief.unknowns,
+    sources,
+    generatedBy: "ai-polisher",
+  };
+}
+
 function attemptSummary(result: { attempts?: Array<{ provider: string; status: string; reason?: string }> } | null) {
   if (!result?.attempts?.length) return "No configured provider attempts were made.";
   return result.attempts.map((attempt) => `${attempt.provider}:${attempt.status}${attempt.reason ? ` (${attempt.reason})` : ""}`).join(" → ");
@@ -199,7 +322,7 @@ function evidencePolisherPrompts(brief: EvidenceBrief) {
 
 function scenarioEnginePrompts(brief: EvidenceBrief) {
   return {
-    system: `${QUANTUM_REASONING_SYSTEM_PROMPT}\n\nYou are SciLoop AI2, a future-possibility engine. Return ONLY one JSON object matching the supplied ScenarioSet shape. Generate exactly three conditional scenarios: near, medium, and long. Use classifications supported, plausible, or speculative; never output probabilities or percentages. Every causal step and scenario claim must reference an existing evidence id. Include conditions, benefits, risks, unknowns, and falsifiers. These are scenarios, not predictions. Set generatedBy to ai-scenario-engine.`,
+    system: `${QUANTUM_REASONING_SYSTEM_PROMPT}\n\nYou are SciLoop AI2, a future-possibility engine. Return ONLY one JSON object matching the supplied ScenarioSet shape. Generate exactly three conditional scenarios: near, medium, and long. Use classifications supported, plausible, or speculative; never output probabilities or percentages. Every causal step and scenario claim must reference an existing evidence id. Include conditions, benefits, risks, unknowns, and falsifiers. These are scenarios, not predictions. Set generatedBy to ai-scenario-engine.\n\nRequired JSON shape (use the exact keys; arrays must be present):\n{"schemaVersion":"0.1","id":"<id>","briefId":"${brief.id}","scenarios":[{"id":"<id>","title":"<title>","summary":"<conditional summary>","classification":"supported","horizon":"near","lens":"scientific","trigger":"<condition>","causalChain":[{"id":"<id>","label":"<label>","explanation":"<explanation>","evidenceIds":["${brief.evidence[0]?.id || "e1"}"]}],"requiredConditions":[],"potentialBenefits":[],"risks":[],"unknowns":[],"falsifiers":[],"evidenceIds":["${brief.evidence[0]?.id || "e1"}"]}],"generatedBy":"ai-scenario-engine","disclaimer":"Conditional scenarios, not predictions."}\nUse the same structure three times with horizons near, medium, and long.`,
     user: `Generate a careful possibility set from this validated EvidenceBrief. Do not add facts that are not present.\n\n${JSON.stringify(brief)}`,
   };
 }
@@ -222,7 +345,7 @@ export async function runPossibilityAiPipeline(brief: unknown, options: Possibil
     provider: "verified source brief",
     detail: "The verified source brief was used because no AI preparation provider is configured.",
   };
-  const configured = possibilityProviderStatus().filter((provider) => provider.configured);
+  const configured = configuredPossibilityProviders();
   if (!configured.length) {
     stages.push({ stage: "evidence-polishing", status: "fallback", provider: "provider-router", detail: "No possibility provider is configured; using the verified evidence brief." });
     if (options.requireAiPreparation) {
@@ -236,17 +359,15 @@ export async function runPossibilityAiPipeline(brief: unknown, options: Possibil
   } else {
     const polish = evidencePolisherPrompts(initial.value);
     const polishResult = await generatePossibilityJson(polish.system, polish.user, {
-      providers: configured.map((provider) => provider.provider),
+      providers: configured,
       accept: (content) => {
         const parsed = parseJsonObject(content);
-        const candidate = parsed && typeof parsed === "object"
-          ? { ...parsed as Record<string, unknown>, schemaVersion: POSSIBILITY_SCHEMA_VERSION, generatedBy: "ai-polisher" }
-          : undefined;
+        const candidate = normalizeEvidenceBriefCandidate(parsed, initial.value!);
         return validateEvidenceBrief(candidate).ok;
       },
     });
     const parsed = polishResult ? parseJsonObject(polishResult.content) : undefined;
-    const candidate = parsed && typeof parsed === "object" ? { ...parsed as Record<string, unknown>, schemaVersion: POSSIBILITY_SCHEMA_VERSION, generatedBy: "ai-polisher" } : undefined;
+    const candidate = normalizeEvidenceBriefCandidate(parsed, initial.value);
     const validation = validateEvidenceBrief(candidate);
     if (polishResult && validation.ok && validation.value) {
       polishedBrief = validation.value;
@@ -270,22 +391,20 @@ export async function runPossibilityAiPipeline(brief: unknown, options: Possibil
   }
 
   let scenarios = buildFallbackScenarioSet(polishedBrief, options.lens);
-  const scenarioProvider = possibilityProviderStatus().some((provider) => provider.configured);
+  const scenarioProvider = configured.length > 0;
   if (scenarioProvider) {
     const prompt = scenarioEnginePrompts(polishedBrief);
     const scenarioResult = await generatePossibilityJson(prompt.system, prompt.user, {
-      providers: configured.map((provider) => provider.provider),
+      providers: configured,
       accept: (content) => {
         const parsed = parseJsonObject(content);
-        const candidate = parsed && typeof parsed === "object"
-          ? { ...parsed as Record<string, unknown>, schemaVersion: POSSIBILITY_SCHEMA_VERSION, briefId: polishedBrief.id, generatedBy: "ai-scenario-engine" }
-          : undefined;
+        const candidate = normalizeScenarioSetCandidate(parsed, polishedBrief, options.lens || "scientific");
         const validation = validateScenarioSet(candidate);
         return Boolean(validation.ok && validation.value && !crossReferenceIssues(polishedBrief, validation.value, []).length && !containsUnsupportedProbability(validation.value));
       },
     });
     const parsed = scenarioResult ? parseJsonObject(scenarioResult.content) : undefined;
-    const candidate = parsed && typeof parsed === "object" ? { ...parsed as Record<string, unknown>, schemaVersion: POSSIBILITY_SCHEMA_VERSION, briefId: polishedBrief.id, generatedBy: "ai-scenario-engine" } : undefined;
+    const candidate = normalizeScenarioSetCandidate(parsed, polishedBrief, options.lens || "scientific");
     const validation = validateScenarioSet(candidate);
     const candidateScenarios = validation.value;
     const references = candidateScenarios ? crossReferenceIssues(polishedBrief, candidateScenarios, []) : [];
