@@ -213,12 +213,25 @@ function normalizeScenarioSetCandidate(value: unknown, brief: EvidenceBrief, len
         };
       })
       : [];
-    const safeCausalChain = causalChain.length ? causalChain : [{
+    const fallbackEvidenceIds = [brief.evidence[0]?.id || "unreferenced"];
+    const seedSteps = causalChain.length ? causalChain : [{
       id: `${scenarioId}-step-1`,
       label: "Current evidence",
       explanation: brief.currentState,
-      evidenceIds: [brief.evidence[0]?.id || "unreferenced"],
+      evidenceIds: fallbackEvidenceIds,
     }];
+    // The visual compiler renders a three-part current → condition → outcome
+    // map. Providers sometimes return only one or two causal steps even when
+    // the rest of the scenario is valid, so pad the validated representation
+    // before compilation instead of allowing an undefined node to crash QP.
+    const safeCausalChain = Array.from({ length: 3 }, (_, stepIndex) => seedSteps[stepIndex] || {
+      id: `${scenarioId}-step-${stepIndex + 1}`,
+      label: stepIndex === 1 ? "Required condition" : "Possible outcome",
+      explanation: stepIndex === 1
+        ? (brief.dependencies[0] || "Further validation is required.")
+        : (brief.unknowns[0] || "The outcome remains conditional."),
+      evidenceIds: fallbackEvidenceIds,
+    });
     const trigger = Array.isArray(scenario.trigger)
       ? normalizeStringList(scenario.trigger)[0] || "Further validation is required."
       : String(scenario.trigger || "Further validation is required.");
