@@ -9,6 +9,9 @@ interface TypewriterRendererProps {
   text: string;
   isStreaming?: boolean;
   speed?: number;
+  animateOnce?: boolean;
+  revealMode?: "characters" | "words";
+  intervalMs?: number;
   className?: string;
 }
 
@@ -16,15 +19,19 @@ function TypewriterRendererBase({
   text,
   isStreaming = false,
   speed = 9,
+  animateOnce = false,
+  revealMode = "characters",
+  intervalMs = 34,
   className = "",
 }: TypewriterRendererProps) {
   const [visibleText, setVisibleText] = useState("");
   const targetRef = useRef(text);
   const frameRef = useRef<number | null>(null);
+  const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
     targetRef.current = text;
-    if (!isStreaming) {
+    if (!isStreaming && !animateOnce) {
       frameRef.current = window.requestAnimationFrame(() => {
         setVisibleText(text);
       });
@@ -33,22 +40,41 @@ function TypewriterRendererBase({
       };
     }
 
-    const tick = () => {
-      setVisibleText((current) => {
-        const target = targetRef.current;
-        if (current.length >= target.length) return current;
-        const remaining = target.length - current.length;
-        const take = Math.min(Math.max(1, speed), remaining);
-        return target.slice(0, current.length + take);
-      });
+    if (isStreaming && !animateOnce) {
+      const tick = () => {
+        setVisibleText((current) => {
+          const target = targetRef.current;
+          if (current.length >= target.length) return current;
+          const remaining = target.length - current.length;
+          const take = Math.min(Math.max(1, speed), remaining);
+          return target.slice(0, current.length + take);
+        });
+        frameRef.current = window.requestAnimationFrame(tick);
+      };
       frameRef.current = window.requestAnimationFrame(tick);
-    };
+      return () => {
+        if (frameRef.current) window.cancelAnimationFrame(frameRef.current);
+      };
+    }
 
-    frameRef.current = window.requestAnimationFrame(tick);
+    setVisibleText("");
+    const units = revealMode === "words"
+      ? (text.match(/\S+\s*/g) ?? [])
+      : Array.from(text);
+    let index = 0;
+    const revealNext = () => {
+      index += revealMode === "words" ? 1 : Math.max(1, speed);
+      setVisibleText(units.slice(0, index).join(""));
+      if (index < units.length) {
+        timerRef.current = window.setTimeout(revealNext, revealMode === "words" ? intervalMs : 0);
+      }
+    };
+    timerRef.current = window.setTimeout(revealNext, 0);
     return () => {
       if (frameRef.current) window.cancelAnimationFrame(frameRef.current);
+      if (timerRef.current) window.clearTimeout(timerRef.current);
     };
-  }, [isStreaming, speed, text]);
+  }, [animateOnce, intervalMs, isStreaming, revealMode, speed, text]);
 
   const rendered = useMemo(() => (
     <ReactMarkdown

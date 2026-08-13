@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import type { InnovationRecord } from "@/data/innovations";
 import { evidenceBriefFromInnovation } from "@/src/possibilities";
+import { TypewriterRenderer } from "@/src/ai-streaming/components/TypewriterRenderer";
 import type {
   PossibilityLens,
   PossibilityPipelineSuccess,
@@ -87,6 +88,9 @@ export function PossibilityEnginePanel({ innovation, onOpenChange, underConstruc
   const selectedScenario = result?.scenarios.scenarios.find((scenario) => scenario.id === selectedScenarioId) ?? result?.scenarios.scenarios[0];
   const selectedVisual = result?.visuals.find((visual) => visual.scenarioId === selectedScenario?.id);
   const runtimeWarnings = result?.warnings.filter((warning) => warning !== result.scenarios.disclaimer) ?? [];
+  const liveSynthesis = result
+    ? `SciLoop AI has traced ${result.analysis.discovery.title} from the earlier limitation to the discovery, then into three conditional futures. The strongest path is ${result.scenarios.scenarios[0]?.title ?? "the evidence-linked scenario"}. Every possibility remains tied to evidence, conditions, risks, and unknowns.`
+    : "";
 
   return <section className="detail-section possibility-panel rounded-[32px] border border-cyan-200/15 p-6 md:p-8" aria-labelledby="possibility-engine-title">
     <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
@@ -110,6 +114,16 @@ export function PossibilityEnginePanel({ innovation, onOpenChange, underConstruc
       {state === "error" && <div className="mt-6 rounded-2xl border border-rose-200/20 bg-rose-950/20 p-4 text-sm leading-6 text-rose-100">The validated pipeline did not return a result. Your innovation page is unchanged; try the map again when the AI layer is ready.</div>}
 
       {state === "ready" && result && selectedScenario && <div className="mt-6 space-y-6">
+        <div className="rounded-2xl border border-cyan-200/20 bg-cyan-950/10 p-5 shadow-[0_0_32px_rgba(34,211,238,0.08)]" aria-live="polite">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div className="eyebrow">Live SciLoop AI synthesis</div>
+              <h3 className="mt-2 font-display text-xl font-semibold text-white">The possibility map is taking shape.</h3>
+            </div>
+            <span className="rounded-full border border-emerald-200/20 px-3 py-1.5 text-xs text-emerald-100">Evidence-linked</span>
+          </div>
+          <TypewriterRenderer key={`${result.brief.id}-${lens}`} text={liveSynthesis} animateOnce revealMode="words" intervalMs={38} className="mt-4 text-sm leading-7 text-slate-300" />
+        </div>
         <div className="grid gap-4 lg:grid-cols-[1.25fr_.75fr]">
           <div className="rounded-2xl border border-cyan-200/15 bg-cyan-950/10 p-5">
             <div className="eyebrow">Causal reasoning model · {result.analysis.discovery.domain}</div>
