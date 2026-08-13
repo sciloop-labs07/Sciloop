@@ -5,6 +5,7 @@ import {
   Space_Grotesk,
 } from "next/font/google";
 import type { ReactNode } from "react";
+import { Analytics } from "@vercel/analytics/next";
 
 import "@/app/globals.css";
 import { SiteBackground } from "@/components/ui/site-background";
@@ -30,9 +31,23 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SciLoop",
+  title: "SciLoop · The World's Live Innovation Platform",
   description:
-    "A premium science visualization MVP where discoveries change interactive worlds instead of living as static articles.",
+    "Discover, understand and explore every breakthrough shaping the future.",
+  metadataBase: new URL("https://sciloop-live.vercel.app"),
+  alternates: { canonical: "/sciloop-live" },
+  openGraph: {
+    title: "SciLoop · The World's Live Innovation Platform",
+    description: "Discover, understand and explore every breakthrough shaping the future.",
+    url: "https://sciloop-live.vercel.app/sciloop-live",
+    siteName: "SciLoop",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "SciLoop · The World's Live Innovation Platform",
+    description: "Discover, understand and explore every breakthrough shaping the future.",
+  },
 };
 
 interface RootLayoutProps {
@@ -43,6 +58,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <body className={`${display.variable} ${body.variable} ${mono.variable} antialiased`}>
+        <Analytics />
         <style>{createThemeVariablesCss()}</style>
         <div className="relative min-h-screen">
           <SiteBackground />

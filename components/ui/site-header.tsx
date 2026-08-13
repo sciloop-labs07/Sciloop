@@ -7,11 +7,11 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/", label: "Home" },
-  { href: "/worlds/physics", label: "Simulation Lab" },
-  { href: "/visual-language-lab", label: "Visual Language" },
-  { href: "/worlds/meaning-engine", label: "Meaning Engine" },
-  { href: "/discoveries", label: "Discoveries" },
-  { href: "/about", label: "About" },
+  { href: "/live-innovations", label: "Live Innovations" },
+  { href: "/content-studio", label: "Content Studio" },
+  { href: "/knowledge-graph", label: "Knowledge Graph" },
+  { href: "/director", label: "Director AI" },
+  { href: "/evolution", label: "Evolution" },
 ];
 
 export function SiteHeader() {
@@ -30,7 +30,7 @@ export function SiteHeader() {
                 SciLoop
               </div>
               <div className="text-xs uppercase tracking-[0.28em] text-slate-500">
-                Discovery as world-model
+                The world&apos;s live innovation platform
               </div>
             </div>
           </Link>

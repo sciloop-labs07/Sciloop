@@ -7,9 +7,11 @@ import { isProviderAllowed, recordFailure, recordSuccess } from "./quotaManager.
 const AI_CACHE_TTL_SECONDS = Number(process.env.AI_CACHE_TTL_SECONDS || 604800);
 const AI_PROVIDER_TIMEOUT_MS = Number(process.env.AI_PROVIDER_TIMEOUT_MS || 5000);
 const MAX_PROVIDERS_PER_AI_REQUEST = Number(process.env.MAX_PROVIDERS_PER_AI_REQUEST || 5);
-const TEXT_PROVIDER_FAILOVER_ORDER = ["gemini", "groq", "deepseek", "cohere", "huggingface"];
-const BIOLOGY_VISUAL_PROVIDER_ORDER = ["gemini", "groq", "deepseek"];
-const UNIVERSAL_VISUAL_PROVIDER_ORDER = ["gemini", "groq", "deepseek", "openrouter", "together"];
+const VERIFIED_PROVIDER_ORDER = ["groq", "openrouter", "cohere", "huggingface", "gemini"];
+const TEXT_PROVIDER_FAILOVER_ORDER = VERIFIED_PROVIDER_ORDER;
+const BIOLOGY_VISUAL_PROVIDER_ORDER = VERIFIED_PROVIDER_ORDER;
+const UNIVERSAL_VISUAL_PROVIDER_ORDER = VERIFIED_PROVIDER_ORDER;
+const STRUCTURED_JSON_PROVIDER_ORDER = VERIFIED_PROVIDER_ORDER;
 
 function textHash(article = {}, mode = "simple") {
   return crypto
@@ -290,6 +292,16 @@ function getUniversalVisualProviders(preferredProvider = "auto") {
   return order
     .map((providerId) => enabled.get(providerId))
     .filter(Boolean);
+}
+
+function getStructuredJsonProviders(preferredProvider = "auto") {
+  const enabled = new Map(getAiProviders().filter((provider) => provider.enabled).map((provider) => [provider.id, provider]));
+  const requested = String(preferredProvider || "auto").toLowerCase();
+  const order = requested !== "auto" && STRUCTURED_JSON_PROVIDER_ORDER.includes(requested)
+    ? [requested, ...STRUCTURED_JSON_PROVIDER_ORDER.filter((providerId) => providerId !== requested)]
+    : STRUCTURED_JSON_PROVIDER_ORDER;
+
+  return order.map((providerId) => enabled.get(providerId)).filter(Boolean);
 }
 
 function normalizeVisualScene(scene = {}, localScene = {}) {
@@ -897,4 +909,57 @@ export async function universalVisualPlan(payload = {}) {
     fallback: true,
     warnings: ["All universal visual AI providers failed or were unavailable.", ...warnings]
   };
+}
+
+export async function generateStructuredJson({ systemPrompt, userPrompt, preferredProvider = "auto" } = {}) {
+  if (!systemPrompt || !userPrompt) throw new Error("Structured JSON generation requires systemPrompt and userPrompt.");
+
+  const warnings = [];
+  const providers = getStructuredJsonProviders(preferredProvider);
+  for (const provider of providers.slice(0, MAX_PROVIDERS_PER_AI_REQUEST)) {
+    const quota = await isProviderAllowed(provider);
+    if (!quota.allowed) {
+      warnings.push(`${provider.name} skipped: ${quota.reason}`);
+      continue;
+    }
+
+    const request = provider.buildRequest({
+      article: { title: "Quantum Possibilities structured request", summary: userPrompt },
+      mode: "structured-json",
+      prompt: userPrompt,
+      systemPrompt,
+      userPrompt,
+      fullText: userPrompt,
+    });
+    const result = await safeFetch(provider.id, request.url, request.options, {
+      retries: 0,
+      timeoutMs: AI_PROVIDER_TIMEOUT_MS,
+    });
+
+    if (!result.ok) {
+      await recordFailure(provider, result);
+      warnings.push(`${provider.name} failed: ${result.reason || result.status}`);
+      continue;
+    }
+
+    const parsed = provider.parseResponse(result.data);
+    const content = parsed && typeof parsed === "object" && !parsed.explanation
+      ? JSON.stringify(parsed)
+      : "";
+    if (!content) {
+      await recordFailure(provider, { reason: "provider returned non-JSON structured output" });
+      warnings.push(`${provider.name} returned non-JSON structured output`);
+      continue;
+    }
+
+    await recordSuccess(provider);
+    return {
+      content,
+      providerUsed: provider.id,
+      attemptedProviders: [...warnings, provider.name],
+      warnings,
+    };
+  }
+
+  throw new Error(`All structured JSON providers failed. ${warnings.join(" | ") || "No enabled providers."}`);
 }

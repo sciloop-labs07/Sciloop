@@ -59,7 +59,9 @@ services:
       - key: OPENROUTER_API_KEY
         sync: false
       - key: OPENROUTER_MODEL
-        sync: false
+        value: openrouter/free
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
 
   - type: web
     name: sciloop-ai-backend
@@ -77,7 +79,9 @@ services:
       - key: VISUAL_LANGUAGE_LAB_URL
         sync: false
       - key: AI_PROVIDER_TIMEOUT_MS
-        value: 5000
+        value: 15000
+      - key: MAX_PROVIDERS_PER_AI_REQUEST
+        value: 5
       - key: GEMINI_API_KEY
         sync: false
       - key: GROQ_API_KEY
@@ -94,3 +98,7 @@ services:
         sync: false
       - key: OPENROUTER_API_KEY
         sync: false
+      - key: OPENROUTER_MODEL
+        value: openrouter/free
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash

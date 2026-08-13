@@ -2,6 +2,18 @@
 
 ## Launch Routes
 
+The root route redirects to the canonical public interface:
+
+```text
+/
+```
+
+The canonical public interface is the uploaded main SciLoop HTML shell:
+
+The newer Next.js Workbench and kernel remain the internal SciLoop Studio layer and are integrated into the main shell through APIs.
+
+See `SCILOOP_PUBLIC_UI.md` for the ownership contract.
+
 Use these routes for the modern one-link launch setup:
 
 ```text

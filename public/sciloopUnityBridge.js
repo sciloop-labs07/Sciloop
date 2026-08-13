@@ -462,6 +462,14 @@
     section.setAttribute("aria-label", "Unity AI Sandbox");
     section.innerHTML = `
       <div class="unity-bridge-shell">
+        <nav class="canonical-portal-nav" aria-label="Visual Language Portal sections">
+          <a href="#visual-language">Visual Language Home</a>
+          <a href="#visual-language/physics">Physics</a>
+          <a href="#visual-language/biology">Biology</a>
+          <a href="#visual-language/students">Student Learning</a>
+          <a href="#visual-language/cosmic">Cosmic Simulation</a>
+          <a href="#visual-language/unity" aria-current="page">Unity AI Sandbox</a>
+        </nav>
         <article class="unity-bridge-hero">
           <div class="lab-label">Unity WebGL AI simulation</div>
           <h2>Unity AI Sandbox</h2>
@@ -1070,20 +1078,7 @@
   }
 
   function addPortalButton() {
-    const tabs = document.querySelector(".portal-tabs");
-    if (!tabs || byId("unitySimulationBridgeTab")) return;
-    const button = document.createElement("button");
-    button.id = "unitySimulationBridgeTab";
-    button.className = "portal-btn";
-    button.type = "button";
-    button.textContent = "Unity AI Sandbox";
-    button.addEventListener("click", () => activateUnityPortal());
-    const anchor = byId("realityVisualizationTab") || byId("universalVisualTab") || byId("newsTab");
-    if (anchor && anchor.parentElement === tabs) {
-      anchor.insertAdjacentElement("afterend", button);
-    } else {
-      tabs.appendChild(button);
-    }
+    byId("unitySimulationBridgeTab")?.remove();
   }
 
   function deactivateUnityPortal() {
@@ -1106,13 +1101,13 @@
     document.querySelectorAll(".portal").forEach((portal) => portal.classList.remove("active"));
     document.querySelectorAll(".portal-btn").forEach((button) => button.classList.remove("active"));
     byId("unitySimulationBridgePortal")?.classList.add("active");
-    byId("unitySimulationBridgeTab")?.classList.add("active");
+    byId("universalVisualTab")?.classList.add("active");
     const footer = byId("footerNote");
     if (footer) {
       footer.textContent = "Unity AI Sandbox sends SciLoop JSON into Unity WebGL and keeps an AI-agent canvas fallback active when Unity is offline.";
     }
-    if (location.hash !== "#unity-ai-sandbox") {
-      history.replaceState(null, "", "#unity-ai-sandbox");
+    if (location.hash !== "#visual-language/unity") {
+      history.replaceState(null, "", "#visual-language/unity");
     }
     requestAnimationFrame(() => {
       byId("unitySimulationBridgePortal")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1147,6 +1142,7 @@
 
   window.sciloopUnityBridge = {
     init: initUnityBridgePortal,
+    activatePortal: activateUnityPortal,
     generateSimulationCommand,
     sendToUnity,
     sendCurrentCommand,

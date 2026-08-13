@@ -187,7 +187,7 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = 15000) {
   }
 }
 
-async function callOpenRouter(news) {
+async function callOpenRouter(news, prompts = {}) {
   const apiKey = process.env.OPENROUTER_API_KEY?.trim();
   if (!apiKey) throw new Error("OPENROUTER_API_KEY missing");
 
@@ -202,8 +202,8 @@ async function callOpenRouter(news) {
     body: JSON.stringify({
       model: process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini",
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: buildUserPrompt(news) }
+        { role: "system", content: prompts.systemPrompt || SYSTEM_PROMPT },
+        { role: "user", content: prompts.userPrompt || buildUserPrompt(news) }
       ],
       temperature: 0.35,
       response_format: { type: "json_object" },
@@ -216,7 +216,7 @@ async function callOpenRouter(news) {
   return payload?.choices?.[0]?.message?.content || "";
 }
 
-async function callGroq(news) {
+async function callGroq(news, prompts = {}) {
   const apiKey = process.env.GROQ_API_KEY?.trim();
   if (!apiKey) throw new Error("GROQ_API_KEY missing");
 
@@ -229,8 +229,8 @@ async function callGroq(news) {
     body: JSON.stringify({
       model: process.env.GROQ_MODEL || "llama-3.1-8b-instant",
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: buildUserPrompt(news) }
+        { role: "system", content: prompts.systemPrompt || SYSTEM_PROMPT },
+        { role: "user", content: prompts.userPrompt || buildUserPrompt(news) }
       ],
       temperature: 0.35,
       response_format: { type: "json_object" },
@@ -243,7 +243,7 @@ async function callGroq(news) {
   return payload?.choices?.[0]?.message?.content || "";
 }
 
-async function callOllama(news) {
+async function callOllama(news, prompts = {}) {
   const baseUrl = (process.env.OLLAMA_BASE_URL || "http://localhost:11434").replace(/\/$/, "");
   const model = process.env.OLLAMA_MODEL || "llama3.1";
 
@@ -254,8 +254,8 @@ async function callOllama(news) {
       model,
       stream: false,
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: buildUserPrompt(news) }
+        { role: "system", content: prompts.systemPrompt || SYSTEM_PROMPT },
+        { role: "user", content: prompts.userPrompt || buildUserPrompt(news) }
       ]
     })
   }).catch((error) => ({ ok: false, _networkError: error }));
@@ -271,7 +271,7 @@ async function callOllama(news) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       model,
-      prompt: `${SYSTEM_PROMPT}\n\n${buildUserPrompt(news)}`,
+      prompt: `${prompts.systemPrompt || SYSTEM_PROMPT}\n\n${prompts.userPrompt || buildUserPrompt(news)}`,
       stream: false,
       format: "json"
     })
@@ -314,4 +314,29 @@ export async function explainNewsWithAI(news = {}) {
     providerUsed: "fallback",
     data: createRuleBasedFallback(news)
   };
+}
+
+export async function generateStructuredJsonWithAI({ systemPrompt, userPrompt } = {}) {
+  if (!systemPrompt || !userPrompt) {
+    throw new Error("Structured JSON generation requires system and user prompts.");
+  }
+
+  const providers = {
+    openrouter: callOpenRouter,
+    groq: callGroq,
+    ollama: callOllama
+  };
+
+  for (const providerName of getProviderOrder()) {
+    try {
+      const content = await providers[providerName]({}, { systemPrompt, userPrompt });
+      if (typeof content === "string" && content.trim()) {
+        return { providerUsed: providerName, content };
+      }
+    } catch (error) {
+      console.log(`[visual-api] ${providerName} failed: ${error.message}`);
+    }
+  }
+
+  throw new Error("No configured ForLoop provider returned structured JSON.");
 }

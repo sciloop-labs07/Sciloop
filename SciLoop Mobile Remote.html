@@ -4938,6 +4938,8 @@ button:active,
   padding: clamp(14px, 2vw, 24px);
   border-radius: 30px;
   overflow: auto;
+  max-height: calc(100dvh - 36px);
+  overscroll-behavior: contain;
   background:
     radial-gradient(circle at 14% 18%, rgba(0, 255, 225, 0.2), transparent 28%),
     radial-gradient(circle at 88% 12%, rgba(255, 97, 216, 0.16), transparent 32%),
@@ -4948,6 +4950,15 @@ button:active,
     0 35px 120px rgba(0, 0, 0, 0.74),
     0 0 90px rgba(0, 255, 225, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+body.quantum-lightbox-open {
+  overflow: hidden;
+}
+
+body > .quantum-possibility-panel.is-open {
+  width: auto;
+  max-width: none;
 }
 
 .quantum-close-btn {
@@ -5252,7 +5263,7 @@ button:active,
 }
 
 .quantum-possibility-panel.is-open .quantum-visual-first .quantum-stage {
-  min-height: min(78vh, 920px);
+  min-height: min(68dvh, 820px);
 }
 
 .quantum-possibility-panel.is-open .quantum-visual-notes {
@@ -30231,12 +30242,35 @@ function renderQuantumPossibilityResult(result = {}, article = {}) {
   `;
 }
 
+const quantumPanelMounts = new WeakMap();
+
+function mountQuantumPanelAsLightbox(panel) {
+  if (!panel || panel.parentElement === document.body) return;
+  quantumPanelMounts.set(panel, {
+    parent: panel.parentElement,
+    nextSibling: panel.nextSibling
+  });
+  document.body.appendChild(panel);
+  document.body.classList.add('quantum-lightbox-open');
+}
+
+function closeQuantumPossibilityPanel(panel) {
+  if (!panel) return;
+  panel.classList.remove('is-open');
+  panel.innerHTML = '';
+  const mount = quantumPanelMounts.get(panel);
+  if (mount?.parent?.isConnected) {
+    mount.parent.insertBefore(panel, mount.nextSibling?.isConnected ? mount.nextSibling : null);
+  }
+  quantumPanelMounts.delete(panel);
+  document.body.classList.remove('quantum-lightbox-open');
+}
+
 function bindQuantumPanelClose(panel) {
   const closeButton = panel?.querySelector?.('.quantum-close-btn');
   if (!closeButton) return;
   closeButton.addEventListener('click', () => {
-    panel.classList.remove('is-open');
-    panel.innerHTML = '';
+    closeQuantumPossibilityPanel(panel);
   }, { once: true });
 }
 
@@ -30579,6 +30613,7 @@ async function openQuantumPossibilities(item = {}, button = null, panel = null) 
   const originalText = button?.textContent || 'âš¡ Imagine Quantum Possibilities';
 
   if (!targetPanel) return;
+  mountQuantumPanelAsLightbox(targetPanel);
   targetPanel.classList.add('is-open');
   targetPanel.innerHTML = '<div class="quantum-loader"><div><strong>Building causal world...</strong><br><span>Extracting intention, bottleneck, entropy flow, scale propagation, and future branches.</span></div></div>';
 

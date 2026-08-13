@@ -12,12 +12,12 @@ export default function NotFound() {
             That part of SciLoop has not been mapped yet.
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-300 md:text-lg">
-            The current MVP is intentionally focused: a premium landing page, one Physics world, and supporting discovery routes. Use the links below to jump back into the mapped experience.
+            This signal is outside the current map. Return to Humanity Live Activity and continue exploring the innovations shaping what comes next.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <ButtonLink href="/">Return home</ButtonLink>
-            <ButtonLink href="/worlds/physics" variant="secondary">
-              Enter Physics World
+            <ButtonLink href="/live-innovations" variant="secondary">
+              Explore live activity
             </ButtonLink>
           </div>
         </Panel>

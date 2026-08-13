@@ -209,6 +209,34 @@
               <div class="sciloop-ai-log" id="sciloop-ai-log"></div>
             </section>
 
+            <section class="panel" data-section="Quantum Possibilities Workflow" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Quantum Possibilities Workflow</p>
+                  <h2>ForLoop orchestration control</h2>
+                </div>
+                <p class="section-copy">
+                  ForLoop sends a validated evidence packet through the main SciLoop QP router. Provider selection and failover stay server-side.
+                </p>
+              </div>
+              <div class="tool-grid">
+                <section class="tool-card">
+                  <div id="quantum-workflow-status"></div>
+                  <div class="tool-actions">
+                    <button class="secondary-button" type="button" id="quantum-workflow-refresh-button">Check QP Workflow</button>
+                    <button class="action-button" type="button" id="quantum-workflow-run-button">Run Control-Panel Test</button>
+                  </div>
+                </section>
+                <form class="tool-card" id="quantum-workflow-form">
+                  <label for="quantum-workflow-title">Test signal title</label>
+                  <input id="quantum-workflow-title" type="text" value="A new material may improve grid batteries" />
+                  <label for="quantum-workflow-summary">Evidence summary</label>
+                  <textarea id="quantum-workflow-summary">Researchers report a material that could improve energy storage, subject to independent validation, scale-up, and safe deployment.</textarea>
+                </form>
+              </div>
+              <pre class="output-raw" id="quantum-workflow-output">No ForLoop QP workflow run yet.</pre>
+            </section>
+
             <section class="panel" data-section="Unity AI Bridge" hidden>
               <div class="section-heading">
                 <div>

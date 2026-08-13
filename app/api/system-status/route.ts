@@ -43,10 +43,14 @@ export async function GET() {
     checkJson(`${forLoopBase}/api/health`),
   ]);
 
-  const ok = aiBackend.ok && forLoopBackend.ok;
+  const coreFallbackAvailable = !process.env.SCILOOP_AI_BACKEND_URL;
+  const servicesOk = aiBackend.ok && forLoopBackend.ok;
+  const coreExperienceReady = aiBackend.ok || coreFallbackAvailable;
 
   return NextResponse.json({
-    ok,
+    ok: coreExperienceReady,
+    servicesOk,
+    degraded: !servicesOk,
     service: "SciLoop Launch Status",
     frontend: {
       ok: true,
@@ -62,7 +66,6 @@ export async function GET() {
     },
     checkedAt: new Date().toISOString(),
   }, {
-    status: ok ? 200 : 503,
+    status: coreExperienceReady ? 200 : 503,
   });
 }
-

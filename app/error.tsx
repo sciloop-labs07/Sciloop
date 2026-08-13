@@ -12,7 +12,7 @@ export default function GlobalError() {
           The world model hit turbulence.
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-300">
-          Reload the route or return to the landing page. The MVP includes graceful fallback states, but this surface still needs a clean reset.
+          The signal was interrupted. Return to the live stream and keep exploring.
         </p>
         <div className="mt-8 flex justify-center">
           <ButtonLink href="/">Return home</ButtonLink>

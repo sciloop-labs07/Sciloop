@@ -12,6 +12,12 @@ function getForLoopBackendUrl() {
   return (process.env.FORLOOP_BACKEND_URL || DEFAULT_FORLOOP_BACKEND_URL).replace(/\/+$/, "");
 }
 
+function getForLoopWorkflowAccessCode() {
+  if (process.env.FORLOOP_WORKFLOW_ACCESS_CODE) return process.env.FORLOOP_WORKFLOW_ACCESS_CODE.trim();
+  if (process.env.FORLOOP_DEV_ACCESS_CODE) return process.env.FORLOOP_DEV_ACCESS_CODE.trim();
+  return process.env.NODE_ENV === "production" ? "" : "123456";
+}
+
 async function proxyToForLoop(request: NextRequest, context: RouteContext) {
   const { path = [] } = await context.params;
   const targetPath = path.join("/");
@@ -20,10 +26,12 @@ async function proxyToForLoop(request: NextRequest, context: RouteContext) {
 
   try {
     const body = ["GET", "HEAD"].includes(request.method) ? undefined : await request.text();
+    const accessCode = getForLoopWorkflowAccessCode();
     const response = await fetch(targetUrl, {
       method: request.method,
       headers: {
         "content-type": request.headers.get("content-type") || "application/json",
+        ...(accessCode ? { "X-ForLoop-Access-Code": accessCode } : {}),
       },
       body,
       cache: "no-store",
@@ -55,4 +63,3 @@ export async function GET(request: NextRequest, context: RouteContext) {
 export async function POST(request: NextRequest, context: RouteContext) {
   return proxyToForLoop(request, context);
 }
-

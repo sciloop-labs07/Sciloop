@@ -57,10 +57,10 @@ export default function DiscoveriesPage() {
                 </div>
 
                 <Link
-                  href={`/worlds/physics?discovery=${discovery.slug}`}
+                  href={`/mini-experiment-lab?discovery=${discovery.slug}`}
                   className="inline-flex min-h-11 items-center rounded-full border border-cyan-200/24 px-5 py-2.5 text-sm text-white transition-transform duration-200 hover:-translate-y-0.5"
                 >
-                  Open in Physics World
+                  Open Simulation Example
                 </Link>
               </div>
             </Panel>

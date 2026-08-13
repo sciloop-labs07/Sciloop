@@ -239,6 +239,10 @@ ${JSON.stringify(compactExamples).slice(0, 3000)}`;
 }
 
 function makeAiPrompt(article = {}, mode = "simple", explanation = "", input = {}) {
+  if (mode === "structured-json" && input.systemPrompt && input.userPrompt) {
+    return `${input.systemPrompt}\n\n${input.userPrompt}`;
+  }
+
   if (mode === "biology-visual-plan") {
     return makeBiologyVisualPlanPrompt(input);
   }
@@ -460,27 +464,23 @@ export function getAiProviders() {
       name: "HuggingFace Inference",
       enabled: hasKey("HUGGINGFACE_API_KEY"),
       priority: 5,
-      baseUrl: "https://api-inference.huggingface.co/models",
-      model: env("HUGGINGFACE_MODEL") || "mistralai/Mistral-7B-Instruct-v0.3",
+      baseUrl: "https://router.huggingface.co/v1/chat/completions",
+      model: env("HUGGINGFACE_MODEL") || "Qwen/Qwen2.5-72B-Instruct",
       rpmLimit: 8,
       dailyLimit: 200,
       monthlyLimit: 2500,
       cooldownMs: DEFAULT_COOLDOWN_MS,
       buildRequest(input) {
         return {
-          url: `${this.baseUrl}/${this.model}`,
+          url: this.baseUrl,
           options: jsonPost({
-            inputs: makeAiPrompt(input.article, input.mode, input.explanation, input),
-            parameters: { max_new_tokens: 700, return_full_text: false }
+            model: this.model,
+            messages: [{ role: "user", content: makeAiPrompt(input.article, input.mode, input.explanation, input) }],
+            response_format: { type: "json_object" }
           }, { Authorization: `Bearer ${env("HUGGINGFACE_API_KEY")}` })
         };
       },
-      parseResponse(response) {
-        const text = Array.isArray(response)
-          ? response[0]?.generated_text
-          : response?.generated_text || response?.[0]?.generated_text || "";
-        return extractJson(text) || { explanation: text };
-      }
+      parseResponse: parseOpenAiLike
     },
     {
       id: "together",

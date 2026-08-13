@@ -13,6 +13,7 @@ const SECTION_NAMES = [
   "Portal Registry",
   "AI Pipeline",
   "SciLoop AI Panel",
+  "Quantum Possibilities Workflow",
   "Unity AI Bridge",
   "AI Test Lab",
   "Story Builder Lab",
@@ -138,6 +139,12 @@ const state = {
     status: null,
     busy: false,
     lastMessage: "SciLoop AI Panel is waiting for a refresh.",
+  },
+  quantumWorkflow: {
+    status: null,
+    result: null,
+    busy: false,
+    lastMessage: "ForLoop QP orchestration is waiting for a check.",
   },
   unityAi: {
     status: null,
@@ -301,10 +308,16 @@ async function requestJson(path, options = {}) {
     } catch {
       throw new Error("Invalid JSON response.");
     }
+    // QP uses a structured 4xx response for a validated safe-stop (for
+    // example, missing AI1 preparation). Preserve that result for the panel
+    // instead of reducing it to a generic transport error.
+    if (payload?.ok === false && Array.isArray(payload?.stages)) {
+      return payload;
+    }
     if (!response.ok || payload?.ok === false) {
       throw new Error(payload?.error || "Backend request failed.");
     }
-    return payload.data;
+    return Object.prototype.hasOwnProperty.call(payload || {}, "data") ? payload.data : payload;
   } catch (error) {
     if (error.name === "AbortError") {
       throw new Error("Request timed out.");
@@ -355,6 +368,13 @@ const api = {
       body: JSON.stringify({ targetId }),
     }),
   getSciloopAiStatus: () => requestJson("/api/admin/sciloop-ai/status"),
+  getQuantumWorkflowStatus: () => requestJson("/api/admin/quantum-possibilities/status"),
+  runQuantumWorkflow: (payload) =>
+    requestJson("/api/admin/quantum-possibilities/run", {
+      method: "POST",
+      headers: runtimeRequestHeaders(),
+      body: JSON.stringify(payload),
+    }),
   saveSciloopAiKeys: (keys) =>
     requestJson("/api/admin/sciloop-ai/keys", {
       method: "POST",
@@ -1044,6 +1064,104 @@ function renderSciloopAiPanel() {
     `TR box: ${status.readiness?.ready ? "ready" : "not ready"}. Backend reachable: ${status.readiness?.backend?.reachable ? "yes" : "not yet"}.`,
     `Start rule: ${status.canStart ? "enabled" : `disabled until ${minReady} specialists and TR are ready`}.`,
   ].forEach((line) => log.appendChild(createNode("div", "log-entry", line)));
+}
+
+function renderQuantumWorkflow() {
+  const host = document.getElementById("quantum-workflow-status");
+  const output = document.getElementById("quantum-workflow-output");
+  const refreshButton = document.getElementById("quantum-workflow-refresh-button");
+  const runButton = document.getElementById("quantum-workflow-run-button");
+  if (!host || !output || !refreshButton || !runButton) return;
+
+  host.innerHTML = "";
+  const status = state.demoMode
+    ? { status: "demo_online", message: "Demo mode is active. No live QP request was sent.", providerStatuses: [] }
+    : state.quantumWorkflow.status;
+  const tone = status?.status === "ready" ? "ready" : status?.status === "demo_online" ? "demo-online" : "offline";
+  host.append(
+    createNode("span", `service-chip status-${tone}`, status?.status || "waiting"),
+    createNode("h3", "", status?.message || "ForLoop QP workflow has not been checked yet."),
+    createNode("p", "", status?.mainOrigin ? `Main product: ${status.mainOrigin}. Provider routing remains delegated to the validated QP engine.` : state.quantumWorkflow.lastMessage),
+  );
+  if (Array.isArray(status?.providerStatuses) && status.providerStatuses.length) {
+    const providers = createNode("p", "meta-row", `Configured main-product providers: ${status.providerStatuses.filter((item) => item.configured).length}/${status.providerStatuses.length}.`);
+    host.appendChild(providers);
+  }
+
+  refreshButton.disabled = state.quantumWorkflow.busy;
+  runButton.disabled = state.demoMode || state.quantumWorkflow.busy || !state.accessCode;
+  output.textContent = state.quantumWorkflow.result
+    ? JSON.stringify(state.quantumWorkflow.result, null, 2)
+    : "No ForLoop QP workflow run yet.";
+}
+
+async function refreshQuantumWorkflowStatus() {
+  state.quantumWorkflow.busy = true;
+  state.quantumWorkflow.lastMessage = "Checking whether ForLoop can reach the main product QP router...";
+  renderQuantumWorkflow();
+  try {
+    state.quantumWorkflow.status = state.demoMode
+      ? { status: "demo_online", message: "Demo mode is active. No live QP status check was sent." }
+      : await api.getQuantumWorkflowStatus();
+    state.quantumWorkflow.lastMessage = "ForLoop QP workflow status refreshed.";
+    addLocalLog("info", "quantum-possibilities", state.quantumWorkflow.lastMessage);
+  } catch (error) {
+    state.quantumWorkflow.status = { status: "offline", message: error.message };
+    state.quantumWorkflow.lastMessage = error.message;
+    addLocalLog("warn", "quantum-possibilities", `QP workflow status unavailable. ${error.message}`);
+  } finally {
+    state.quantumWorkflow.busy = false;
+    renderQuantumWorkflow();
+    renderLogs();
+  }
+}
+
+async function runQuantumWorkflowTest() {
+  if (state.demoMode || state.quantumWorkflow.busy || !state.accessCode) return;
+  const title = sanitizeText(document.getElementById("quantum-workflow-title")?.value, 240);
+  const summary = sanitizeText(document.getElementById("quantum-workflow-summary")?.value, 2000);
+  if (!title || !summary) {
+    pushToast("warn", "Add a title and evidence summary first.");
+    return;
+  }
+
+  state.quantumWorkflow.busy = true;
+  state.quantumWorkflow.lastMessage = "ForLoop is handing AI1 evidence preparation to the main QP router...";
+  renderQuantumWorkflow();
+  try {
+    const result = await api.runQuantumWorkflow({
+      brief: {
+        schemaVersion: "0.1",
+        id: `forloop-test-${Date.now()}`,
+        title,
+        subject: "Applied Science",
+        field: "Applied Science",
+        currentState: summary,
+        mechanism: summary,
+        evidence: [{ id: "forloop-evidence-1", statement: summary, kind: "fact", strength: "moderate", sourceIds: ["forloop-source-1"] }],
+        sources: [{ id: "forloop-source-1", title: "ForLoop Control Panel test signal", publisher: "SciLoop", sourceType: "developer-test", url: "" }],
+        constraints: ["Independent validation", "Engineering scale-up", "Safe deployment"],
+        dependencies: ["Repeatable measurements", "A testable mechanism"],
+        unknowns: ["Long-term performance remains uncertain."],
+        generatedBy: "forloop-control-panel",
+      },
+      lens: "scientific",
+      includeVisual: true,
+      requireAiPreparation: true,
+    });
+    state.quantumWorkflow.result = result;
+    state.quantumWorkflow.lastMessage = result?.ok ? "ForLoop QP workflow completed with a validated result." : "ForLoop QP workflow stopped safely before guessing.";
+    addLocalLog(result?.ok ? "info" : "warn", "quantum-possibilities", state.quantumWorkflow.lastMessage);
+    pushToast(result?.ok ? "info" : "warn", result?.ok ? "QP workflow completed." : "QP workflow stopped safely.");
+  } catch (error) {
+    state.quantumWorkflow.lastMessage = error.message;
+    addLocalLog("error", "quantum-possibilities", `QP workflow test failed. ${error.message}`);
+    pushToast("error", "QP workflow test failed safely.");
+  } finally {
+    state.quantumWorkflow.busy = false;
+    renderQuantumWorkflow();
+    renderLogs();
+  }
 }
 
 function renderUnityAiBridge() {
@@ -1988,6 +2106,14 @@ function attachHandlers() {
     await startSciloopAiServer();
   }));
 
+  withElement("quantum-workflow-refresh-button", (button) => button.addEventListener("click", async () => {
+    await refreshQuantumWorkflowStatus();
+  }));
+
+  withElement("quantum-workflow-run-button", (button) => button.addEventListener("click", async () => {
+    await runQuantumWorkflowTest();
+  }));
+
   withElement("sciloop-ai-key-form", (form) => form.addEventListener("submit", saveSciloopAiKeys));
 
   withElement("sciloop-ai-key-form", (form) => form.addEventListener("click", async (event) => {
@@ -2156,6 +2282,7 @@ function renderAll() {
   renderPortalRegistry();
   renderPipeline();
   renderSciloopAiPanel();
+  renderQuantumWorkflow();
   renderUnityAiBridge();
   renderChecklist();
   renderSettings();
@@ -2184,6 +2311,7 @@ async function init() {
     await refreshSystemStatus();
     await refreshRuntimeStatus();
     await refreshSciloopAiStatus();
+    await refreshQuantumWorkflowStatus();
     await refreshUnityAiStatus();
   }
 }

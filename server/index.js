@@ -31,6 +31,10 @@ import {
   getSciloopAiStatus,
   saveSciloopAiKeys,
 } from "./sciloopAiControl.js";
+import {
+  getQuantumPossibilitiesStatus,
+  runQuantumPossibilitiesWorkflow,
+} from "./forloopQuantumWorkflow.js";
 import { generateRealityEngine } from "../backend/reality-engine/services/sciloop-analysis.service.js";
 import { getUnityBridgeInstructions } from "../backend/reality-engine/unity-bridge/websocket-bridge.service.js";
 
@@ -838,6 +842,42 @@ app.post("/api/admin/sciloop-ai/check-all", async (req, res) => {
   }
 });
 
+app.get("/api/admin/quantum-possibilities/status", async (_req, res) => {
+  pushAdminLog("info", "quantum-possibilities", "Quantum Possibilities ForLoop workflow status requested.");
+  try {
+    return respondOk(res, await getQuantumPossibilitiesStatus());
+  } catch (error) {
+    pushAdminLog("error", "quantum-possibilities", `Quantum Possibilities status failed: ${normalizeErrorMessage(error)}`);
+    return respondError(res, 502, "Could not read Quantum Possibilities workflow status.");
+  }
+});
+
+app.post("/api/admin/quantum-possibilities/run", async (req, res) => {
+  try {
+    if (!hasRuntimeAccess(req)) {
+      return respondError(res, 403, "Running Quantum Possibilities requires a valid local ForLoop access code.");
+    }
+    if (!req.body?.brief || typeof req.body.brief !== "object") {
+      return respondError(res, 400, "A structured brief is required for the Quantum Possibilities workflow.");
+    }
+
+    pushAdminLog("action", "quantum-possibilities", "ForLoop QP workflow started: AI1 preparation, validation, then QP reasoning.");
+    const result = await runQuantumPossibilitiesWorkflow(req.body);
+    const statusCode = Number(result.statusCode || (result.ok ? 200 : 400));
+    pushAdminLog(
+      result.ok ? "info" : "warn",
+      "quantum-possibilities",
+      result.ok
+        ? `ForLoop QP workflow completed through ${result.workflow?.mainOriginAttempts?.at(-1)?.origin || "main product"}.`
+        : `ForLoop QP workflow stopped safely: ${result.error || "validated result unavailable"}.`,
+    );
+    return safeJson(res, statusCode, result);
+  } catch (error) {
+    pushAdminLog("error", "quantum-possibilities", `ForLoop QP workflow failed: ${normalizeErrorMessage(error)}`);
+    return respondError(res, 502, "ForLoop Quantum Possibilities workflow failed safely.");
+  }
+});
+
 app.post("/api/admin/sciloop-ai/start-server", async (req, res) => {
   try {
     if (!hasRuntimeAccess(req)) {
@@ -1136,6 +1176,73 @@ app.get("/api/admin/visual-language/status", (_req, res) => {
   } catch (error) {
     pushAdminLog("error", "visual-language", `Visual Language status failed: ${normalizeErrorMessage(error)}`);
     return respondError(res, 500, "Could not read Visual Language Engine status.");
+  }
+});
+
+app.get("/api/admin/visual-engine/status", async (_req, res) => {
+  try {
+    const status = await getSciloopAiStatus({ projectRoot: PROJECT_ROOT });
+    const configuredProviders = status.providers.filter((provider) => provider.configured && provider.keyName);
+    const readyProvider = status.providers.find((provider) => provider.check.status === "ready" && provider.keyName)
+      || configuredProviders[0];
+    const available = configuredProviders.length > 0 && status.readiness.backend.reachable;
+    return respondOk(res, {
+      status: available ? "available" : "missing-config",
+      providerName: readyProvider?.name || "ForLoop provider router",
+      modelName: "managed by SciLoop AI backend",
+      hasServerSideKey: Boolean(readyProvider),
+      backendReachable: status.readiness.backend.reachable,
+      readyProviderCount: status.readyCount,
+      configuredProviderCount: configuredProviders.length,
+      message: available
+        ? `${configuredProviders.length} ForLoop providers are configured; SciLoop AI backend is online.`
+        : configuredProviders.length > 0
+          ? `${configuredProviders.length} ForLoop providers are configured, but SciLoop AI backend on port 5050 is offline.`
+          : "No configured ForLoop text provider was found.",
+    });
+  } catch (error) {
+    return respondError(res, 500, normalizeErrorMessage(error));
+  }
+});
+
+app.post("/api/admin/visual-engine/translate", async (req, res) => {
+  pushAdminLog("action", "visual-engine", "Controlled visual recipe translation requested.");
+  try {
+    const systemPrompt = typeof req.body?.systemPrompt === "string" ? req.body.systemPrompt.trim() : "";
+    const userPrompt = typeof req.body?.userPrompt === "string" ? req.body.userPrompt.trim() : "";
+    if (!systemPrompt || !userPrompt) {
+      return respondError(res, 400, "systemPrompt and userPrompt are required.");
+    }
+    const input = req.body?.input && typeof req.body.input === "object" ? req.body.input : {};
+    const response = await fetchWithTimeout(`${sciloopAiBackendBase()}/api/sciloop-ai/universal-visual-plan`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: input.topic || input.rawText,
+        summary: input.rawText,
+        fullText: userPrompt,
+        sourceType: input.sourceType || "concept",
+        subject: input.topic || "auto",
+        preferredProvider: "auto",
+        mode: "visual-recipe-translation",
+        renderMode: "sciloop-visual-recipe",
+        constraints: input.constraints || [],
+        systemPrompt,
+      }),
+    }, 30000);
+    const result = await response.json().catch(() => null);
+    if (!response.ok || !result?.ok || !result?.visualPlan) {
+      throw new Error(result?.error || `SciLoop AI backend returned ${response.status}.`);
+    }
+    return respondOk(res, {
+      providerUsed: result.providerUsed,
+      content: result.visualPlan,
+      cached: Boolean(result.cached),
+      warnings: Array.isArray(result.warnings) ? result.warnings : [],
+    });
+  } catch (error) {
+    pushAdminLog("error", "visual-engine", `Visual recipe translation failed: ${normalizeErrorMessage(error)}`);
+    return respondError(res, 502, "ForLoop visual recipe translation failed safely.");
   }
 });
 

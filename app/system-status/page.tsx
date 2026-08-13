@@ -42,7 +42,7 @@ export default async function SystemStatusPage() {
               SciLoop System Status
             </h1>
             <p className="max-w-3xl text-slate-300">
-              Use this page before sharing SciLoop publicly. Green means the one-link launch path can reach the frontend, AI backend, and ForLoop backend.
+              The core public experience is online. Optional live providers can be connected later without taking the innovation journey offline.
             </p>
           </div>
           <StatusPill ok={Boolean(status?.ok)} />
@@ -63,7 +63,7 @@ export default async function SystemStatusPage() {
             <h2 className="font-display text-2xl text-white">SciLoop AI</h2>
             <StatusPill ok={aiOk} />
           </div>
-          <p className="mt-3 text-sm leading-6 text-slate-300">News explanation, Visualize handoff, provider switching, and local fallback.</p>
+            <p className="mt-3 text-sm leading-6 text-slate-300">News explanation, provider switching, and curated fallback signals.</p>
         </Panel>
 
         <Panel className="rounded-[28px] p-5">
@@ -79,7 +79,7 @@ export default async function SystemStatusPage() {
         <div className="eyebrow">Launch links</div>
         <div className="mt-4 flex flex-wrap gap-3">
           <Link className="rounded-full border border-cyan-200/25 px-4 py-2 text-sm text-white" href="/sciloop-live">Open SciLoop Live</Link>
-          <Link className="rounded-full border border-cyan-200/25 px-4 py-2 text-sm text-white" href="/visual-language-lab">Open Visual Language Lab</Link>
+          <Link className="rounded-full border border-cyan-200/25 px-4 py-2 text-sm text-white" href="/visual-language">Open Visual Language Portal</Link>
           <Link className="rounded-full border border-cyan-200/25 px-4 py-2 text-sm text-white" href="/api/system-status">Raw JSON Status</Link>
         </div>
       </Panel>

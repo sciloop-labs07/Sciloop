@@ -1,0 +1,27 @@
+.git
+.vercel
+.next
+node_modules
+Sciloop/
+SciLoopQuantumPossibilities/
+SciLoop_Demo_Package/
+sciloop-backend/node_modules/
+server/node_modules/
+*.log
+*.zip
+*.bat
+*.exe
+*.jpeg
+*.jpg
+*.png
+*.mp4
+*.mov
+*.html
+!SciLoop - Live Scientific Discoveries 80.html
+!ForLoop Control Panel Mobile.html
+.env*
+!.env.example
+cloudflared*
+share-processes.txt
+requirements.txt
+app.py

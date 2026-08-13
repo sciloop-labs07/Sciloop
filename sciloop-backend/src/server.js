@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import crypto from "crypto";
 import { getAiProviders, getNewsProviders, publicProviderSummary } from "./config/providers.js";
 import { getNews } from "./services/newsRouter.js";
-import { biologyVisualPlan, explainArticle, simulateArticle, universalVisualPlan } from "./services/aiRouter.js";
+import { biologyVisualPlan, explainArticle, generateStructuredJson, simulateArticle, universalVisualPlan } from "./services/aiRouter.js";
 import { getQuotaState } from "./services/quotaManager.js";
 import { getCacheState } from "./services/cacheManager.js";
 import { handleRealityGenerate } from "../../backend/reality-engine/controllers/realityEngine.controller.js";
@@ -191,6 +191,22 @@ app.post("/api/sciloop-ai/universal-visual-plan", async (req, res) => {
     ok: true,
     ...result
   });
+});
+
+app.post("/api/sciloop-ai/structured-json", async (req, res) => {
+  try {
+    const result = await generateStructuredJson({
+      systemPrompt: req.body?.systemPrompt,
+      userPrompt: req.body?.userPrompt,
+      preferredProvider: req.body?.preferredProvider || "auto",
+    });
+    return res.json({ ok: true, ...result });
+  } catch (error) {
+    return res.status(502).json({
+      ok: false,
+      error: error instanceof Error ? error.message : "Structured JSON provider workflow failed.",
+    });
+  }
 });
 
 app.post("/api/sciloop-ai/news-visualize", async (req, res) => {
