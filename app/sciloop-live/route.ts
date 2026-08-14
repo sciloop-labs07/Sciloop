@@ -8,10 +8,14 @@ function buildShareConfig(request: NextRequest) {
   const origin = request.nextUrl.origin;
   return {
     aiBackendUrl: `${origin}/api/sciloop-ai-proxy`,
-    // QP enters through the protected ForLoop orchestration path. The direct
-    // route remains available as an emergency local fallback in the UI.
-    possibilitiesUrl: `${origin}/api/forloop-proxy/quantum-possibilities/run`,
+    // The public button uses the same-origin QP route directly. That route
+    // already runs AI1 preparation, validation, AI2 reasoning, and visual
+    // compilation. Sending a first-click request through ForLoop adds a
+    // second server round-trip and can outlive the browser's request window.
+    possibilitiesUrl: `${origin}/api/possibilities`,
     possibilitiesDirectUrl: `${origin}/api/possibilities`,
+    // ForLoop remains available to the local control panel and diagnostics.
+    possibilitiesOrchestrationUrl: `${origin}/api/forloop-proxy/quantum-possibilities/run`,
     // The canonical public UI owns this feature now; allow an explicit `0`
     // only for diagnostics, while keeping normal users on the working path.
     quantumPossibilitiesPipeline: request.nextUrl.searchParams.get("quantumPreview") !== "0",

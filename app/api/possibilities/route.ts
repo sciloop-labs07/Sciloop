@@ -12,6 +12,10 @@ const LENSES = new Set<PossibilityLens>([
 ]);
 
 export const dynamic = "force-dynamic";
+// QP runs AI1 evidence preparation before AI2 scenario generation. Give the
+// public route enough headroom for a cold provider/backend start as well as
+// the two sequential validation passes.
+export const maxDuration = 90;
 
 export async function POST(request: Request) {
   try {

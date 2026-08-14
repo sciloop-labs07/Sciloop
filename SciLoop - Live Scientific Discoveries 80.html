@@ -33356,6 +33356,8 @@ function buildQuantumPossibilityBrief(article = {}) {
   };
 }
 
+const QUANTUM_REQUEST_TIMEOUT_MS = 90000;
+
 async function requestQuantumPossibilityPipeline(article = {}) {
   if (!QUANTUM_POSSIBILITIES_PIPELINE_ENABLED) {
     return { ok: false, status: 'disabled', reason: 'feature-flag-disabled' };
@@ -33376,16 +33378,15 @@ async function requestQuantumPossibilityPipeline(article = {}) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: requestBody
-    }, 12000);
-    // ForLoop is the primary path. If that local control service is down,
-    // preserve a narrow direct same-origin fallback so the product still has
-    // a safe result instead of a blank interaction.
+    }, QUANTUM_REQUEST_TIMEOUT_MS);
+    // The same-origin QP route is canonical for the public product. Keep the
+    // narrow fallback for older cached shells and local file-based previews.
     if (response.status === 502 && SCILOOP_DIRECT_POSSIBILITIES_API_URL && SCILOOP_DIRECT_POSSIBILITIES_API_URL !== SCILOOP_POSSIBILITIES_API_URL) {
       response = await fetchWithTimeout(SCILOOP_DIRECT_POSSIBILITIES_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: requestBody
-      }, 12000);
+      }, QUANTUM_REQUEST_TIMEOUT_MS);
     }
   } catch (error) {
     if (!SCILOOP_DIRECT_POSSIBILITIES_API_URL || SCILOOP_DIRECT_POSSIBILITIES_API_URL === SCILOOP_POSSIBILITIES_API_URL) throw error;
@@ -33393,7 +33394,7 @@ async function requestQuantumPossibilityPipeline(article = {}) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: requestBody
-    }, 12000);
+    }, QUANTUM_REQUEST_TIMEOUT_MS);
   }
 
   let payload = await response.json().catch(() => null);
@@ -33404,7 +33405,7 @@ async function requestQuantumPossibilityPipeline(article = {}) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: requestBody
-    }, 12000);
+    }, QUANTUM_REQUEST_TIMEOUT_MS);
     const directPayload = await directResponse.json().catch(() => null);
     if (directResponse.ok && directPayload) {
       response = directResponse;
