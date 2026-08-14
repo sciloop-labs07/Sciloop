@@ -34107,6 +34107,8 @@ async function openQuantumPossibilities(item = {}, button = null, panel = null) 
     window.clearInterval(loadingTimer);
     targetPanel.innerHTML = renderQuantumPossibilityPipelinePreview(result, article);
     bindQuantumPanelClose(targetPanel);
+    prepareQuantumWordStreaming(targetPanel);
+    window.setTimeout(() => playQuantumWordStream(targetPanel), 180);
   } catch (error) {
     window.clearInterval(loadingTimer);
     console.warn('[SciLoop] Quantum Possibilities pipeline stopped safely:', error?.message || error);
@@ -34839,10 +34841,8 @@ function prepareAiWordStreaming(panel) {
   });
 }
 
-function playAiWordStream(panel) {
-  if (!panel || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const output = panel.querySelector('.ai-output');
-  if (!output) return;
+function playWordStream(output) {
+  if (!output || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const words = Array.from(output.querySelectorAll('.ai-word'));
   if (!words.length) return;
   let index = 0;
@@ -34887,6 +34887,74 @@ function playAiWordStream(panel) {
     }
   };
   window.requestAnimationFrame(revealFrame);
+}
+
+function playAiWordStream(panel) {
+  playWordStream(panel?.querySelector?.('.ai-output'));
+}
+
+function prepareQuantumWordStreaming(panel) {
+  if (!panel || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const output = panel.querySelector('.quantum-text-first');
+  if (!output) return;
+
+  output.classList.add('ai-word-streaming');
+  const streamSelector = [
+    '.quantum-text-kicker',
+    '.quantum-text-head h3',
+    '.quantum-text-head p',
+    '.quantum-text-meta span',
+    '.quantum-ai-ledger b',
+    '.quantum-ai-ledger span',
+    '.quantum-text-flow span',
+    '.quantum-text-flow b',
+    '.quantum-text-section h4',
+    '.quantum-text-section p',
+    '.quantum-text-section li',
+    '.quantum-text-subtitle',
+    '.quantum-causal-chain b',
+    '.quantum-causal-chain span',
+    '.quantum-impact-head h4',
+    '.quantum-impact-head span',
+    '.quantum-impact-row span',
+    '.quantum-impact-row strong',
+    '.quantum-future-card h4',
+    '.quantum-future-card p',
+    '.quantum-future-card li',
+    '.quantum-pipeline-trace summary',
+    '.quantum-preview-stage span',
+    '.quantum-preview-stage small',
+    '.quantum-preview-stage strong',
+    '.quantum-text-warning',
+    '.quantum-text-disclaimer'
+  ].join(', ');
+  const walker = document.createTreeWalker(output, NodeFilter.SHOW_TEXT);
+  const textNodes = [];
+  let node;
+  while ((node = walker.nextNode())) {
+    const parent = node.parentElement;
+    if (!parent || !node.nodeValue?.trim() || parent.closest('button, canvas') || !parent.closest(streamSelector)) continue;
+    textNodes.push(node);
+  }
+  textNodes.forEach((textNode) => {
+    const fragment = document.createDocumentFragment();
+    String(textNode.nodeValue || '').split(/(\s+)/).forEach((token) => {
+      if (!token) return;
+      if (/^\s+$/.test(token)) {
+        fragment.appendChild(document.createTextNode(token));
+      } else {
+        const word = document.createElement('span');
+        word.className = 'ai-word';
+        word.textContent = token;
+        fragment.appendChild(word);
+      }
+    });
+    textNode.parentNode?.replaceChild(fragment, textNode);
+  });
+}
+
+function playQuantumWordStream(panel) {
+  playWordStream(panel?.querySelector?.('.quantum-text-first'));
 }
 
 function revealAiExplanationHtml(panel, html) {
