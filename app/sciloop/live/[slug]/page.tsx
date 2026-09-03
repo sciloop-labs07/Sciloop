@@ -2,10 +2,17 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { InnovationExplorer } from "@/components/innovations/innovation-explorer";
-import { getInnovation } from "@/data/innovations";
+import { getInnovation, innovations } from "@/data/innovations";
 
 interface InnovationPageProps {
   params: Promise<{ slug: string }>;
+}
+
+// The public experience intentionally exposes only the reviewed local signal
+// set. Pre-rendering those paths also guarantees the canary URLs are included
+// in the Vercel production route manifest.
+export function generateStaticParams() {
+  return innovations.map(({ slug }) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: InnovationPageProps): Promise<Metadata> {
