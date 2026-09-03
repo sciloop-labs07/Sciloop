@@ -2,18 +2,15 @@
 
 import { track } from "@vercel/analytics";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 
 import { InnovationExplorer } from "@/components/innovations/innovation-explorer";
-import { innovations } from "@/data/innovations";
+import { innovations, type InnovationRecord } from "@/data/innovations";
 
-export function LiveInnovationPortal() {
-  const searchParams = useSearchParams();
+export function LiveInnovationPortal({ selectedInnovation }: { selectedInnovation?: InnovationRecord }) {
   const [query, setQuery] = useState("");
   const [field, setField] = useState("All fields");
   const searchRef = useRef<HTMLInputElement>(null);
-  const selectedInnovation = innovations.find((innovation) => innovation.slug === searchParams.get("signal"));
   const fields = useMemo(() => ["All fields", ...innovations.map((innovation) => innovation.field)], []);
   const filtered = useMemo(() => innovations.filter((innovation) => {
     const haystack = [innovation.title, innovation.summary, innovation.field, innovation.decision.affectedCapability, ...innovation.organizations].join(" ").toLowerCase();
