@@ -4,4 +4,6 @@ export * from "./fixtures";
 export * from "./selfTest";
 export * from "./pipeline";
 export * from "./innovationAdapter";
+export * from "./predictiveVisualAdapter";
+export * from "./predictiveVisualAdapter.selfTest";
 export * from "./quantum";

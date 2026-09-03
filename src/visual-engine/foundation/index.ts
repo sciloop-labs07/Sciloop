@@ -33,6 +33,9 @@ export {
   visualRecipeDefaultMetadata,
   visualRecipeRequiredFields,
 } from "./visualRecipe.schema";
+export { compilePredictiveVisualPackage } from "./predictiveVisual.compiler";
+export { validatePredictiveVisualPackage } from "./predictiveVisual.validator";
+export { PREDICTIVE_VISUAL_PACKAGE_VERSION } from "./predictiveVisual.types";
 export {
   getRecipeValidationErrors,
   isValidVisualRecipe,
@@ -74,6 +77,17 @@ export type {
   VisualRecipeTimeline,
   VisualRecipeVisualType,
 } from "./visualRecipe.types";
+export type {
+  PredictiveCertainty,
+  PredictiveEdgeKind,
+  PredictiveSemanticEdge,
+  PredictiveSemanticKind,
+  PredictiveSemanticNode,
+  PredictiveVisualPackage,
+  PredictiveVisualProvenance,
+  PredictiveVisualValidationIssue,
+  PredictiveVisualValidationResult,
+} from "./predictiveVisual.types";
 export type {
   VisualAtom,
   VisualAtomType,

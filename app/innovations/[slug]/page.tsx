@@ -28,6 +28,8 @@ function fallbackInnovation(slug: string, params: Record<string, string | string
     technology: [{ label: "Source context", detail: first(params.source) ?? "Live news signal" }],
     related: ["Explore related breakthroughs", "Ask a better question"],
     futures: [{ label: "Best case", detail: "The signal develops into a meaningful improvement or breakthrough.", tone: "positive" as const }, { label: "Caution", detail: "Early claims may change as evidence accumulates.", tone: "caution" as const }, { label: "Open question", detail: "What should we investigate next?", tone: "open" as const }],
+    evidence: [{ label: first(params.source) ?? "Unverified live signal", url: first(params.sourceUrl) ?? "", publisher: "Unreviewed source", publishedAt: "Unknown" }],
+    decision: { whyItMatters: "This signal has not passed SciLoop editorial review and is not part of the public decision-signal set.", affectedCapability: "Not classified", confidence: "Emerging evidence" as const, nextAction: "No action yet" as const, researchQuestion: "Which primary source and independent evidence are needed before this signal can be evaluated?" },
   };
 }
 

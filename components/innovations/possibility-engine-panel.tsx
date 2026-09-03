@@ -1,10 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { track } from "@vercel/analytics";
 
 import type { InnovationRecord } from "@/data/innovations";
+import { PREDICTIVE_VISUAL_CANARY_SLUG, predictiveVisualCanaryEnabled } from "@/lib/sciloop-feature-flags";
 import { evidenceBriefFromInnovation } from "@/src/possibilities";
 import { TypewriterRenderer } from "@/src/ai-streaming/components/TypewriterRenderer";
+import { validatePredictiveVisualPackage, validateVisualRecipe, type PredictiveVisualPackage, type VisualRecipe } from "@/src/visual-engine/foundation";
+import { VisualRecipeRenderer } from "@/src/visual-engine/renderer";
 import type {
   PossibilityLens,
   PossibilityPipelineSuccess,
@@ -12,6 +16,7 @@ import type {
 } from "@/src/possibilities";
 
 type PanelState = "idle" | "loading" | "ready" | "error";
+type PredictiveVisualState = "idle" | "loading" | "ready" | "error";
 
 const lensOptions: Array<{ id: PossibilityLens; label: string }> = [
   { id: "scientific", label: "Scientific" },
@@ -40,6 +45,9 @@ export function PossibilityEnginePanel({ innovation, onOpenChange, underConstruc
   const [lens, setLens] = useState<PossibilityLens>("scientific");
   const [result, setResult] = useState<PossibilityPipelineSuccess | null>(null);
   const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(null);
+  const [predictiveVisualState, setPredictiveVisualState] = useState<PredictiveVisualState>("idle");
+  const [predictiveRecipe, setPredictiveRecipe] = useState<VisualRecipe | null>(null);
+  const visualCanaryAvailable = predictiveVisualCanaryEnabled && innovation.slug === PREDICTIVE_VISUAL_CANARY_SLUG;
 
   useEffect(() => {
     document.documentElement.classList.toggle("possibility-focus-active", open);
@@ -47,11 +55,14 @@ export function PossibilityEnginePanel({ innovation, onOpenChange, underConstruc
   }, [open]);
 
   async function explore(nextLens = lens) {
+    track("scenario_map_requested", { signal: innovation.slug, lens: nextLens });
     setOpen(true);
     onOpenChange?.(true);
     if (underConstruction) return;
     setState("loading");
     setResult(null);
+    setPredictiveVisualState("idle");
+    setPredictiveRecipe(null);
     try {
       const response = await fetch("/api/possibilities", {
         method: "POST",
@@ -60,6 +71,10 @@ export function PossibilityEnginePanel({ innovation, onOpenChange, underConstruc
           brief: evidenceBriefFromInnovation(innovation),
           lens: nextLens,
           includeVisual: true,
+          // Keep the existing experience available when an optional AI
+          // preparation provider is unavailable; the route validates its
+          // deterministic evidence and scenario fallback before returning it.
+          requireAiPreparation: false,
         }),
       });
       const data = await response.json() as PossibilityPipelineSuccess | { ok: false; error?: string };
@@ -67,6 +82,7 @@ export function PossibilityEnginePanel({ innovation, onOpenChange, underConstruc
       setResult(data);
       setSelectedScenarioId(data.scenarios.scenarios[0]?.id ?? null);
       setState("ready");
+      track("scenario_map_ready", { signal: innovation.slug, lens: nextLens });
     } catch {
       setState("error");
     }
@@ -77,12 +93,36 @@ export function PossibilityEnginePanel({ innovation, onOpenChange, underConstruc
     setState("idle");
     setResult(null);
     setSelectedScenarioId(null);
+    setPredictiveVisualState("idle");
+    setPredictiveRecipe(null);
     onOpenChange?.(false);
   }
 
   function changeLens(nextLens: PossibilityLens) {
     setLens(nextLens);
     if (open) void explore(nextLens);
+  }
+
+  async function visualizePredictiveModel() {
+    if (!visualCanaryAvailable) return;
+    setPredictiveVisualState("loading");
+    setPredictiveRecipe(null);
+    try {
+      const response = await fetch("/api/predictive-visual", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ slug: innovation.slug }),
+      });
+      const data = await response.json() as { ok?: boolean; package?: PredictiveVisualPackage; recipe?: VisualRecipe };
+      if (!response.ok || !data.ok || !data.package || !data.recipe || !validatePredictiveVisualPackage(data.package).ok || !validateVisualRecipe(data.recipe).ok) {
+        throw new Error("The visual model did not pass SciLoop validation.");
+      }
+      setPredictiveRecipe(data.recipe);
+      setPredictiveVisualState("ready");
+      track("predictive_model_visualized", { signal: innovation.slug });
+    } catch {
+      setPredictiveVisualState("error");
+    }
   }
 
   const selectedScenario = result?.scenarios.scenarios.find((scenario) => scenario.id === selectedScenarioId) ?? result?.scenarios.scenarios[0];
@@ -95,8 +135,8 @@ export function PossibilityEnginePanel({ innovation, onOpenChange, underConstruc
   return <section className="detail-section possibility-panel rounded-[32px] border border-cyan-200/15 p-6 md:p-8" aria-labelledby="possibility-engine-title">
     <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
       <div>
-        <div className="eyebrow">Quantum Possibilities Engine</div>
-        <h2 id="possibility-engine-title" className="detail-heading">Explore what this innovation could become.</h2>
+        <div className="eyebrow">Scenario comparison</div>
+        <h2 id="possibility-engine-title" className="detail-heading">Compare conditional futures.</h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-400">SciLoop separates evidence, conditions, risks, and speculation before drawing a possible future. These are scenarios—not promises.</p>
       </div>
       <div className="flex flex-wrap gap-2"><button type="button" onClick={() => void explore()} className="possibility-launch-button min-h-12 rounded-2xl border border-cyan-100/30 px-5 py-3 text-sm font-semibold text-cyan-50 transition hover:border-cyan-100/60 hover:bg-cyan-100/10">{open ? "Refresh possibilities" : "Explore possibilities →"}</button>{open && <button type="button" onClick={closeCleanView} className="min-h-12 rounded-2xl border border-white/10 px-4 py-3 text-sm text-slate-400 transition hover:border-white/25 hover:text-white">Exit clean view</button>}</div>
@@ -117,7 +157,7 @@ export function PossibilityEnginePanel({ innovation, onOpenChange, underConstruc
         <div className="rounded-2xl border border-cyan-200/20 bg-cyan-950/10 p-5 shadow-[0_0_32px_rgba(34,211,238,0.08)]" aria-live="polite">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <div className="eyebrow">Live SciLoop AI synthesis</div>
+            <div className="eyebrow">Decision synthesis</div>
               <h3 className="mt-2 font-display text-xl font-semibold text-white">The possibility map is taking shape.</h3>
             </div>
             <span className="rounded-full border border-emerald-200/20 px-3 py-1.5 text-xs text-emerald-100">Evidence-linked</span>
@@ -154,7 +194,7 @@ export function PossibilityEnginePanel({ innovation, onOpenChange, underConstruc
         <div className="rounded-2xl border border-cyan-200/10 bg-cyan-950/10 p-5"><div className="flex flex-wrap items-center justify-between gap-3"><div><div className="eyebrow">Text-only visual compiler</div><h3 className="mt-2 font-display text-xl font-semibold text-white">Ready for the future visual engine</h3></div><span className="rounded-full border border-cyan-200/20 px-3 py-1.5 text-xs text-cyan-100">No image generation in V1</span></div><div className="mt-5 grid gap-3 md:grid-cols-2"><p className="rounded-xl border border-white/10 p-4 text-sm leading-6 text-slate-300"><strong className="block text-cyan-100">Before scene</strong>{result.analysis.visualScene.beforeScene}</p><p className="rounded-xl border border-white/10 p-4 text-sm leading-6 text-slate-300"><strong className="block text-cyan-100">Discovery scene</strong>{result.analysis.visualScene.discoveryScene}</p><p className="rounded-xl border border-white/10 p-4 text-sm leading-6 text-slate-300"><strong className="block text-cyan-100">After scene</strong>{result.analysis.visualScene.afterScene}</p><p className="rounded-xl border border-white/10 p-4 text-sm leading-6 text-slate-300"><strong className="block text-cyan-100">Future scene</strong>{result.analysis.visualScene.futureScene}</p></div><p className="mt-4 text-xs leading-6 text-slate-500"><strong className="text-slate-300">Transition:</strong> {result.analysis.visualScene.transitionAnimation}</p></div>
 
         <div className="grid gap-3 md:grid-cols-3">
-          {result.scenarios.scenarios.map((scenario) => <button key={scenario.id} type="button" onClick={() => setSelectedScenarioId(scenario.id)} className={`possibility-scenario-card text-left ${selectedScenario.id === scenario.id ? "possibility-scenario-card-active" : ""}`}>
+          {result.scenarios.scenarios.map((scenario) => <button key={scenario.id} type="button" onClick={() => { setSelectedScenarioId(scenario.id); track("scenario_compared", { signal: innovation.slug, scenario: scenario.id }); }} className={`possibility-scenario-card text-left ${selectedScenario.id === scenario.id ? "possibility-scenario-card-active" : ""}`}>
             <div className="flex items-center justify-between gap-3"><span className="possibility-horizon">{scenario.horizon}</span><span className={`possibility-class possibility-class-${scenario.classification}`}>{classLabels[scenario.classification]}</span></div>
             <h3 className="mt-4 font-display text-xl font-semibold text-white">{scenario.title}</h3>
             <p className="mt-3 text-sm leading-6 text-slate-400">{scenario.summary}</p>
@@ -177,6 +217,12 @@ export function PossibilityEnginePanel({ innovation, onOpenChange, underConstruc
         </div>
 
         {selectedVisual && <div className="rounded-2xl border border-cyan-200/10 bg-cyan-950/10 p-5"><div className="flex flex-wrap items-center justify-between gap-3"><div><div className="eyebrow">Visual compiler</div><h3 className="mt-2 font-display text-xl font-semibold text-white">{selectedVisual.title}</h3></div><span className="rounded-full border border-cyan-200/20 px-3 py-1.5 text-xs text-cyan-100">{selectedVisual.nodes.length} nodes · {selectedVisual.edges.length} links</span></div><div className="mt-5 grid gap-3 md:grid-cols-4">{selectedVisual.nodes.map((node, index) => <div key={node.id} className={`possibility-visual-node possibility-visual-node-${node.kind}`}><span>0{index + 1}</span><strong>{node.label}</strong></div>)}</div><div className="mt-4 flex flex-wrap gap-2">{selectedVisual.edges.map((edge) => <span key={edge.id} className="possibility-edge-pill">{edge.label}</span>)}</div></div>}
+
+        {visualCanaryAvailable && <section className="rounded-2xl border border-cyan-200/20 bg-cyan-950/10 p-5" aria-label="SciLoop predictive visual model">
+          <div className="flex flex-wrap items-center justify-between gap-4"><div><div className="eyebrow">SciLoop predictive visual canary</div><h3 className="mt-2 font-display text-xl font-semibold text-white">See the evidence-linked model.</h3><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">SciLoop compiles this model from validated evidence, causal relationships, conditional scenarios, and explicit unknowns.</p></div><button type="button" onClick={() => void visualizePredictiveModel()} disabled={predictiveVisualState === "loading"} className="min-h-11 rounded-xl border border-cyan-100/35 px-4 py-2.5 text-sm font-semibold text-cyan-50 transition hover:border-cyan-100/60 hover:bg-cyan-100/10 disabled:cursor-wait disabled:opacity-60">{predictiveVisualState === "loading" ? "Compiling model…" : predictiveRecipe ? "Refresh visual model" : "Visualize model"}</button></div>
+          {predictiveVisualState === "error" && <p className="mt-4 rounded-xl border border-amber-200/20 bg-amber-950/15 p-4 text-sm leading-6 text-amber-100">The visual model could not be compiled. Your validated possibility map is still available above.</p>}
+          {predictiveVisualState === "ready" && predictiveRecipe && <div className="mt-5"><VisualRecipeRenderer recipe={predictiveRecipe} /></div>}
+        </section>}
 
         <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500"><span>{result.scenarios.disclaimer}</span><span>{result.stages.filter((stage) => stage.status === "completed").length} validation stages complete</span></div>
         {runtimeWarnings.map((warning) => <div key={warning} className="possibility-runtime-note" role="status">{warning}</div>)}

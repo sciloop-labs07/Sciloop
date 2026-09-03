@@ -36,6 +36,8 @@ export interface GeneratePossibilityOptions {
   providers?: ProviderName[];
 }
 
+type JsonObject = Record<string, unknown>;
+
 const ALL_PROVIDERS: ProviderName[] = [
   "forloop",
   "gemini",
@@ -107,18 +109,33 @@ async function fetchWithTimeout(url: string, init: RequestInit) {
   }
 }
 
-async function readProviderPayload(response: Response) {
-  const payload = await response.json().catch(() => null) as Record<string, any> | null;
+function asJsonObject(value: unknown): JsonObject | null {
+  return value && typeof value === "object" && !Array.isArray(value) ? value as JsonObject : null;
+}
+
+function textFromParts(value: unknown) {
+  if (!Array.isArray(value)) return "";
+  return value.map((part) => {
+    const item = asJsonObject(part);
+    return typeof item?.text === "string" ? item.text : "";
+  }).join("");
+}
+
+async function readProviderPayload(response: Response): Promise<JsonObject> {
+  const payload = asJsonObject(await response.json().catch(() => null));
   if (!response.ok) {
-    const code = payload?.error?.code || payload?.error?.type || payload?.error?.status || `http-${response.status}`;
+    const error = asJsonObject(payload?.error);
+    const code = error?.code || error?.type || error?.status || `http-${response.status}`;
     throw new Error(String(code));
   }
   return payload || {};
 }
 
-function chatContent(payload: Record<string, any>) {
-  const content = payload?.choices?.[0]?.message?.content;
-  if (Array.isArray(content)) return content.map((part) => typeof part?.text === "string" ? part.text : "").join("");
+function chatContent(payload: JsonObject) {
+  const firstChoice = Array.isArray(payload.choices) ? asJsonObject(payload.choices[0]) : null;
+  const message = asJsonObject(firstChoice?.message);
+  const content = message?.content;
+  if (Array.isArray(content)) return textFromParts(content);
   return typeof content === "string" ? content : "";
 }
 
@@ -209,8 +226,8 @@ async function callCohere(systemPrompt: string, userPrompt: string) {
     }),
   });
   const payload = await readProviderPayload(response);
-  const content = payload?.message?.content;
-  if (Array.isArray(content)) return content.map((part) => typeof part?.text === "string" ? part.text : "").join("");
+  const content = asJsonObject(payload.message)?.content;
+  if (Array.isArray(content)) return textFromParts(content);
   return typeof content === "string" ? content : "";
 }
 
@@ -228,7 +245,9 @@ async function callGemini(systemPrompt: string, userPrompt: string) {
     }),
   });
   const payload = await readProviderPayload(response);
-  return payload?.candidates?.[0]?.content?.parts?.map((part: any) => part?.text || "").join("") || "";
+  const candidate = Array.isArray(payload.candidates) ? asJsonObject(payload.candidates[0]) : null;
+  const content = asJsonObject(candidate?.content);
+  return textFromParts(content?.parts);
 }
 
 async function callOllama(systemPrompt: string, userPrompt: string) {
@@ -244,7 +263,8 @@ async function callOllama(systemPrompt: string, userPrompt: string) {
     }),
   });
   const payload = await readProviderPayload(response);
-  return payload?.message?.content || "";
+  const content = asJsonObject(payload.message)?.content;
+  return typeof content === "string" ? content : "";
 }
 
 function reasonFor(error: unknown) {

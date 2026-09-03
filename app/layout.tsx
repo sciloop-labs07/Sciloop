@@ -31,22 +31,22 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SciLoop · The World's Live Innovation Platform",
+  title: "SciLoop · Scientific Intelligence for Decisions",
   description:
-    "Discover, understand and explore every breakthrough shaping the future.",
+    "Turn reviewed scientific signals into evidence briefs, causal models, and conditional scenarios.",
   metadataBase: new URL("https://sciloop-live.vercel.app"),
-  alternates: { canonical: "/sciloop-live" },
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "SciLoop · The World's Live Innovation Platform",
-    description: "Discover, understand and explore every breakthrough shaping the future.",
-    url: "https://sciloop-live.vercel.app/sciloop-live",
+    title: "SciLoop · Scientific Intelligence for Decisions",
+    description: "Turn reviewed scientific signals into evidence briefs, causal models, and conditional scenarios.",
+    url: "https://sciloop-live.vercel.app/",
     siteName: "SciLoop",
     type: "website",
   },
   twitter: {
     card: "summary",
-    title: "SciLoop · The World's Live Innovation Platform",
-    description: "Discover, understand and explore every breakthrough shaping the future.",
+    title: "SciLoop · Scientific Intelligence for Decisions",
+    description: "Turn reviewed scientific signals into evidence briefs, causal models, and conditional scenarios.",
   },
 };
 

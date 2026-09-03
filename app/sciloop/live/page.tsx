@@ -4,9 +4,10 @@ import { LiveInnovationPortal } from "@/components/live-innovations/live-innovat
 
 export const metadata: Metadata = {
   title: "Decision Signals | SciLoop",
-  description: "Review scientific signals through source evidence, causal models, conditional scenarios, and next research actions.",
+  description: "Explore reviewed scientific signals with their source evidence, causal model, and conditional scenarios.",
+  alternates: { canonical: "/live-innovations" },
 };
 
-export default function LiveInnovationsPage() {
+export default function SciLoopLiveSignalsPage() {
   return <LiveInnovationPortal />;
 }

@@ -45,6 +45,12 @@ export interface VisualRecipeObject {
   atom: VisualAtomType;
   layerId: string;
   description: string;
+  /** Evidence remains attached to the meaning, not the renderer. */
+  evidenceIds?: string[];
+  /** Links this visual object back to a controlled semantic-model category. */
+  semanticKind?: "signal" | "evidence" | "variable" | "condition" | "event" | "outcome" | "risk" | "unknown";
+  /** Conditional scenario branches represented by this object, when applicable. */
+  scenarioIds?: string[];
   position?: VisualPosition;
   certainty?: VisualCertainty;
   importance?: number;
@@ -58,6 +64,8 @@ export interface VisualRecipeRelation {
   label: string;
   description?: string;
   strength: number;
+  evidenceIds?: string[];
+  scenarioIds?: string[];
   certainty?: VisualCertainty;
 }
 
@@ -146,4 +154,3 @@ export interface VisualRecipe {
   understandingGoal?: VisualUnderstandingGoal;
   tags: string[];
 }
-

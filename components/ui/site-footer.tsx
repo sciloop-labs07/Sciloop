@@ -10,6 +10,14 @@ export function SiteFooter() {
             <p className="mt-1 max-w-xl text-sm leading-6 text-slate-400">
               Discover, understand, and explore every breakthrough shaping the future.
             </p>
+            <a
+              href="https://www.instagram.com/sciloop.in/"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-cyan-100 transition-colors hover:text-white"
+            >
+              Follow SciLoop on Instagram <span aria-hidden="true">↗</span>
+            </a>
           </div>
           <div className="text-right text-xs uppercase tracking-[0.22em] text-slate-500">
             Live innovation platform

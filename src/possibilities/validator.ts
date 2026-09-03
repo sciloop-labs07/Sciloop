@@ -1,6 +1,5 @@
 import type {
   EvidenceBrief,
-  PossibilityScenario,
   ScenarioSet,
   ValidationIssue,
   ValidationResult,

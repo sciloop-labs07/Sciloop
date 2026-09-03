@@ -6,12 +6,9 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/", label: "Home" },
-  { href: "/live-innovations", label: "Live Innovations" },
-  { href: "/content-studio", label: "Content Studio" },
-  { href: "/knowledge-graph", label: "Knowledge Graph" },
-  { href: "/director", label: "Director AI" },
-  { href: "/evolution", label: "Evolution" },
+  { href: "/", label: "Overview" },
+  { href: "/live-innovations", label: "Decision signals" },
+  { href: "/live-innovations#method", label: "Method" },
 ];
 
 export function SiteHeader() {
@@ -21,7 +18,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-30 px-0 pt-5 md:pt-7">
       <div className="page-shell">
         <div className="panel-surface flex flex-col gap-4 rounded-full px-4 py-3 md:flex-row md:items-center md:justify-between md:px-6">
-          <Link href="/" className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-3">
             <div className="grid h-11 w-11 place-items-center rounded-2xl border border-cyan-200/18 bg-cyan-200/10 text-sm text-cyan-100 shadow-[0_0_24px_rgba(143,233,255,0.16)]">
               SL
             </div>
@@ -30,7 +27,7 @@ export function SiteHeader() {
                 SciLoop
               </div>
               <div className="text-xs uppercase tracking-[0.28em] text-slate-500">
-                The world&apos;s live innovation platform
+                Scientific intelligence for decisions
               </div>
             </div>
           </Link>
