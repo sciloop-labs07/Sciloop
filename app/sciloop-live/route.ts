@@ -85,16 +85,85 @@ function buildExperimentLabBridge() {
 </section>`;
 }
 
+function buildLiveInnovationPortalEnhancement() {
+  return `<style id="sciloopLiveInnovationEnhancement">
+    #sciloopLiveSubjectRail { max-width:1180px; margin:18px auto 0; padding:16px; border:1px solid rgba(103,232,249,.2); border-radius:20px; background:linear-gradient(135deg,rgba(8,47,73,.72),rgba(15,23,42,.84)); color:#e0f2fe; }
+    #sciloopLiveSubjectRail h2 { margin:0; color:#fff; font-size:20px; }
+    #sciloopLiveSubjectRail p { margin:5px 0 12px; color:#94a3b8; font-size:13px; }
+    #sciloopLiveSubjectChoices { display:flex; flex-wrap:wrap; gap:8px; }
+    #sciloopLiveSubjectChoices button { border:1px solid rgba(165,243,252,.25); border-radius:999px; background:rgba(2,6,23,.35); color:#bae6fd; padding:8px 12px; cursor:pointer; font-weight:700; }
+    #sciloopLiveSubjectChoices button[aria-pressed="true"], #sciloopLiveSubjectChoices button:hover { background:#cffafe; color:#082f49; }
+    .sciloop-live-explain { display:inline-flex; align-items:center; margin:12px 8px 0 0; border:0; border-radius:10px; background:#cffafe; color:#082f49; padding:9px 12px; font:700 12px system-ui; cursor:pointer; text-decoration:none; }
+    .sciloop-live-explain:hover { background:#a5f3fc; }
+  </style>
+  <script>
+    (() => {
+      const esc = (value) => String(value || '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+      const init = () => {
+        const portal = document.getElementById('newsPortal');
+        if (!portal || document.getElementById('sciloopLiveSubjectRail')) return;
+        const rail = document.createElement('section');
+        rail.id = 'sciloopLiveSubjectRail';
+        rail.setAttribute('aria-label', 'Live innovation subjects');
+        rail.innerHTML = '<h2>Explore live innovations by subject</h2><p>Choose one subject or combine several. The visual mechanism block and explanations stay together for every signal.</p><div id="sciloopLiveSubjectChoices"></div>';
+        const anchor = portal.querySelector('#publicCuratedSignals, #feed');
+        if (anchor) anchor.parentNode.insertBefore(rail, anchor);
+        const choices = rail.querySelector('#sciloopLiveSubjectChoices');
+        const subjects = ['All subjects','Physics','Quantum','Biology','Chemistry','Mathematics','Artificial Intelligence','Computer Science'];
+        let active = new Set(['All subjects']);
+        const cards = () => Array.from(portal.querySelectorAll('#publicCuratedGrid > article, #feed > article, #feed .card'));
+        const explainUrl = (card) => {
+          const title = card.querySelector('h2,h3')?.textContent?.trim() || 'Live scientific innovation';
+          const copy = Array.from(card.querySelectorAll('p')).map((p) => p.textContent.trim()).filter(Boolean).join(' ');
+          return '/sciloop-ai-stream?prompt=' + encodeURIComponent('Explain this live innovation for a curious learner: ' + title + '. Include the evidence, causal mechanism, practical significance, uncertainties, and one useful follow-up question. Context: ' + copy);
+        };
+        const addExplainButtons = () => cards().forEach((card) => {
+          if (card.querySelector('.sciloop-live-explain')) return;
+          const button = document.createElement('a');
+          button.className = 'sciloop-live-explain';
+          button.href = explainUrl(card);
+          button.textContent = 'Explain with SciLoop AI';
+          button.setAttribute('aria-label', 'Explain this live innovation with SciLoop AI');
+          const visual = card.querySelector('.public-static-mechanism, .mechanism-visual, [class*="mechanism"]');
+          (visual || card.querySelector('a'))?.parentNode?.appendChild(button);
+        });
+        const apply = () => {
+          cards().forEach((card) => {
+            if (active.has('All subjects')) { card.hidden = false; return; }
+            const text = card.textContent.toLowerCase();
+            card.hidden = !Array.from(active).some((subject) => text.includes(subject.toLowerCase()));
+          });
+        };
+        subjects.forEach((subject) => {
+          const button = document.createElement('button');
+          button.type = 'button'; button.textContent = subject; button.setAttribute('aria-pressed', subject === 'All subjects' ? 'true' : 'false');
+          button.addEventListener('click', () => {
+            if (subject === 'All subjects') active = new Set(['All subjects']);
+            else { active.delete('All subjects'); active.has(subject) ? active.delete(subject) : active.add(subject); if (!active.size) active.add('All subjects'); }
+            choices.querySelectorAll('button').forEach((item) => item.setAttribute('aria-pressed', String(active.has(item.textContent))));
+            apply();
+          });
+          choices.appendChild(button);
+        });
+        addExplainButtons(); apply();
+        new MutationObserver(addExplainButtons).observe(portal, { childList:true, subtree:true });
+      };
+      document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', init, { once:true }) : init();
+    })();
+  </script>`;
+}
+
 export async function GET(request: NextRequest) {
   const filePath = path.join(process.cwd(), MAIN_HTML_FILE);
   const html = await readFile(filePath, "utf8");
   const configScript = `<script>window.SCILOOP_SHARE_CONFIG=${JSON.stringify(buildShareConfig(request))};</script><script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script><script defer src="/_vercel/insights/script.js"></script><script>(()=>{const send=(payload)=>{try{const body=JSON.stringify({...payload,page:location.href});if(navigator.sendBeacon){navigator.sendBeacon('/api/client-error',new Blob([body],{type:'application/json'}));}else{fetch('/api/client-error',{method:'POST',headers:{'content-type':'application/json'},body,keepalive:true});}}catch{}};window.addEventListener('error',(event)=>send({message:event.message,sourceFile:event.filename,line:event.lineno}));window.addEventListener('unhandledrejection',(event)=>send({message:String(event.reason||'Unhandled promise rejection')}));})();</script>`;
   const fallbackExperimentLab = buildExperimentLabBridge();
+  const liveInnovationEnhancement = buildLiveInnovationPortalEnhancement();
   const enhancedHtml = html.includes('id="sciloopExperimentLab"')
     ? html
     : html.replace(/<body[^>]*>/i, (match) => `${match}${fallbackExperimentLab}`);
   const withConfig = enhancedHtml.includes("</head>")
-    ? enhancedHtml.replace("</head>", `${configScript}</head>`)
+    ? enhancedHtml.replace("</head>", `${configScript}${liveInnovationEnhancement}</head>`)
     : `${configScript}${enhancedHtml}`;
 
   return new NextResponse(withConfig, {
