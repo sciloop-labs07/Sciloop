@@ -50,7 +50,7 @@ function buildTargets({ projectRoot, backendPort }) {
       cwd: projectRoot,
       command: npmCommand(),
       args: npmArgs("run", "dev"),
-      url: "http://localhost:3000",
+      url: "http://localhost:3010",
       startable: true,
       stoppable: true,
       restartable: true,

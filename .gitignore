@@ -1,4 +1,5 @@
 .next
+.vercel
 node_modules
 out
 dist
@@ -43,3 +44,13 @@ share-server*.err.log
 cloudflared.exe
 .DS_Store
 Thumbs.db
+
+# Local experiments and generated creative exports belong beside the project,
+# but are not product source code.
+.tmp-possibilities/
+__pycache__/
+SciLoop_First_Banger_*.mp4
+test.mp4
+
+.vercel
+.env*

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { innovations } from "@/data/innovations";
 
 const DEFAULT_AI_BACKEND_URL = "http://localhost:5050";
+const PUBLIC_BACKEND_TIMEOUT_MS = 6000;
 
 type RouteContext = {
   params: Promise<{
@@ -16,7 +17,12 @@ function getAiBackendUrl() {
 async function proxyToAiBackend(request: NextRequest, context: RouteContext) {
   const { path = [] } = await context.params;
   const targetPath = path.join("/");
-  const targetUrl = new URL(`${getAiBackendUrl()}/api/sciloop-ai/${targetPath}`);
+  const backendPath = targetPath === "health"
+    ? "/health"
+    : targetPath === "providers"
+      ? "/api/providers"
+      : `/api/sciloop-ai/${targetPath}`;
+  const targetUrl = new URL(`${getAiBackendUrl()}${backendPath}`);
   request.nextUrl.searchParams.forEach((value, key) => targetUrl.searchParams.set(key, value));
   const requestBody = ["GET", "HEAD"].includes(request.method) ? null : await request.text();
 
@@ -28,6 +34,7 @@ async function proxyToAiBackend(request: NextRequest, context: RouteContext) {
       },
       body: requestBody || undefined,
       cache: "no-store",
+      signal: AbortSignal.timeout(PUBLIC_BACKEND_TIMEOUT_MS),
     });
 
     const text = await response.text();
@@ -71,6 +78,40 @@ async function proxyToAiBackend(request: NextRequest, context: RouteContext) {
         fallback: true,
         cached: false,
         warnings: ["Live AI backend is not configured; this explanation is a transparent local fallback."],
+      });
+    }
+    if (targetPath === "simulate" && request.method === "POST") {
+      let body: { article?: { title?: string; summary?: string } } = {};
+      try { body = requestBody ? JSON.parse(requestBody) : {}; } catch { body = {}; }
+      const article = body.article || {};
+      const title = article.title || "this innovation";
+      const summary = article.summary || "The source describes a scientific or technical development.";
+      return NextResponse.json({
+        ok: true,
+        simulationTitle: `Local possibility model: ${title}`,
+        whyHumansNeededThis: `People needed a clearer way to understand the problem behind ${title}.`,
+        evolutionStoryline: [
+          "Problem: A real constraint or unanswered question appears.",
+          "Observation: Researchers collect evidence about how the system behaves.",
+          "Experiment: A new method tests the most useful mechanism.",
+          "Breakthrough: The mechanism becomes easier to inspect and compare.",
+          "Application: The result can guide the next validated experiment."
+        ],
+        humanPossibility: `A cautious next possibility is to test the mechanism described by ${title}.`,
+        realWorldImpact: summary,
+        futurePossibility: "Possible future only: further evidence could turn this mechanism into a practical tool.",
+        visualSimulationBlueprint: {
+          scene: "problem -> evidence -> mechanism -> possible application",
+          objects: ["problem", "evidence", "mechanism", "application"],
+          motion: "A muted pulse moves from the observed problem toward the tested mechanism.",
+          labels: ["Problem", "Evidence", "Experiment", "Future"],
+          interaction: "Inspect one stage at a time.",
+          colorEffectIdea: "Use the existing SciLoop accent palette with one active stage at a time."
+        },
+        providerUsed: "SciLoop local fallback",
+        fallback: true,
+        cached: false,
+        warnings: ["The live AI provider exceeded the public response budget; this transparent local model is shown instead."]
       });
     }
     return NextResponse.json(

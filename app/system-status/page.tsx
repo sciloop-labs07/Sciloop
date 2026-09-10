@@ -30,7 +30,6 @@ function StatusPill({ ok }: { ok: boolean }) {
 export default async function SystemStatusPage() {
   const status = await getStatus();
   const aiOk = Boolean(status?.aiBackend?.ok);
-  const forLoopOk = Boolean(status?.forLoopBackend?.ok);
 
   return (
     <div className="page-shell space-y-6 pb-12">
@@ -55,7 +54,7 @@ export default async function SystemStatusPage() {
             <h2 className="font-display text-2xl text-white">Frontend</h2>
             <StatusPill ok />
           </div>
-          <p className="mt-3 text-sm leading-6 text-slate-300">Next.js shell, `/sciloop-live`, and proxy routes.</p>
+          <p className="mt-3 text-sm leading-6 text-slate-300">React product routes, the public API layer, and the controlled AI proxy.</p>
         </Panel>
 
         <Panel className="rounded-[28px] p-5">
@@ -68,17 +67,17 @@ export default async function SystemStatusPage() {
 
         <Panel className="rounded-[28px] p-5">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="font-display text-2xl text-white">ForLoop</h2>
-            <StatusPill ok={forLoopOk} />
+            <h2 className="font-display text-2xl text-white">Legacy admin</h2>
+            <StatusPill ok />
           </div>
-          <p className="mt-3 text-sm leading-6 text-slate-300">Admin visibility, visual-language plan logging, and control-panel backend.</p>
+          <p className="mt-3 text-sm leading-6 text-slate-300">Quarantined from the public product while its useful capabilities are migrated safely.</p>
         </Panel>
       </section>
 
       <Panel className="rounded-[30px] p-5">
         <div className="eyebrow">Launch links</div>
         <div className="mt-4 flex flex-wrap gap-3">
-          <Link className="rounded-full border border-cyan-200/25 px-4 py-2 text-sm text-white" href="/sciloop-live">Open SciLoop Live</Link>
+          <Link className="rounded-full border border-cyan-200/25 px-4 py-2 text-sm text-white" href="/">Open SciLoop</Link>
           <Link className="rounded-full border border-cyan-200/25 px-4 py-2 text-sm text-white" href="/visual-language">Open Visual Language Portal</Link>
           <Link className="rounded-full border border-cyan-200/25 px-4 py-2 text-sm text-white" href="/api/system-status">Raw JSON Status</Link>
         </div>

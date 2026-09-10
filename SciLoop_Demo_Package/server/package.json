@@ -1,0 +1,16 @@
+{
+  "name": "sciloop-news-explanation-api",
+  "version": "1.0.0",
+  "description": "Standalone SciLoop news explanation API with AI provider routing and fallback.",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.18.3"
+  }
+}

@@ -17,6 +17,7 @@ server/node_modules/
 *.mp4
 *.mov
 *.html
+!public/portal/index.html
 !SciLoop - Live Scientific Discoveries 80.html
 !ForLoop Control Panel Mobile.html
 .env*

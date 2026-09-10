@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
 const DEFAULT_AI_BACKEND_URL = "http://localhost:5050";
-const DEFAULT_FORLOOP_BACKEND_URL = "http://localhost:3001";
 
 async function checkJson(url: string, timeoutMs = 4000) {
   const controller = new AbortController();
@@ -37,32 +36,32 @@ async function checkJson(url: string, timeoutMs = 4000) {
 
 export async function GET() {
   const aiBase = (process.env.SCILOOP_AI_BACKEND_URL || DEFAULT_AI_BACKEND_URL).replace(/\/+$/, "");
-  const forLoopBase = (process.env.FORLOOP_BACKEND_URL || DEFAULT_FORLOOP_BACKEND_URL).replace(/\/+$/, "");
-  const [aiBackend, forLoopBackend] = await Promise.all([
-    checkJson(`${aiBase}/health`),
-    checkJson(`${forLoopBase}/api/health`),
-  ]);
+  const aiBackend = await checkJson(`${aiBase}/health`);
 
   const coreFallbackAvailable = !process.env.SCILOOP_AI_BACKEND_URL;
-  const servicesOk = aiBackend.ok && forLoopBackend.ok;
   const coreExperienceReady = aiBackend.ok || coreFallbackAvailable;
 
   return NextResponse.json({
     ok: coreExperienceReady,
-    servicesOk,
-    degraded: !servicesOk,
+    servicesOk: aiBackend.ok,
+    degraded: !aiBackend.ok,
     service: "SciLoop Launch Status",
     frontend: {
       ok: true,
       mode: process.env.NODE_ENV || "development",
     },
     aiBackend,
-    forLoopBackend,
+    legacyAdmin: {
+      exposed: false,
+      status: "quarantined",
+      message: "ForLoop is local/admin migration tooling and is not required by the public product.",
+    },
     launchRoutes: {
-      sciloopLive: "/sciloop-live",
+      overview: "/",
+      liveSignals: "/sciloop/live",
+      legacyFallback: "/sciloop-live",
       visualLanguageLab: "/visual-language-lab",
       aiProxy: "/api/sciloop-ai-proxy",
-      forLoopProxy: "/api/forloop-proxy",
     },
     checkedAt: new Date().toISOString(),
   }, {

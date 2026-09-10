@@ -7,6 +7,12 @@ const nextConfig: NextConfig = {
     // detects a package-lock above the project and expands the workspace.
     root: __dirname,
   },
+  // The canonical public route intentionally serves the preserved portal
+  // shell from `public/portal/index.html`. Include it in the server bundle so
+  // the Vercel function can read it at runtime as well as local development.
+  outputFileTracingIncludes: {
+    "/sciloop-live": ["./public/portal/index.html"],
+  },
   async redirects() {
     return [
       // Keep shareable brief URLs stable while resolving them through the

@@ -465,5 +465,109 @@
       "teacherDemoSpeech": "This module takes a live news card, separates facts from guesses, and turns it into a simple student-friendly explanation."
     },
     "savedAt": "2026-05-02T07:22:29.148Z"
+  },
+  "e1784cd7d750883c80a2b46eb1f86832a98379b5944afa3e412f7af9635697cb": {
+    "providerUsed": "fallback",
+    "data": {
+      "simpleExplanation": "🧠 Scientists unlock a powerful new way to turn sunlight into fuel means researchers are reporting a new science or innovation update. In simple words: Researchers developed a computational method that may speed up discovery of materials for converting sunlight into useful chemical energy.",
+      "storyline": {
+        "problem": "The source points to a scientific or technology problem that researchers are trying to understand or improve.",
+        "oldLimit": "The earlier limitation is not fully clear from the news card, so SciLoop marks it as not clearly stated in source.",
+        "breakthrough": "The reported breakthrough is the main discovery or improvement described in the title and summary.",
+        "howItWorks": "SciLoop can explain the idea at a high level, but exact technical steps need the original source or research paper.",
+        "impact": "The update may help students understand how research moves from problem to idea to real-world impact."
+      },
+      "timeline": [
+        {
+          "year": "earlier",
+          "event": "Scientists worked on the broad problem area."
+        },
+        {
+          "year": "not clearly stated in source",
+          "event": "This news item reported the current update."
+        },
+        {
+          "year": "future",
+          "event": "More testing, peer review, or real-world use may come next."
+        }
+      ],
+      "peopleOrLabs": "not clearly stated in source",
+      "field": "Chemistry / Materials",
+      "impactScore": 55,
+      "visualSymbols": [
+        "⚗️",
+        "🔬",
+        "🧱",
+        "⚡"
+      ],
+      "factInferenceSpeculation": {
+        "facts": [
+          "Title from source: Scientists unlock a powerful new way to turn sunlight into fuel",
+          "Source label: ScienceDaily"
+        ],
+        "inferences": [
+          "Likely field: Chemistry / Materials",
+          "The problem and impact are summarized from the title and summary."
+        ],
+        "speculation": [
+          "Future uses need verification from the original research or official source."
+        ]
+      },
+      "oneLineForStudent": "✨ Scientists unlock a powerful new way to turn sunlight into fuel is a news example of how science turns a problem into a possible solution.",
+      "teacherDemoSpeech": "This module takes a live news card, separates facts from guesses, and turns it into a simple student-friendly explanation."
+    },
+    "savedAt": "2026-06-18T13:21:36.161Z"
+  },
+  "80c4e4c7ccffd73df38a366580663eb10b13195271e67ff14fe94b7620f35e5c": {
+    "providerUsed": "fallback",
+    "data": {
+      "simpleExplanation": "🧠 a man goeas to moon on cycle means researchers are reporting a new science or innovation update. In simple words: Researchers developed a computational method that may speed up discovery of materials for converting sunlight into useful chemical energy.",
+      "storyline": {
+        "problem": "The source points to a scientific or technology problem that researchers are trying to understand or improve.",
+        "oldLimit": "The earlier limitation is not fully clear from the news card, so SciLoop marks it as not clearly stated in source.",
+        "breakthrough": "The reported breakthrough is the main discovery or improvement described in the title and summary.",
+        "howItWorks": "SciLoop can explain the idea at a high level, but exact technical steps need the original source or research paper.",
+        "impact": "The update may help students understand how research moves from problem to idea to real-world impact."
+      },
+      "timeline": [
+        {
+          "year": "earlier",
+          "event": "Scientists worked on the broad problem area."
+        },
+        {
+          "year": "not clearly stated in source",
+          "event": "This news item reported the current update."
+        },
+        {
+          "year": "future",
+          "event": "More testing, peer review, or real-world use may come next."
+        }
+      ],
+      "peopleOrLabs": "not clearly stated in source",
+      "field": "Space Science",
+      "impactScore": 55,
+      "visualSymbols": [
+        "🚀",
+        "🛰️",
+        "🌌",
+        "🔭"
+      ],
+      "factInferenceSpeculation": {
+        "facts": [
+          "Title from source: a man goeas to moon on cycle",
+          "Source label: ScienceDaily"
+        ],
+        "inferences": [
+          "Likely field: Space Science",
+          "The problem and impact are summarized from the title and summary."
+        ],
+        "speculation": [
+          "Future uses need verification from the original research or official source."
+        ]
+      },
+      "oneLineForStudent": "✨ a man goeas to moon on cycle is a news example of how science turns a problem into a possible solution.",
+      "teacherDemoSpeech": "This module takes a live news card, separates facts from guesses, and turns it into a simple student-friendly explanation."
+    },
+    "savedAt": "2026-06-18T13:22:14.062Z"
   }
 }

@@ -495,7 +495,7 @@ export async function saveSciloopAiKeys({ projectRoot, keys = {} }) {
   const defaults = {
     PORT: String(DEFAULT_NEWS_BACKEND_PORT),
     NODE_ENV: "development",
-    FRONTEND_ORIGIN: "http://localhost:3000",
+    FRONTEND_ORIGIN: "http://localhost:3010",
     DEEPSEEK_MODEL: "deepseek-chat",
     COHERE_EMBED_MODEL: "embed-v4.0",
     GITHUB_MODELS_BASE_URL: "https://models.github.ai/inference",

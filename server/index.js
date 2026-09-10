@@ -48,8 +48,8 @@ const CACHE_DIR = path.join(__dirname, "cache");
 const CACHE_FILE = path.join(CACHE_DIR, "news-explanations.json");
 const LOG_LIMIT = 200;
 const SERVER_STARTED_AT = Date.now();
-const DEFAULT_FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:3000";
-const DEFAULT_FORLOOP_ORIGIN = process.env.FORLOOP_ALLOWED_ORIGIN || "http://localhost:3000";
+const DEFAULT_FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:3010";
+const DEFAULT_FORLOOP_ORIGIN = process.env.FORLOOP_ALLOWED_ORIGIN || "http://localhost:3010";
 const DEFAULT_FORLOOP_ACCESS_CODE = process.env.FORLOOP_DEV_ACCESS_CODE || "123456";
 const DEFAULT_TIMEOUT_MS = Number(process.env.DEFAULT_TIMEOUT_MS || 5000);
 const ALLOW_ADMIN_AI_TEST = String(process.env.ALLOW_ADMIN_AI_TEST || "").toLowerCase() === "true";
@@ -675,6 +675,14 @@ app.get("/", (_req, res) => {
 
 app.get("/api/health", (_req, res) => {
   pushAdminLog("info", "system", "Backend health requested.");
+  markCheck("backend", "online");
+  return respondOk(res, buildBackendHealthPayload());
+});
+
+// Keep a conventional health path for launchers, monitors, and local smoke tests.
+// The original /api/health route remains canonical for the ForLoop control panel.
+app.get("/health", (_req, res) => {
+  pushAdminLog("info", "system", "Health requested.");
   markCheck("backend", "online");
   return respondOk(res, buildBackendHealthPayload());
 });

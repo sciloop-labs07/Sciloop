@@ -1,1 +1,5 @@
-export { SciLoopIntroduction as default } from "@/components/sciloop-home/sciloop-introduction";
+import { redirect } from "next/navigation";
+
+export default function HomePage() {
+  redirect("/sciloop-live");
+}

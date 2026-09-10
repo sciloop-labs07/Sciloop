@@ -603,7 +603,7 @@ export function getNewsProviders() {
       dailyLimit: 250,
       monthlyLimit: 3000,
       cooldownMs: DEFAULT_COOLDOWN_MS,
-      buildRequest(topic, limit) {
+      buildRequest(topic) {
         return {
           url: `${this.baseUrl}?q=${encodeURIComponent(topic)}&sort=newest&api-key=${encodeURIComponent(env("NYT_API_KEY"))}`,
           options: {}

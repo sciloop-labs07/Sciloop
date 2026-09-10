@@ -57,7 +57,6 @@ function TypewriterRendererBase({
       };
     }
 
-    setVisibleText("");
     const units = revealMode === "words"
       ? (text.match(/\S+\s*/g) ?? [])
       : Array.from(text);
@@ -69,7 +68,12 @@ function TypewriterRendererBase({
         timerRef.current = window.setTimeout(revealNext, revealMode === "words" ? intervalMs : 0);
       }
     };
-    timerRef.current = window.setTimeout(revealNext, 0);
+    timerRef.current = window.setTimeout(() => {
+      // Deferring the reset avoids a synchronous state change inside the
+      // effect while still starting every one-shot reveal from an empty frame.
+      setVisibleText("");
+      revealNext();
+    }, 0);
     return () => {
       if (frameRef.current) window.cancelAnimationFrame(frameRef.current);
       if (timerRef.current) window.clearTimeout(timerRef.current);
