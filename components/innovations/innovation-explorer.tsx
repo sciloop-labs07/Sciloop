@@ -1,7 +1,6 @@
 "use client";
 
 import { track } from "@vercel/analytics";
-import Link from "next/link";
 import { useState } from "react";
 
 import { PossibilityEnginePanel } from "@/components/innovations/possibility-engine-panel";
@@ -34,7 +33,7 @@ export function InnovationExplorer({ innovation }: { innovation: InnovationRecor
       <div className="flex flex-wrap items-center gap-3 text-xs"><span className="chip rounded-full px-3 py-1.5">{innovation.field}</span><span className="rounded-full border border-emerald-200/20 px-3 py-1.5 text-emerald-100">{innovation.decision.confidence}</span><span className="text-slate-500">Reviewed source set</span></div>
       <h1 className="mt-5 max-w-5xl font-display text-4xl font-semibold leading-tight tracking-[-0.04em] text-white md:text-6xl">{innovation.title}</h1>
       <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">{innovation.summary}</p>
-      <div className="mt-8 flex flex-wrap gap-3"><button type="button" onClick={save} className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950">{saved ? "Saved ✓" : "Save brief"}</button><button type="button" onClick={share} className="rounded-full border border-white/15 px-5 py-2.5 text-sm text-white">{shared ? "Link copied ✓" : "Share brief"}</button><Link href={`/sciloop-ai-stream?prompt=${encodeURIComponent(`Explain this live innovation for a curious learner: ${innovation.title}. Include the evidence, causal mechanism, practical significance, uncertainties, and one useful follow-up question.`)}`} onClick={() => track("sciloop_ai_explanation_requested", { signal: innovation.slug, source: "innovation-detail" })} className="rounded-full border border-cyan-200/30 bg-cyan-200/10 px-5 py-2.5 text-sm font-semibold text-cyan-50 hover:bg-cyan-200/20">Explain with SciLoop AI</Link><span className="rounded-full border border-cyan-200/15 px-5 py-2.5 text-sm text-cyan-100">Recommended: {innovation.decision.nextAction}</span></div>
+      <div className="mt-8 flex flex-wrap gap-3"><button type="button" onClick={save} className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950">{saved ? "Saved ✓" : "Save brief"}</button><button type="button" onClick={share} className="rounded-full border border-white/15 px-5 py-2.5 text-sm text-white">{shared ? "Link copied ✓" : "Share brief"}</button><span className="rounded-full border border-cyan-200/15 px-5 py-2.5 text-sm text-cyan-100">Recommended: {innovation.decision.nextAction}</span></div>
     </section>
 
     <section className="detail-section grid gap-5 lg:grid-cols-[1.1fr_.9fr]">
