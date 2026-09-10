@@ -1,0 +1,41 @@
+name: SciLoop checks
+
+on:
+  push:
+    branches: [main, workbench]
+  pull_request:
+    branches: [main, workbench]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      SCILOOP_WORKBENCH_ENABLED: "false"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Validate physics recipes
+        run: npm run validate:physics
+
+      - name: Production build
+        run: npm run build
+
+      - name: Diff check
+        run: git diff --check
+
