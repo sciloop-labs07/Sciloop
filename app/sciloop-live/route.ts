@@ -148,7 +148,9 @@ function buildLiveInnovationPortalEnhancement() {
         addExplainButtons(); apply();
         new MutationObserver(addExplainButtons).observe(portal, { childList:true, subtree:true });
       };
-      document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', init, { once:true }) : init();
+      document.addEventListener('DOMContentLoaded', init, { once:true });
+      window.addEventListener('load', init, { once:true });
+      window.setTimeout(init, 0);
     })();
   </script>`;
 }
