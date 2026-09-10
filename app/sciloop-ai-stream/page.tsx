@@ -6,7 +6,10 @@ const examples = [
   "Generate TypeScript code for a tiny semantic graph validator.",
 ];
 
-export default function SciLoopAiStreamPage() {
+export default async function SciLoopAiStreamPage({ searchParams }: { searchParams: Promise<{ prompt?: string | string[] }> }) {
+  const params = await searchParams;
+  const prompt = Array.isArray(params.prompt) ? params.prompt[0] : params.prompt;
+
   return (
     <div className="page-shell space-y-8 pb-12">
       <section className="panel-surface rounded-[38px] border border-white/10 bg-white/[0.035] px-6 py-8 md:px-9 md:py-10">
@@ -29,7 +32,7 @@ export default function SciLoopAiStreamPage() {
         </div>
       </section>
 
-      <StreamingMessage initialPrompt={examples[0]} />
+      <StreamingMessage initialPrompt={prompt?.trim() || examples[0]} />
     </div>
   );
 }
