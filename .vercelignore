@@ -19,6 +19,9 @@ server/node_modules/
 *.html
 !SciLoop - Live Scientific Discoveries 80.html
 !ForLoop Control Panel Mobile.html
+!index.html
+!final-product/index.html
+!final-product/vercel.json
 .env*
 !.env.example
 cloudflared*
