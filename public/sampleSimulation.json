@@ -1,0 +1,90 @@
+{
+  "source": "SciLoop",
+  "target": "Unity",
+  "version": "1.0",
+  "simulationType": "ecosystem",
+  "entities": [
+    {
+      "id": "ai_agents",
+      "type": "agent",
+      "name": "AI Agent",
+      "count": 34,
+      "energy": 62,
+      "speed": 1.2,
+      "behavior": ["wander", "seek_energy", "avoid_walls"]
+    },
+    {
+      "id": "energy_particles",
+      "type": "resource",
+      "name": "Energy Particle",
+      "count": 10,
+      "energyValue": 25
+    },
+    {
+      "id": "environment",
+      "type": "field",
+      "name": "Simulation Chamber",
+      "role": "gravity and temperature boundary"
+    }
+  ],
+  "variables": {
+    "gravity": 9.8,
+    "speed": 1.2,
+    "population": 34,
+    "energy": 62,
+    "temperature": 24
+  },
+  "causalRelations": [
+    {
+      "from": "energyParticles",
+      "to": "averageEnergy",
+      "relation": "agents recover energy when they reach a particle"
+    },
+    {
+      "from": "population",
+      "to": "collisionCount",
+      "relation": "more agents create more collisions"
+    },
+    {
+      "from": "temperature",
+      "to": "stabilityScore",
+      "relation": "temperature far from the comfort zone lowers stability"
+    },
+    {
+      "from": "gravity",
+      "to": "verticalSettling",
+      "relation": "higher gravity pulls the simulation closer to the floor plane"
+    }
+  ],
+  "visualModel": {
+    "renderer": "unity-webgl-or-canvas-fallback",
+    "scene": "dark scientific AI sandbox",
+    "camera": "orbit",
+    "prefabs": {
+      "agent": "AI agent sphere",
+      "resource": "energy particle orb"
+    },
+    "palette": ["#7dd3fc", "#63f5d5", "#ffd166", "#ff6b6b"],
+    "effects": ["agent trails", "energy glow", "collision flashes", "temperature haze"]
+  },
+  "controls": {
+    "gravity": 9.8,
+    "speed": 1.2,
+    "population": 34,
+    "energy": 62,
+    "temperature": 24
+  },
+  "resultsRequest": {
+    "aliveAgents": true,
+    "averageEnergy": true,
+    "collisionCount": true,
+    "stabilityScore": true
+  },
+  "bridgeMeta": {
+    "protocol": "sciloop-unity-ai-sandbox",
+    "version": "0.2",
+    "targetObject": "SciLoopUnityBridge",
+    "targetMethod": "LoadSimulation",
+    "generatedAt": "2026-05-30T00:00:00.000Z"
+  }
+}

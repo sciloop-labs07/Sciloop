@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ForLoop Control Panel - SciLoop AI Panel Demo</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 14mm;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: #eef7ff;
+      background: #071018;
+      font-family: "Segoe UI", Arial, sans-serif;
+      line-height: 1.45;
+    }
+
+    .page {
+      min-height: 269mm;
+      padding: 28px;
+      page-break-after: always;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(0, 255, 225, 0.24), transparent 30%),
+        radial-gradient(circle at 88% 18%, rgba(255, 196, 79, 0.18), transparent 30%),
+        linear-gradient(135deg, #071018 0%, #0b1724 45%, #050a12 100%);
+      border: 1px solid rgba(124, 231, 255, 0.18);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.62), transparent 80%);
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+    }
+
+    h1, h2, h3, p {
+      margin-top: 0;
+    }
+
+    h1 {
+      font-size: 42px;
+      line-height: 1.02;
+      letter-spacing: -1.6px;
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      font-size: 25px;
+      margin: 0 0 14px;
+      color: #83f6ff;
+      letter-spacing: -0.35px;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin: 0 0 8px;
+      color: #ffd880;
+    }
+
+    .subtitle {
+      max-width: 760px;
+      color: #b8cadd;
+      font-size: 18px;
+      margin-bottom: 26px;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 22px 0;
+    }
+
+    .badge {
+      border: 1px solid rgba(124, 231, 255, 0.3);
+      background: rgba(8, 26, 42, 0.75);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #d9fbff;
+      box-shadow: 0 0 22px rgba(0, 255, 225, 0.08);
+    }
+
+    .hero-card,
+    .card,
+    .flow-card {
+      border: 1px solid rgba(143, 226, 255, 0.2);
+      background: rgba(4, 13, 24, 0.78);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255,255,255,0.06);
+      border-radius: 22px;
+      padding: 18px;
+    }
+
+    .hero-card {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+      align-items: stretch;
+      margin-top: 26px;
+    }
+
+    .metric {
+      padding: 14px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(0,255,225,0.13), rgba(255,199,80,0.08));
+      border: 1px solid rgba(255,255,255,0.12);
+      margin-bottom: 10px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 22px;
+      color: #ffffff;
+    }
+
+    .metric span {
+      color: #b5c7d8;
+      font-size: 12px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .card {
+      min-height: 122px;
+    }
+
+    .card p,
+    .card li {
+      color: #c8d7e6;
+      font-size: 13px;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+      margin: 0;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    .section-label {
+      text-transform: uppercase;
+      color: #68f7ff;
+      letter-spacing: 2px;
+      font-size: 11px;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .callout {
+      margin: 16px 0;
+      padding: 14px 16px;
+      border-left: 4px solid #00ffe1;
+      background: rgba(0, 255, 225, 0.08);
+      color: #defdff;
+      border-radius: 14px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin: 12px 0 18px;
+      align-items: stretch;
+    }
+
+    .flow-card {
+      min-height: 116px;
+      padding: 14px;
+      position: relative;
+    }
+
+    .flow-card:not(:last-child)::after {
+      content: ">";
+      position: absolute;
+      right: -13px;
+      top: 42%;
+      color: #00ffe1;
+      font-weight: 800;
+      font-size: 18px;
+      text-shadow: 0 0 18px rgba(0,255,225,0.65);
+    }
+
+    .flow-card strong {
+      display: block;
+      color: #fff;
+      font-size: 13px;
+      margin-bottom: 7px;
+    }
+
+    .flow-card span {
+      display: block;
+      color: #bed0df;
+      font-size: 11px;
+    }
+
+    .api-table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 16px;
+      font-size: 12px;
+      background: rgba(0,0,0,0.18);
+    }
+
+    .api-table th,
+    .api-table td {
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 10px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .api-table th {
+      color: #071018;
+      background: linear-gradient(90deg, #00ffe1, #ffd36d);
+      font-size: 12px;
+    }
+
+    code {
+      color: #a8fff5;
+      background: rgba(0,255,225,0.09);
+      padding: 2px 5px;
+      border-radius: 6px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 11px;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .time-step {
+      border-radius: 16px;
+      padding: 12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.035));
+      border: 1px solid rgba(255,255,255,0.11);
+      min-height: 120px;
+    }
+
+    .time-step b {
+      display: inline-grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      color: #061018;
+      background: #00ffe1;
+      margin-bottom: 8px;
+    }
+
+    .time-step strong {
+      display: block;
+      font-size: 12px;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .time-step span {
+      color: #bccddd;
+      font-size: 11px;
+    }
+
+    .footer {
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      color: #7890a8;
+      font-size: 10px;
+      z-index: 2;
+    }
+
+    .big-number {
+      font-size: 52px;
+      font-weight: 800;
+      color: transparent;
+      background: linear-gradient(90deg, #00ffe1, #ffd36d, #ff61d8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      line-height: 1;
+    }
+
+    .mini {
+      font-size: 12px;
+      color: #aebfcd;
+    }
+
+    .stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .no-break {
+      break-inside: avoid;
+    }
+  </style>
+</head>
+<body>
+  <section class="page">
+    <div class="content">
+      <div class="section-label">Demo Explanation PDF</div>
+      <h1>ForLoop Control Panel<br>SciLoop AI Panel</h1>
+      <p class="subtitle">
+        A simple explanation of how the SciLoop AI control layer was developed, how it connects to the SciLoop platform, and how AI providers are used securely from the backend.
+      </p>
+
+      <div class="badge-row">
+        <span class="badge">Control Panel</span>
+        <span class="badge">Secure Backend APIs</span>
+        <span class="badge">SciLoop AI Explanation</span>
+        <span class="badge">News to Visual Plan</span>
+        <span class="badge">Provider Switching</span>
+      </div>
+
+      <div class="hero-card">
+        <div>
+          <h2>What We Created</h2>
+          <p>
+            We created a dedicated SciLoop AI panel inside the ForLoop Control Panel. This panel works like an operator dashboard for the AI layer of SciLoop.
+          </p>
+          <ul>
+            <li>It checks whether the SciLoop AI backend is running.</li>
+            <li>It checks whether AI provider keys are available and usable.</li>
+            <li>It can trigger the SciLoop AI backend start flow from a safe control endpoint.</li>
+            <li>It connects the News Portal, AI explanation system, and Visual Language Lab.</li>
+            <li>It keeps secret API keys away from the browser UI.</li>
+          </ul>
+          <div class="callout">
+            Simple line for demo: <strong>“I built the SciLoop AI control layer that connects the frontend, ForLoop dashboard, backend, provider APIs, and visual explanation system.”</strong>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="metric">
+            <strong>3001</strong>
+            <span>ForLoop Control API port</span>
+          </div>
+          <div class="metric">
+            <strong>5050</strong>
+            <span>SciLoop AI Backend port</span>
+          </div>
+          <div class="metric">
+            <strong>Secure</strong>
+            <span>API keys stay inside backend .env files</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>SciLoop / ForLoop demo document</span><span>Page 1</span></div>
+  </section>
+
+  <section class="page">
+    <div class="content">
+      <div class="section-label">Architecture</div>
+      <h2>How the SciLoop AI Panel Connects Everything</h2>
+      <p class="mini">The panel is not just a button. It is a bridge between the user-facing platform and the protected backend AI services.</p>
+
+      <div class="flow">
+        <div class="flow-card">
+          <strong>1. SciLoop UI</strong>
+          <span>User clicks Explain, Simulate, or Visualize inside the News Portal.</span>
+        </div>
+        <div class="flow-card">
+          <strong>2. Next Proxy</strong>
+          <span>Browser calls safe app proxy routes instead of exposing private backend URLs.</span>
+        </div>
+        <div class="flow-card">
+          <strong>3. SciLoop AI Backend</strong>
+          <span>Backend creates prompts, applies fallback logic, cache, and quota protection.</span>
+        </div>
+        <div class="flow-card">
+          <strong>4. AI Provider Router</strong>
+          <span>Gemini, Groq, OpenRouter, Hugging Face, Together, and other providers can be selected.</span>
+        </div>
+        <div class="flow-card">
+          <strong>5. SciLoop Output</strong>
+          <span>Explanation, simulation, timeline, and visual plan are returned to the frontend.</span>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card no-break">
+          <h3>ForLoop Control Panel Role</h3>
+          <ul>
+            <li>Shows SciLoop AI status and readiness.</li>
+            <li>Saves/checks provider keys locally.</li>
+            <li>Starts the SciLoop AI backend through an allowlisted runtime target.</li>
+            <li>Logs important admin actions for demo visibility.</li>
+          </ul>
+        </div>
+
+        <div class="card no-break">
+          <h3>SciLoop AI Backend Role</h3>
+          <ul>
+            <li>Receives article or concept data from SciLoop.</li>
+            <li>Builds safe prompts for explanation, simulation, and visual planning.</li>
+            <li>Calls the selected AI provider server-side.</li>
+            <li>Returns clean JSON that the UI can render beautifully.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout">
+        Important: The AI key is never placed inside the HTML page. The browser sends a request to the backend, and only the backend talks to Gemini/Groq/OpenRouter-style providers.
+      </div>
+    </div>
+    <div class="footer"><span>Flow: UI → Proxy → Backend → Provider → SciLoop result</span><span>Page 2</span></div>
+  </section>
+
+  <section class="page">
+    <div class="content">
+      <div class="section-label">APIs Used</div>
+      <h2>Main Backend APIs Behind the Panel</h2>
+
+      <table class="api-table">
+        <thead>
+          <tr>
+            <th>Area</th>
+            <th>Endpoint</th>
+            <th>Why It Exists</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ForLoop SciLoop AI Panel</td>
+            <td><code>GET /api/admin/sciloop-ai/status</code></td>
+            <td>Checks whether the SciLoop AI backend and provider configuration are visible to the control panel.</td>
+          </tr>
+          <tr>
+            <td>ForLoop SciLoop AI Panel</td>
+            <td><code>GET /api/admin/sciloop-ai/readiness</code></td>
+            <td>Shows if enough required provider keys are configured before a live demo.</td>
+          </tr>
+          <tr>
+            <td>ForLoop SciLoop AI Panel</td>
+            <td><code>POST /api/admin/sciloop-ai/keys</code></td>
+            <td>Saves provider keys into the local backend environment, not into the frontend.</td>
+          </tr>
+          <tr>
+            <td>ForLoop SciLoop AI Panel</td>
+            <td><code>POST /api/admin/sciloop-ai/check-provider</code></td>
+            <td>Tests one provider key and returns ready, missing key, quota, or warning state.</td>
+          </tr>
+          <tr>
+            <td>ForLoop SciLoop AI Panel</td>
+            <td><code>POST /api/admin/sciloop-ai/check-all</code></td>
+            <td>Runs a full provider readiness check for the control dashboard.</td>
+          </tr>
+          <tr>
+            <td>ForLoop SciLoop AI Panel</td>
+            <td><code>POST /api/admin/sciloop-ai/start-server</code></td>
+            <td>Starts the allowlisted SciLoop AI backend runtime target.</td>
+          </tr>
+          <tr>
+            <td>SciLoop AI Backend</td>
+            <td><code>POST /api/sciloop-ai/explain</code></td>
+            <td>Turns news into simple meaning, timeline, people/team info, impact, and visual blueprint.</td>
+          </tr>
+          <tr>
+            <td>SciLoop AI Backend</td>
+            <td><code>POST /api/sciloop-ai/simulate</code></td>
+            <td>Creates a possibility simulation storyline from the AI explanation.</td>
+          </tr>
+          <tr>
+            <td>SciLoop AI Backend</td>
+            <td><code>POST /api/sciloop-ai/news-visualize</code></td>
+            <td>Converts a news article into a visual-plan handoff for the Visual Language Lab.</td>
+          </tr>
+          <tr>
+            <td>SciLoop AI Backend</td>
+            <td><code>GET /api/sciloop-ai/news-visualize/:handoffId</code></td>
+            <td>Lets the Visual Language Lab load the prepared visual plan after redirect.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="grid-2" style="margin-top: 16px;">
+        <div class="card">
+          <h3>Frontend Proxy Routes</h3>
+          <ul>
+            <li><code>/api/sciloop-ai-proxy/*</code> forwards SciLoop AI requests safely.</li>
+            <li><code>/api/forloop-proxy/*</code> forwards ForLoop admin requests safely.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Provider APIs Used</h3>
+          <ul>
+            <li>Gemini for structured explanation and planning.</li>
+            <li>Groq for fast response generation.</li>
+            <li>OpenRouter/Hugging Face/Together as optional provider routes.</li>
+            <li>Local fallback when providers fail or keys are missing.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Control APIs + AI APIs</span><span>Page 3</span></div>
+  </section>
+
+  <section class="page">
+    <div class="content">
+      <div class="section-label">Demo Flow</div>
+      <h2>What Happens When a User Clicks “Explain with SciLoop AI”</h2>
+
+      <div class="timeline">
+        <div class="time-step">
+          <b>1</b>
+          <strong>User action</strong>
+          <span>User opens News Portal and clicks Explain with SciLoop AI.</span>
+        </div>
+        <div class="time-step">
+          <b>2</b>
+          <strong>Payload</strong>
+          <span>Frontend sends title, summary, source, URL, and date.</span>
+        </div>
+        <div class="time-step">
+          <b>3</b>
+          <strong>Backend prompt</strong>
+          <span>SciLoop AI Backend builds a structured prompt for simple explanation.</span>
+        </div>
+        <div class="time-step">
+          <b>4</b>
+          <strong>Provider call</strong>
+          <span>Provider router uses available APIs and switches if one fails.</span>
+        </div>
+        <div class="time-step">
+          <b>5</b>
+          <strong>Clean JSON</strong>
+          <span>Backend returns explanation, timeline, people/team info, impact, and visual blueprint.</span>
+        </div>
+        <div class="time-step">
+          <b>6</b>
+          <strong>Live UI</strong>
+          <span>SciLoop shows colorful explanation with typing effect and simulation action.</span>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top: 18px;">
+        <div class="card">
+          <h3>What the User Sees</h3>
+          <ul>
+            <li>Simple meaning of the news.</li>
+            <li>Why the innovation matters.</li>
+            <li>Team or people behind it when confirmed.</li>
+            <li>Animated timeline block.</li>
+            <li>Visual simulation blueprint.</li>
+            <li>Simulate button for future possibility.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>What the Backend Handles</h3>
+          <ul>
+            <li>Prompt construction.</li>
+            <li>Provider selection.</li>
+            <li>Quota/cache protection.</li>
+            <li>Error handling.</li>
+            <li>Fallback explanation if AI provider fails.</li>
+            <li>Safe JSON response for the UI.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout">
+        Demo sentence: <strong>“The user only clicks one button, but behind it the system builds an article payload, routes it through a secure backend, talks to an AI provider, and renders a student-friendly SciLoop explanation.”</strong>
+      </div>
+    </div>
+    <div class="footer"><span>Explain flow</span><span>Page 4</span></div>
+  </section>
+
+  <section class="page">
+    <div class="content">
+      <div class="section-label">Security + Reliability</div>
+      <h2>Why This Architecture Is Safe for Demo and Expansion</h2>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="big-number">01</div>
+          <h3>Keys stay hidden</h3>
+          <p>AI provider keys are read from backend environment files. The browser never receives real API keys.</p>
+        </div>
+        <div class="card">
+          <div class="big-number">02</div>
+          <h3>Panel is controlled</h3>
+          <p>ForLoop admin actions use a local access code and allowlisted runtime actions instead of open shell access.</p>
+        </div>
+        <div class="card">
+          <div class="big-number">03</div>
+          <h3>Failures do not break UI</h3>
+          <p>If a provider fails, hits quota, or times out, SciLoop can switch provider or return local fallback content.</p>
+        </div>
+        <div class="card">
+          <div class="big-number">04</div>
+          <h3>Quota protection</h3>
+          <p>The backend uses cache, cooldowns, limits, and provider status checks so demos do not burn API usage unnecessarily.</p>
+        </div>
+        <div class="card">
+          <div class="big-number">05</div>
+          <h3>Clean JSON contract</h3>
+          <p>The frontend receives predictable fields, so the explanation card, timeline, and visual lab can render reliably.</p>
+        </div>
+        <div class="card">
+          <div class="big-number">06</div>
+          <h3>Expandable</h3>
+          <p>The same pattern can support more providers, more subjects, voice, visual plans, and future learning tools.</p>
+        </div>
+      </div>
+
+      <h2 style="margin-top: 24px;">How to Explain “I Created SciLoop AI”</h2>
+      <div class="card">
+        <ul>
+          <li>I created the SciLoop AI experience layer: the buttons, explanation panel, timeline, simulation button, and visual handoff.</li>
+          <li>I connected that frontend layer to a secure backend instead of exposing API keys in the browser.</li>
+          <li>I built the ForLoop SciLoop AI panel to check readiness, provider keys, backend status, and runtime start.</li>
+          <li>I connected the News Portal to AI explanation and Visual Language Lab so science news becomes a learning story.</li>
+          <li>I designed fallback behavior so the platform still works even when one AI provider is unavailable.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer"><span>Security, reliability, and demo story</span><span>Page 5</span></div>
+  </section>
+
+  <section class="page">
+    <div class="content">
+      <div class="section-label">Presentation Script</div>
+      <h2>Simple Demo Script You Can Say</h2>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Opening</h3>
+          <p>
+            “This is the ForLoop Control Panel. I built a SciLoop AI panel inside it so I can check and control the AI layer of my SciLoop platform from one place.”
+          </p>
+        </div>
+        <div class="card">
+          <h3>Backend</h3>
+          <p>
+            “The AI keys are not inside the website. They stay in the backend. The frontend only sends safe requests, and the backend talks to Gemini, Groq, OpenRouter, or fallback providers.”
+          </p>
+        </div>
+        <div class="card">
+          <h3>News Portal</h3>
+          <p>
+            “When a user clicks Explain with SciLoop AI, the article title and summary go to my SciLoop AI backend, and the backend returns a structured learning explanation.”
+          </p>
+        </div>
+        <div class="card">
+          <h3>Visualize</h3>
+          <p>
+            “When the user clicks Visualize, SciLoop creates a visual plan and redirects to the Visual Language Lab, where the idea becomes a causal visual scene.”
+          </p>
+        </div>
+      </div>
+
+      <h2 style="margin-top: 22px;">Final One-Line Summary</h2>
+      <div class="hero-card" style="grid-template-columns: 1fr;">
+        <p style="font-size: 21px; margin: 0; color: #fff;">
+          “ForLoop controls the AI system, SciLoop AI explains and simulates the news, and the Visual Language Lab turns that explanation into a visual learning scene.”
+        </p>
+      </div>
+
+      <div class="callout">
+        Best demo order: open ForLoop Control Panel → check SciLoop AI status → open SciLoop News Portal → click Explain → show animated explanation → click Simulate or Visualize.
+      </div>
+    </div>
+    <div class="footer"><span>Ready for demo</span><span>Page 6</span></div>
+  </section>
+</body>
+</html>

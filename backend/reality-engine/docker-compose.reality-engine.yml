@@ -1,0 +1,13 @@
+services:
+  sciloop-ai-backend:
+    build:
+      context: ../..
+      dockerfile: backend/reality-engine/Dockerfile
+    ports:
+      - "5050:5050"
+    environment:
+      PORT: 5050
+      FRONTEND_ORIGIN: http://localhost:3000
+      VISUAL_LANGUAGE_LAB_URL: http://localhost:3000/visual-language-lab
+    env_file:
+      - ../../sciloop-backend/.env

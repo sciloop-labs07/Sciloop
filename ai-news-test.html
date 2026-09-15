@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SciLoop AI News Test</title>
+  <style>
+    :root {
+      --bg: #050914;
+      --panel: rgba(9, 18, 34, 0.86);
+      --panel-strong: rgba(12, 28, 52, 0.92);
+      --line: rgba(118, 190, 255, 0.22);
+      --text: #f4fbff;
+      --muted: #a9bdd1;
+      --cyan: #84efff;
+      --gold: #ffd47d;
+      --green: #9bf5be;
+      --pink: #ffadd2;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(53, 110, 190, 0.18), transparent 30%),
+        linear-gradient(180deg, #060b16, var(--bg));
+      color: var(--text);
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 28px 0 42px;
+    }
+
+    .top {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .top span,
+    label,
+    .badge {
+      color: var(--cyan);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 4vw, 3.4rem);
+      line-height: 1.05;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.84fr) minmax(320px, 1.16fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      padding: 18px;
+    }
+
+    form {
+      display: grid;
+      gap: 12px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid rgba(132, 239, 255, 0.2);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.045);
+      color: var(--text);
+      padding: 12px;
+      font: inherit;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 140px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: rgba(132, 239, 255, 0.5);
+      box-shadow: 0 0 0 3px rgba(132, 239, 255, 0.08);
+    }
+
+    button {
+      min-height: 48px;
+      border: 1px solid rgba(132, 239, 255, 0.35);
+      border-radius: 14px;
+      background:
+        linear-gradient(135deg, rgba(132, 239, 255, 0.24), rgba(255, 212, 125, 0.18)),
+        rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.62;
+      cursor: wait;
+    }
+
+    .status {
+      min-height: 22px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .cards {
+      display: grid;
+      gap: 12px;
+    }
+
+    .card {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      background: var(--panel-strong);
+      padding: 14px;
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+    }
+
+    .card p {
+      margin: 0;
+      color: #dcecff;
+      line-height: 1.6;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 8px;
+    }
+
+    .timeline div,
+    .chip-row span {
+      border: 1px solid rgba(132, 239, 255, 0.14);
+      border-radius: 999px;
+      background: rgba(132, 239, 255, 0.07);
+      padding: 8px 10px;
+      color: #dcfaff;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    pre {
+      overflow: auto;
+      margin: 0;
+      max-height: 280px;
+      color: #d9f5ff;
+      white-space: pre-wrap;
+    }
+
+    @media (max-width: 820px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="top">
+      <span>SciLoop local API test</span>
+      <h1>AI News Explanation</h1>
+      <p class="status">Backend target: http://localhost:3001/api/explain-news</p>
+    </section>
+
+    <div class="layout">
+      <section class="panel">
+        <form id="newsForm">
+          <label>
+            News Title
+            <input id="titleInput" required value="Scientists unlock a powerful new way to turn sunlight into fuel">
+          </label>
+          <label>
+            Summary
+            <textarea id="summaryInput">Researchers developed a computational method that may speed up discovery of materials for converting sunlight into useful chemical energy.</textarea>
+          </label>
+          <label>
+            Source
+            <input id="sourceInput" value="ScienceDaily">
+          </label>
+          <button id="submitBtn" type="submit">Explain with Sciloop AI</button>
+          <p id="statusText" class="status">Ready.</p>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div id="output" class="cards">
+          <article class="card">
+            <h2>Waiting for explanation</h2>
+            <p>Submit a science news item to see the structured SciLoop JSON rendered as readable cards.</p>
+          </article>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById('newsForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const statusText = document.getElementById('statusText');
+    const output = document.getElementById('output');
+
+    function escapeHtml(value = '') {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function renderList(items = []) {
+      return items.length
+        ? items.map((item) => `<span>${escapeHtml(item)}</span>`).join('')
+        : '<span>not clearly stated in source</span>';
+    }
+
+    function renderResult(result) {
+      const data = result.data || {};
+      const storyline = data.storyline || {};
+      const factGroups = data.factInferenceSpeculation || {};
+      output.innerHTML = `
+        <article class="card">
+          <span class="badge">${escapeHtml(result.providerUsed || 'fallback')} ${result.cached ? '| cached' : ''}</span>
+          <h2>🧠 Simple Explanation</h2>
+          <p>${escapeHtml(data.simpleExplanation || '')}</p>
+        </article>
+        <article class="card">
+          <h2>📜 Storyline</h2>
+          <p><strong>Problem:</strong> ${escapeHtml(storyline.problem || '')}</p>
+          <p><strong>Old limit:</strong> ${escapeHtml(storyline.oldLimit || '')}</p>
+          <p><strong>Breakthrough:</strong> ${escapeHtml(storyline.breakthrough || '')}</p>
+          <p><strong>How it works:</strong> ${escapeHtml(storyline.howItWorks || '')}</p>
+          <p><strong>Impact:</strong> ${escapeHtml(storyline.impact || '')}</p>
+        </article>
+        <article class="card">
+          <h2>🕒 Timeline</h2>
+          <div class="timeline">
+            ${(data.timeline || []).map((item) => `<div>${escapeHtml(item.year)} — ${escapeHtml(item.event)}</div>`).join('')}
+          </div>
+        </article>
+        <article class="card">
+          <h2>🌍 Impact + Visuals</h2>
+          <p><strong>Field:</strong> ${escapeHtml(data.field || '')}</p>
+          <p><strong>Impact score:</strong> ${Number(data.impactScore || 0)}/100</p>
+          <div class="chip-row">${renderList(data.visualSymbols || [])}</div>
+        </article>
+        <article class="card">
+          <h2>✅ Facts / ⚠️ Inferences / 🧪 Speculation</h2>
+          <p><strong>Facts:</strong></p>
+          <div class="chip-row">${renderList(factGroups.facts || [])}</div>
+          <p><strong>Inferences:</strong></p>
+          <div class="chip-row">${renderList(factGroups.inferences || [])}</div>
+          <p><strong>Speculation:</strong></p>
+          <div class="chip-row">${renderList(factGroups.speculation || [])}</div>
+        </article>
+        <article class="card">
+          <h2>🎓 Student + Teacher</h2>
+          <p>${escapeHtml(data.oneLineForStudent || '')}</p>
+          <p>${escapeHtml(data.teacherDemoSpeech || '')}</p>
+        </article>
+        <article class="card">
+          <h2>Raw JSON</h2>
+          <pre>${escapeHtml(JSON.stringify(result, null, 2))}</pre>
+        </article>
+      `;
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      submitBtn.disabled = true;
+      statusText.textContent = 'Generating explanation...';
+
+      try {
+        const response = await fetch('http://localhost:3001/api/explain-news', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: document.getElementById('titleInput').value,
+            summary: document.getElementById('summaryInput').value,
+            source: document.getElementById('sourceInput').value
+          })
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || 'API request failed');
+        }
+        renderResult(result);
+        statusText.textContent = result.cached ? 'Loaded from cache.' : 'Explanation generated.';
+      } catch (error) {
+        statusText.textContent = `Could not reach API: ${error.message}`;
+        output.innerHTML = `
+          <article class="card">
+            <h2>Fallback message</h2>
+            <p>Start the backend with <strong>cd server</strong>, <strong>npm install</strong>, then <strong>npm run dev</strong>.</p>
+          </article>
+        `;
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

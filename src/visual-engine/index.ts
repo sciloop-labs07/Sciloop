@@ -1,0 +1,14 @@
+export { VisualEngineHealthPanel } from "./VisualEngineHealthPanel";
+export { VisualEngineOverview } from "./VisualEngineOverview";
+export * from "./api";
+export * from "./ai";
+export * from "./engines";
+export * from "./feedback";
+export * from "./foundation";
+export * from "./memory";
+export * from "./patterns";
+export * from "./renderer";
+export * from "./visual-tech-lab";
+export * from "./v1";
+export * from "./visualEngine.selfTest";
+export * from "./visualEngineHealthCheck";

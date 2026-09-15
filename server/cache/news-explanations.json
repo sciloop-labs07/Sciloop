@@ -1,0 +1,469 @@
+{
+  "02d11e33fe8502ed34fae86211ea1cead68f0f0990291ee71190fe5e00f9fb04": {
+    "providerUsed": "fallback",
+    "data": {
+      "simpleExplanation": "🧠 Scientists unlock a powerful new way to turn sunlight into fuel means researchers are reporting a new science or innovation update. In simple words: Researchers developed a computational method that may speed up discovery of materials for converting sunlight into useful chemical energy.",
+      "storyline": {
+        "problem": "The source points to a scientific or technology problem that researchers are trying to understand or improve.",
+        "oldLimit": "The earlier limitation is not fully clear from the news card, so SciLoop marks it as not clearly stated in source.",
+        "breakthrough": "The reported breakthrough is the main discovery or improvement described in the title and summary.",
+        "howItWorks": "SciLoop can explain the idea at a high level, but exact technical steps need the original source or research paper.",
+        "impact": "The update may help students understand how research moves from problem to idea to real-world impact."
+      },
+      "timeline": [
+        {
+          "year": "earlier",
+          "event": "Scientists worked on the broad problem area."
+        },
+        {
+          "year": "2026",
+          "event": "This news item reported the current update."
+        },
+        {
+          "year": "future",
+          "event": "More testing, peer review, or real-world use may come next."
+        }
+      ],
+      "peopleOrLabs": "not clearly stated in source",
+      "field": "Chemistry / Materials",
+      "impactScore": 55,
+      "visualSymbols": [
+        "⚗️",
+        "🔬",
+        "🧱",
+        "⚡"
+      ],
+      "factInferenceSpeculation": {
+        "facts": [
+          "Title from source: Scientists unlock a powerful new way to turn sunlight into fuel",
+          "Source label: ScienceDaily"
+        ],
+        "inferences": [
+          "Likely field: Chemistry / Materials",
+          "The problem and impact are summarized from the title and summary."
+        ],
+        "speculation": [
+          "Future uses need verification from the original research or official source."
+        ]
+      },
+      "oneLineForStudent": "✨ Scientists unlock a powerful new way to turn sunlight into fuel is a news example of how science turns a problem into a possible solution.",
+      "teacherDemoSpeech": "This module takes a live news card, separates facts from guesses, and turns it into a simple student-friendly explanation."
+    },
+    "savedAt": "2026-05-02T07:15:37.134Z"
+  },
+  "87870810dd8bcb3f25076bce5f6375ef062d762adc785eb7333598596974feb9": {
+    "providerUsed": "fallback",
+    "data": {
+      "simpleExplanation": "🧠 New battery innovation means researchers are reporting a new science or innovation update. In simple words: Scientists created a faster charging battery",
+      "storyline": {
+        "problem": "The source points to a scientific or technology problem that researchers are trying to understand or improve.",
+        "oldLimit": "The earlier limitation is not fully clear from the news card, so SciLoop marks it as not clearly stated in source.",
+        "breakthrough": "The reported breakthrough is the main discovery or improvement described in the title and summary.",
+        "howItWorks": "SciLoop can explain the idea at a high level, but exact technical steps need the original source or research paper.",
+        "impact": "The update may help students understand how research moves from problem to idea to real-world impact."
+      },
+      "timeline": [
+        {
+          "year": "earlier",
+          "event": "Scientists worked on the broad problem area."
+        },
+        {
+          "year": "2026",
+          "event": "This news item reported the current update."
+        },
+        {
+          "year": "future",
+          "event": "More testing, peer review, or real-world use may come next."
+        }
+      ],
+      "peopleOrLabs": "not clearly stated in source",
+      "field": "Technology",
+      "impactScore": 55,
+      "visualSymbols": [
+        "⚡",
+        "🤖",
+        "💡",
+        "🌍"
+      ],
+      "factInferenceSpeculation": {
+        "facts": [
+          "Title from source: New battery innovation",
+          "Source label: Test"
+        ],
+        "inferences": [
+          "Likely field: Technology",
+          "The problem and impact are summarized from the title and summary."
+        ],
+        "speculation": [
+          "Future uses need verification from the original research or official source."
+        ]
+      },
+      "oneLineForStudent": "✨ New battery innovation is a news example of how science turns a problem into a possible solution.",
+      "teacherDemoSpeech": "This module takes a live news card, separates facts from guesses, and turns it into a simple student-friendly explanation."
+    },
+    "savedAt": "2026-05-02T07:19:07.456Z"
+  },
+  "f2547cf0939d89ba6ee8fb43755e7cad677b545edbcc38b164686cb0810a4c92": {
+    "providerUsed": "fallback",
+    "data": {
+      "simpleExplanation": "🧠 Dietary fats shape pancreatic cancer risk via ferroptosis means researchers are reporting a new science or innovation update. In simple words: For decades, the relationship between fat and cancer has been treated as a question of quantity: Eat less fat, reduce your risk of developing cancer. But new research published April 29 in Cancer Discovery shows that for pancreatic cancer, the type of fat you consume matters more than the amount.",
+      "storyline": {
+        "problem": "The source points to a scientific or technology problem that researchers are trying to understand or improve.",
+        "oldLimit": "The earlier limitation is not fully clear from the news card, so SciLoop marks it as not clearly stated in source.",
+        "breakthrough": "The reported breakthrough is the main discovery or improvement described in the title and summary.",
+        "howItWorks": "SciLoop can explain the idea at a high level, but exact technical steps need the original source or research paper.",
+        "impact": "The update may help students understand how research moves from problem to idea to real-world impact."
+      },
+      "timeline": [
+        {
+          "year": "earlier",
+          "event": "Scientists worked on the broad problem area."
+        },
+        {
+          "year": "2026",
+          "event": "This news item reported the current update."
+        },
+        {
+          "year": "future",
+          "event": "More testing, peer review, or real-world use may come next."
+        }
+      ],
+      "peopleOrLabs": "not clearly stated in source",
+      "field": "Biology / Medicine",
+      "impactScore": 55,
+      "visualSymbols": [
+        "🧬",
+        "🔬",
+        "🩺",
+        "🌍"
+      ],
+      "factInferenceSpeculation": {
+        "facts": [
+          "Title from source: Dietary fats shape pancreatic cancer risk via ferroptosis",
+          "Source label: MedicalXpress"
+        ],
+        "inferences": [
+          "Likely field: Biology / Medicine",
+          "The problem and impact are summarized from the title and summary."
+        ],
+        "speculation": [
+          "Future uses need verification from the original research or official source."
+        ]
+      },
+      "oneLineForStudent": "✨ Dietary fats shape pancreatic cancer risk via ferroptosis is a news example of how science turns a problem into a possible solution.",
+      "teacherDemoSpeech": "This module takes a live news card, separates facts from guesses, and turns it into a simple student-friendly explanation."
+    },
+    "savedAt": "2026-05-02T07:19:59.341Z"
+  },
+  "5a85d6d378c92c9c428591f577e8374785daf19b283be4ee9f7771377c831394": {
+    "providerUsed": "fallback",
+    "data": {
+      "simpleExplanation": "🧠 NASA Laser Terminal enhances views during Artemis II mission means researchers are reporting a new science or innovation update. In simple words: Millions of people watched the historic launch of Artemis II and were captivated by the mission's 10-day journey around the moon as NASA astronauts Reid Wiseman, Victor Glover, and Christina Koch, and CSA (Canadian Space Agency) astronaut Jeremy Hansen ventured farther into space than any human before. Part of the public's ability to experience the mission in high-definition was due to laser communications.",
+      "storyline": {
+        "problem": "The source points to a scientific or technology problem that researchers are trying to understand or improve.",
+        "oldLimit": "The earlier limitation is not fully clear from the news card, so SciLoop marks it as not clearly stated in source.",
+        "breakthrough": "The reported breakthrough is the main discovery or improvement described in the title and summary.",
+        "howItWorks": "SciLoop can explain the idea at a high level, but exact technical steps need the original source or research paper.",
+        "impact": "The update may help students understand how research moves from problem to idea to real-world impact."
+      },
+      "timeline": [
+        {
+          "year": "earlier",
+          "event": "Scientists worked on the broad problem area."
+        },
+        {
+          "year": "2026",
+          "event": "This news item reported the current update."
+        },
+        {
+          "year": "future",
+          "event": "More testing, peer review, or real-world use may come next."
+        }
+      ],
+      "peopleOrLabs": "not clearly stated in source",
+      "field": "Space Science",
+      "impactScore": 55,
+      "visualSymbols": [
+        "🚀",
+        "🛰️",
+        "🌌",
+        "🔭"
+      ],
+      "factInferenceSpeculation": {
+        "facts": [
+          "Title from source: NASA Laser Terminal enhances views during Artemis II mission",
+          "Source label: Phys.org"
+        ],
+        "inferences": [
+          "Likely field: Space Science",
+          "The problem and impact are summarized from the title and summary."
+        ],
+        "speculation": [
+          "Future uses need verification from the original research or official source."
+        ]
+      },
+      "oneLineForStudent": "✨ NASA Laser Terminal enhances views during Artemis II mission is a news example of how science turns a problem into a possible solution.",
+      "teacherDemoSpeech": "This module takes a live news card, separates facts from guesses, and turns it into a simple student-friendly explanation."
+    },
+    "savedAt": "2026-05-02T07:20:09.244Z"
+  },
+  "0c34931c2ae168956b6e0a2997f453c56167104eced6d5beddb23ebcb93aee50": {
+    "providerUsed": "fallback",
+    "data": {
+      "simpleExplanation": "🧠 Mechanochemistry simplifies synthesis of challenging conductive organic molecules means researchers are reporting a new science or innovation update. In simple words: Mechanochemistry is a growing field for chemical reactions that proceed in the solid state in the absence, or with minuscule amounts, of solvent added. For decades, solvents have been considered conventional for the progression of modern chemistry; nonetheless, researchers are increasingly demonstrating that mechanochemistry can synthesize complex molecules more effectively. With more progress, mechanochemistry could alleviate solvent-related environmental and financial burdens in chemical industries.",
+      "storyline": {
+        "problem": "The source points to a scientific or technology problem that researchers are trying to understand or improve.",
+        "oldLimit": "The earlier limitation is not fully clear from the news card, so SciLoop marks it as not clearly stated in source.",
+        "breakthrough": "The reported breakthrough is the main discovery or improvement described in the title and summary.",
+        "howItWorks": "SciLoop can explain the idea at a high level, but exact technical steps need the original source or research paper.",
+        "impact": "The update may help students understand how research moves from problem to idea to real-world impact."
+      },
+      "timeline": [
+        {
+          "year": "earlier",
+          "event": "Scientists worked on the broad problem area."
+        },
+        {
+          "year": "2026",
+          "event": "This news item reported the current update."
+        },
+        {
+          "year": "future",
+          "event": "More testing, peer review, or real-world use may come next."
+        }
+      ],
+      "peopleOrLabs": "not clearly stated in source",
+      "field": "Earth / Environment",
+      "impactScore": 55,
+      "visualSymbols": [
+        "🌍",
+        "🌦️",
+        "🌊",
+        "⚠️"
+      ],
+      "factInferenceSpeculation": {
+        "facts": [
+          "Title from source: Mechanochemistry simplifies synthesis of challenging conductive organic molecules",
+          "Source label: Phys.org"
+        ],
+        "inferences": [
+          "Likely field: Earth / Environment",
+          "The problem and impact are summarized from the title and summary."
+        ],
+        "speculation": [
+          "Future uses need verification from the original research or official source."
+        ]
+      },
+      "oneLineForStudent": "✨ Mechanochemistry simplifies synthesis of challenging conductive organic molecules is a news example of how science turns a problem into a possible solution.",
+      "teacherDemoSpeech": "This module takes a live news card, separates facts from guesses, and turns it into a simple student-friendly explanation."
+    },
+    "savedAt": "2026-05-02T07:20:25.663Z"
+  },
+  "f91c25ac66d4ebc202fa014dc74aaad0ff51241ae1bdae694778ebd6880b1939": {
+    "providerUsed": "fallback",
+    "data": {
+      "simpleExplanation": "🧠 FDA recalls several Ghirardelli powdered beverages over potential contamination means researchers are reporting a new science or innovation update. In simple words: Several powdered beverage mixes by Ghirardelli Chocolate Company are being recalled due to possible concerns of Salmonella contamination.",
+      "storyline": {
+        "problem": "The source points to a scientific or technology problem that researchers are trying to understand or improve.",
+        "oldLimit": "The earlier limitation is not fully clear from the news card, so SciLoop marks it as not clearly stated in source.",
+        "breakthrough": "The reported breakthrough is the main discovery or improvement described in the title and summary.",
+        "howItWorks": "SciLoop can explain the idea at a high level, but exact technical steps need the original source or research paper.",
+        "impact": "The update may help students understand how research moves from problem to idea to real-world impact."
+      },
+      "timeline": [
+        {
+          "year": "earlier",
+          "event": "Scientists worked on the broad problem area."
+        },
+        {
+          "year": "2026",
+          "event": "This news item reported the current update."
+        },
+        {
+          "year": "future",
+          "event": "More testing, peer review, or real-world use may come next."
+        }
+      ],
+      "peopleOrLabs": "not clearly stated in source",
+      "field": "Science / Innovation",
+      "impactScore": 55,
+      "visualSymbols": [
+        "🔬",
+        "⚡",
+        "🌍"
+      ],
+      "factInferenceSpeculation": {
+        "facts": [
+          "Title from source: FDA recalls several Ghirardelli powdered beverages over potential contamination",
+          "Source label: MedicalXpress"
+        ],
+        "inferences": [
+          "Likely field: Science / Innovation",
+          "The problem and impact are summarized from the title and summary."
+        ],
+        "speculation": [
+          "Future uses need verification from the original research or official source."
+        ]
+      },
+      "oneLineForStudent": "✨ FDA recalls several Ghirardelli powdered beverages over potential contamination is a news example of how science turns a problem into a possible solution.",
+      "teacherDemoSpeech": "This module takes a live news card, separates facts from guesses, and turns it into a simple student-friendly explanation."
+    },
+    "savedAt": "2026-05-02T07:20:30.946Z"
+  },
+  "183f778a95dbb02fc900a1468ae9cd2fc00baba1852f827b8085cef22aa1fd22": {
+    "providerUsed": "fallback",
+    "data": {
+      "simpleExplanation": "🧠 Reverse engineering ketamine's effects may lead to new antidepressants means researchers are reporting a new science or innovation update. In simple words: Weill Cornell Medicine investigators have \"reverse engineered\" ketamine's antidepressant effects to identify potential new strategies for treating depression. While there are many effective treatments available for depression, not all patients respond to them.",
+      "storyline": {
+        "problem": "The source points to a scientific or technology problem that researchers are trying to understand or improve.",
+        "oldLimit": "The earlier limitation is not fully clear from the news card, so SciLoop marks it as not clearly stated in source.",
+        "breakthrough": "The reported breakthrough is the main discovery or improvement described in the title and summary.",
+        "howItWorks": "SciLoop can explain the idea at a high level, but exact technical steps need the original source or research paper.",
+        "impact": "The update may help students understand how research moves from problem to idea to real-world impact."
+      },
+      "timeline": [
+        {
+          "year": "earlier",
+          "event": "Scientists worked on the broad problem area."
+        },
+        {
+          "year": "2026",
+          "event": "This news item reported the current update."
+        },
+        {
+          "year": "future",
+          "event": "More testing, peer review, or real-world use may come next."
+        }
+      ],
+      "peopleOrLabs": "not clearly stated in source",
+      "field": "Technology",
+      "impactScore": 55,
+      "visualSymbols": [
+        "⚡",
+        "🤖",
+        "💡",
+        "🌍"
+      ],
+      "factInferenceSpeculation": {
+        "facts": [
+          "Title from source: Reverse engineering ketamine's effects may lead to new antidepressants",
+          "Source label: MedicalXpress"
+        ],
+        "inferences": [
+          "Likely field: Technology",
+          "The problem and impact are summarized from the title and summary."
+        ],
+        "speculation": [
+          "Future uses need verification from the original research or official source."
+        ]
+      },
+      "oneLineForStudent": "✨ Reverse engineering ketamine's effects may lead to new antidepressants is a news example of how science turns a problem into a possible solution.",
+      "teacherDemoSpeech": "This module takes a live news card, separates facts from guesses, and turns it into a simple student-friendly explanation."
+    },
+    "savedAt": "2026-05-02T07:20:43.802Z"
+  },
+  "0c7021a4958d42c20645d8e4a735df7eec47af6a81f4799643f413eb2709a57a": {
+    "providerUsed": "fallback",
+    "data": {
+      "simpleExplanation": "🧠 Battery-free skin-conformal wearable system can measure electrocardiogram signals means researchers are reporting a new science or innovation update. In simple words: A research team led by Prof. Jerald Yoo from the Department of Electrical and Computer Engineering at Seoul National University (SNU) has developed a skin-conformal wearable health care system, \"SkinECG,\" capable of measuring electrocardiogram (ECG) signals without a battery. By combining energy harvesting with human body–coupled power transfer, the study presents a new solution to one of the most critical challenges in wearable devices: power supply.",
+      "storyline": {
+        "problem": "The source points to a scientific or technology problem that researchers are trying to understand or improve.",
+        "oldLimit": "The earlier limitation is not fully clear from the news card, so SciLoop marks it as not clearly stated in source.",
+        "breakthrough": "The reported breakthrough is the main discovery or improvement described in the title and summary.",
+        "howItWorks": "SciLoop can explain the idea at a high level, but exact technical steps need the original source or research paper.",
+        "impact": "The update may help students understand how research moves from problem to idea to real-world impact."
+      },
+      "timeline": [
+        {
+          "year": "earlier",
+          "event": "Scientists worked on the broad problem area."
+        },
+        {
+          "year": "2026",
+          "event": "This news item reported the current update."
+        },
+        {
+          "year": "future",
+          "event": "More testing, peer review, or real-world use may come next."
+        }
+      ],
+      "peopleOrLabs": "not clearly stated in source",
+      "field": "Technology",
+      "impactScore": 55,
+      "visualSymbols": [
+        "⚡",
+        "🤖",
+        "💡",
+        "🌍"
+      ],
+      "factInferenceSpeculation": {
+        "facts": [
+          "Title from source: Battery-free skin-conformal wearable system can measure electrocardiogram signals",
+          "Source label: MedicalXpress"
+        ],
+        "inferences": [
+          "Likely field: Technology",
+          "The problem and impact are summarized from the title and summary."
+        ],
+        "speculation": [
+          "Future uses need verification from the original research or official source."
+        ]
+      },
+      "oneLineForStudent": "✨ Battery-free skin-conformal wearable system can measure electrocardiogram signals is a news example of how science turns a problem into a possible solution.",
+      "teacherDemoSpeech": "This module takes a live news card, separates facts from guesses, and turns it into a simple student-friendly explanation."
+    },
+    "savedAt": "2026-05-02T07:20:47.012Z"
+  },
+  "eb3cff9c8ee8e5c549544ecc06b3b52950648dc8929a83dd938f91a7bee708af": {
+    "providerUsed": "fallback",
+    "data": {
+      "simpleExplanation": "🧠 Widespread genetic exchange in disease-causing parasites revealed means researchers are reporting a new science or innovation update. In simple words: Mississippi State University biologist Matthew W. Brown is part of an international research team whose latest findings, published this spring in the Proceedings of the National Academy of Sciences, are reshaping scientific understanding of how parasitic organisms evolve and ultimately spread disease.",
+      "storyline": {
+        "problem": "The source points to a scientific or technology problem that researchers are trying to understand or improve.",
+        "oldLimit": "The earlier limitation is not fully clear from the news card, so SciLoop marks it as not clearly stated in source.",
+        "breakthrough": "The reported breakthrough is the main discovery or improvement described in the title and summary.",
+        "howItWorks": "SciLoop can explain the idea at a high level, but exact technical steps need the original source or research paper.",
+        "impact": "The update may help students understand how research moves from problem to idea to real-world impact."
+      },
+      "timeline": [
+        {
+          "year": "earlier",
+          "event": "Scientists worked on the broad problem area."
+        },
+        {
+          "year": "2026",
+          "event": "This news item reported the current update."
+        },
+        {
+          "year": "future",
+          "event": "More testing, peer review, or real-world use may come next."
+        }
+      ],
+      "peopleOrLabs": "not clearly stated in source",
+      "field": "Biology / Medicine",
+      "impactScore": 55,
+      "visualSymbols": [
+        "🧬",
+        "🔬",
+        "🩺",
+        "🌍"
+      ],
+      "factInferenceSpeculation": {
+        "facts": [
+          "Title from source: Widespread genetic exchange in disease-causing parasites revealed",
+          "Source label: Phys.org"
+        ],
+        "inferences": [
+          "Likely field: Biology / Medicine",
+          "The problem and impact are summarized from the title and summary."
+        ],
+        "speculation": [
+          "Future uses need verification from the original research or official source."
+        ]
+      },
+      "oneLineForStudent": "✨ Widespread genetic exchange in disease-causing parasites revealed is a news example of how science turns a problem into a possible solution.",
+      "teacherDemoSpeech": "This module takes a live news card, separates facts from guesses, and turns it into a simple student-friendly explanation."
+    },
+    "savedAt": "2026-05-02T07:22:29.148Z"
+  }
+}
