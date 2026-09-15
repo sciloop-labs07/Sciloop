@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:research-pipeline": "node --experimental-strip-types --experimental-loader ./scripts/test-loader.mjs scripts/test-research-pipeline.ts"
   },
   "keywords": [],
   "author": "",
