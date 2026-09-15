@@ -13,6 +13,7 @@
     { pattern: /thermodynamic|heat|temperature|energy transfer/i, label: 'Thermodynamics', caption: 'Energy spreads from a concentrated state toward balance.', stages: ['Hot region', 'Energy transfer', 'Equilibrium'], colors: ['#ffad7a', '#ffd166', '#9ff0d0'] },
     { pattern: /material|battery|semiconductor|superconductor|crystal|ion movement/i, label: 'Materials physics', caption: 'Structure guides charge, motion, and useful behavior.', stages: ['Material structure', 'Charge / motion', 'Useful behavior'], colors: ['#9fdcff', '#d6b3ff', '#ffd166'] },
     { pattern: /chemistry|chemical|reaction|molecule|covalent/i, label: 'Chemistry mechanism', caption: 'Atoms rearrange, bonds change, and a new material appears.', stages: ['Reactants', 'Bond change', 'New material'], colors: ['#ffd166', '#ff9fba', '#9ff0d0'] },
+    { pattern: /artificial intelligence|machine learning/i, label: 'AI systems', caption: 'Input data moves through a model to produce an output.', stages: ['Input data', 'Model', 'Output'], colors: ['#9fdcff', '#d6b3ff', '#9ff0d0'] },
     { pattern: /algorithm|computation|software|code|computer science/i, label: 'Computer science', caption: 'A rule transforms information into a useful result.', stages: ['Input data', 'Algorithm', 'Result'], colors: ['#9fdcff', '#d6b3ff', '#9ff0d0'] },
     { pattern: /equation|derivative|theorem|mathematics|mathematical/i, label: 'Mathematics mechanism', caption: 'A relationship turns structure into a prediction.', stages: ['Structure', 'Relationship', 'Prediction'], colors: ['#d6b3ff', '#9fdcff', '#ffd166'] },
     { pattern: /physics|magnetic|electric|photon|electron|particle|plasma|wave/i, label: 'Physics mechanism', caption: 'A measurable interaction turns an input into a new state.', stages: ['Input / field', 'Interaction', 'Measured outcome'], colors: ['#9fdcff', '#d6b3ff', '#9ff0d0'] }
@@ -31,16 +32,16 @@
     const recipe = recipeFor(card);
     const section = document.createElement('section');
     section.className = 'sciloop-mechanism-block';
-    section.setAttribute('aria-label', `${recipe.label} mechanism`);
+    section.setAttribute('aria-label', `${recipe.label} topic preview`);
 
     const head = document.createElement('div');
     head.className = 'mechanism-head';
     const kicker = document.createElement('span');
     kicker.className = 'mechanism-kicker';
-    kicker.textContent = 'Mechanism in view';
+    kicker.textContent = 'Subject mechanism preview';
     const status = document.createElement('span');
     status.className = 'mechanism-status';
-    status.textContent = 'Preview';
+    status.textContent = 'Template';
     head.append(kicker, status);
 
     const graphic = document.createElement('div');
@@ -105,7 +106,7 @@
     run.addEventListener('click', () => {
       section.classList.toggle('is-active');
       const active = section.classList.contains('is-active');
-      status.textContent = active ? 'Live preview' : 'Preview';
+      status.textContent = active ? 'Animated template' : 'Template';
       run.setAttribute('aria-pressed', String(active));
     });
     section.append(head, graphic, footer, run);

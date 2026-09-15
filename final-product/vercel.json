@@ -4,6 +4,8 @@
   "routes": [
     { "src": "/news-mechanism-blocks.css", "dest": "/news-mechanism-blocks.css" },
     { "src": "/news-mechanism-blocks.js", "dest": "/news-mechanism-blocks.js" },
+    { "src": "/live-innovations-layout.css", "dest": "/live-innovations-layout.css" },
+    { "src": "/live-innovations-layout.js", "dest": "/live-innovations-layout.js" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
