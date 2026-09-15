@@ -2,6 +2,8 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "routes": [
+    { "src": "/news-mechanism-blocks.css", "dest": "/news-mechanism-blocks.css" },
+    { "src": "/news-mechanism-blocks.js", "dest": "/news-mechanism-blocks.js" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }

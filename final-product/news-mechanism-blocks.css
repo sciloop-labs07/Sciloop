@@ -1,0 +1,93 @@
+/* Live Innovations: inline scientific mechanisms from the newer SciLoop HTML. */
+#newsPortal #feed .universal-news-visual-btn,
+#newsPortal #feed .physics-news-visual-btn,
+#newsPortal #feed .bio-news-visual-btn {
+  display: none !important;
+}
+
+#newsPortal #feed .sciloop-mechanism-block {
+  position: relative;
+  margin: 0 0 18px;
+  padding: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(122, 198, 255, .25);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(13, 31, 51, .92), rgba(8, 17, 31, .86));
+  color: #eaf7ff;
+  contain: layout paint;
+}
+
+#newsPortal #feed .mechanism-head,
+#newsPortal #feed .mechanism-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+#newsPortal #feed .mechanism-kicker {
+  color: #9fdcff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+#newsPortal #feed .mechanism-status {
+  color: #b9c9d8;
+  font-size: 11px;
+}
+
+#newsPortal #feed .mechanism-preview-graphic svg {
+  display: block;
+  width: 100%;
+  height: 116px;
+}
+
+#newsPortal #feed .mechanism-flow {
+  stroke-dasharray: 7 9;
+}
+
+#newsPortal #feed .sciloop-mechanism-block.is-active .mechanism-flow {
+  animation: sciloopMechanismFlow 2.8s linear infinite;
+}
+
+#newsPortal #feed .mechanism-caption {
+  margin: 0;
+  color: #d8e7f2;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+#newsPortal #feed .mechanism-run {
+  margin-top: 11px;
+  padding: 8px 12px;
+  border: 1px solid rgba(159, 220, 255, .4);
+  border-radius: 10px;
+  background: rgba(29, 73, 101, .6);
+  color: #eaf7ff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#newsPortal #feed .mechanism-run:hover,
+#newsPortal #feed .mechanism-run:focus-visible {
+  background: rgba(45, 110, 143, .75);
+  outline: 2px solid #9fdcff;
+  outline-offset: 2px;
+}
+
+@keyframes sciloopMechanismFlow {
+  to { stroke-dashoffset: -32; }
+}
+
+@media (max-width: 600px) {
+  #newsPortal #feed .sciloop-mechanism-block { padding: 11px; }
+  #newsPortal #feed .mechanism-footer { align-items: flex-start; }
+  #newsPortal #feed .mechanism-preview-graphic svg { height: 105px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #newsPortal #feed .mechanism-flow { animation: none !important; }
+}
