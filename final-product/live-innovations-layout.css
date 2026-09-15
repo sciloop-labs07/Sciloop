@@ -1,4 +1,15 @@
 /* Content-first Live Innovations layout. Existing tools and story actions remain in the DOM. */
+body:has(#newsPortal.active) header { padding: 8px 12px !important; margin-bottom: 0 !important; }
+body:has(#newsPortal.active) header h1 { font-size: 28px !important; line-height: 1.1 !important; margin: 0 !important; }
+body:has(#newsPortal.active) header p { display: none !important; }
+body:has(#newsPortal.active) .portal-tabs {
+  display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important;
+  gap: 6px !important; padding: 5px !important; scrollbar-width: thin;
+}
+body:has(#newsPortal.active) .portal-tabs .portal-btn:not([hidden]) {
+  flex: 0 0 auto !important; width: auto !important; min-width: 0 !important;
+  padding: 7px 10px !important; white-space: nowrap !important;
+}
 #newsPortal .layout { display: block; width: 100%; max-width: none; gap: 0; }
 #newsPortal .main { min-width: 0; width: 100%; }
 body > .sciloop-subject-drawer {
@@ -85,17 +96,7 @@ body > .sciloop-subject-drawer .sciloop-subject-close:focus-visible,
 #newsPortal.subjects-open .sciloop-subject-edge { display: none; }
 @media (max-width: 900px) { #newsPortal #feed.container { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
 @media (max-width: 560px) {
-  body:has(#newsPortal.active) header { padding: 8px !important; margin-bottom: 0 !important; }
-  body:has(#newsPortal.active) header h1 { font-size: 24px !important; margin: 0 !important; }
-  body:has(#newsPortal.active) header p { display: none !important; }
-  body:has(#newsPortal.active) .portal-tabs {
-    display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important;
-    gap: 6px !important; padding: 5px !important; scrollbar-width: thin;
-  }
-  body:has(#newsPortal.active) .portal-tabs .portal-btn:not([hidden]) {
-    flex: 0 0 auto !important; width: auto !important; min-width: 0 !important;
-    padding: 7px 10px !important; white-space: nowrap !important;
-  }
+  body:has(#newsPortal.active) header h1 { font-size: 24px !important; }
   #newsPortal #feed.container { grid-template-columns: minmax(0, 1fr) !important; }
   #newsPortal .sciloop-feed-controls { display: grid; grid-template-columns: 1fr auto; padding: 8px; gap: 6px; }
   #newsPortal .sciloop-feed-controls > button:first-child { grid-column: 1; grid-row: 1; }
