@@ -1,0 +1,38 @@
+{
+  "name": "sciloop-agi-os",
+  "version": "0.1.0",
+  "description": "Evidence-to-decision workflow connecting SciLoop with AGI OS.",
+  "source": {
+    "system": "SciLoop",
+    "stages": ["discover", "understand", "explore", "ask_better"]
+  },
+  "destination": {
+    "system": "AGI OS",
+    "stages": ["predict", "simulate", "observe", "adapt", "compress", "transfer", "remember"]
+  },
+  "human_gates": ["approve_decision_question", "approve_external_action", "approve_publish"],
+  "steps": [
+    {"id": "discover", "type": "sciloop.signal", "next": "understand"},
+    {"id": "understand", "type": "sciloop.evidence_brief", "next": "explore"},
+    {"id": "explore", "type": "sciloop.causal_model", "next": "ask_better"},
+    {"id": "ask_better", "type": "sciloop.decision_question", "gate": "approve_decision_question", "next": "predict"},
+    {"id": "predict", "type": "agi_os.prediction", "next": "simulate"},
+    {"id": "simulate", "type": "agi_os.bounded_test", "next": "observe"},
+    {"id": "observe", "type": "agi_os.observation", "next": "adapt"},
+    {"id": "adapt", "type": "agi_os.feedback", "on_error": "predict", "on_success": "compress"},
+    {"id": "compress", "type": "agi_os.rule_and_explanation", "next": "transfer"},
+    {"id": "transfer", "type": "agi_os.transfer_challenge", "next": "remember"},
+    {"id": "remember", "type": "agi_os.persist", "targets": ["workspace", "knowledge_graph", "roadmap", "frontier"]}
+  ],
+  "payload_schema": {
+    "signal": "object",
+    "evidence": "array",
+    "causalModel": "object",
+    "decisionQuestion": "string",
+    "prediction": "object",
+    "test": "object",
+    "observation": "object",
+    "adaptation": "object",
+    "transfer": "object"
+  }
+}
