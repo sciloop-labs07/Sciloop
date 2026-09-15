@@ -16,4 +16,14 @@ export type {
   PhysicsUncertainty,
   PhysicsVisualRecipe,
 } from "./types";
+export {
+  createInitialInductionState,
+  resetInductionSimulation,
+  setInductionInput,
+  stepInductionSimulation,
+  type CurrentDirection,
+  type InductionSimulationInput,
+  type InductionSimulationState,
+  type MagnetDirection,
+} from "./simulations/induction-simulation";
 

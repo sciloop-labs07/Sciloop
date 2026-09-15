@@ -17,7 +17,8 @@
     "typecheck": "tsc --noEmit",
     "test": "npm run validate:physics",
     "validate:physics": "tsx scripts/validate-physics-visual-language.ts",
-    "test:browser": "npm run build && echo Browser smoke tests are run with the repository browser verifier against the production server."
+    "test:browser": "npm run build && echo Browser smoke tests are run with the repository browser verifier against the production server.",
+    "test:induction": "node --experimental-strip-types --experimental-specifier-resolution=node scripts/test-induction.ts"
   },
   "keywords": [],
   "author": "",
