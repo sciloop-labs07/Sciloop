@@ -63,7 +63,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <div className="relative min-h-screen">
           <SiteBackground />
           <SiteHeader />
-          <main className="relative z-10 pt-10">{children}</main>
+          <main className="relative z-10 pb-20 pt-10 md:pb-0 lg:pl-20">{children}</main>
           <SiteFooter />
         </div>
       </body>
